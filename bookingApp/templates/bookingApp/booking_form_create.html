@@ -1,0 +1,11 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}{{ booking_form.name|default:"Create Booking Form" }}{% endblock %}
+{% block content %}
+<h1>{{ booking_form.name|default:"Create Booking Form" }}</h1>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary" type="submit">Save</button>
+  <a href="{% url 'owner_dashboard' business.id %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

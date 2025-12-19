@@ -1,0 +1,79 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}My Bookings | BookingApp{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h1 class="fw-bold text-dark">My Bookings</h1>
+        <p class="text-secondary">Manage your upcoming and past appointments.</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a href="{% url 'home' %}" class="btn btn-primary rounded-pill px-4">
+            Book New Appointment
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for appointment in appointments %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm hover-shadow transition-all" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center border-end d-none d-md-block">
+                            <div class="text-primary fw-bold small text-uppercase">{{ appointment.appointment_date|date:"M" }}</div>
+                            <div class="display-6 fw-bold text-dark">{{ appointment.appointment_date|date:"d" }}</div>
+                            <div class="text-muted small">{{ appointment.appointment_date|date:"Y" }}</div>
+                        </div>
+
+                        <div class="col-md-7 ps-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 me-2">
+                                    {{ appointment.booking_form.business.name }}
+                                </span>
+                                <span class="badge rounded-pill badge-status-{{ appointment.status }}">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            </div>
+                            <h4 class="fw-bold mb-1">{{ appointment.service.name }}</h4>
+                            <div class="d-flex flex-wrap gap-3 text-secondary small">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    {{ appointment.appointment_start_time }} ({{ appointment.length_minutes }} min)
+                                </span>
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    Staff: {{ appointment.staff.name|default:"Any Available" }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-primary btn-sm rounded-pill">Manage Booking</a>
+                                <a href="{% url 'business_detail' appointment.booking_form.business.id %}" class="btn btn-outline-secondary btn-sm rounded-pill">View Business</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="p-5 bg-white rounded-4 shadow-sm">
+                <h4 class="text-secondary">No appointments found</h4>
+                <a href="{% url 'home' %}" class="btn btn-primary px-4 rounded-pill">Browse Businesses</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+    .hover-shadow:hover { transform: scale(1.01); box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.08)!important; }
+    .transition-all { transition: all 0.2s ease-in-out; }
+    .badge-status-pending { background-color: #fef3c7; color: #92400e; }
+    .badge-status-confirmed { background-color: #d1fae5; color: #065f46; }
+    .badge-status-cancelled { background-color: #fee2e2; color: #991b1b; }
+    .badge-status-completed { background-color: #e0f2fe; color: #075985; }
+</style>
+{% endblock %}

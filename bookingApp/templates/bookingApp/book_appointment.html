@@ -1,0 +1,143 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}Book | {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <div class="stepper mb-5 px-5">
+                <div class="progress" style="height: 4px; background-color: #e2e8f0;">
+                    <div id="progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 33%;"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-n3">
+                    <div class="step-dot active"></div>
+                    <div class="step-dot" id="dot-2"></div>
+                    <div class="step-dot" id="dot-3"></div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg" style="border-radius: 24px; background: #ffffff;">
+                <div class="row g-0">
+                    <div class="col-md-4 p-5 text-white" style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); border-top-left-radius: 24px; border-bottom-left-radius: 24px;">
+                        <h6 class="text-uppercase small fw-bold opacity-75 mb-3">Booking At</h6>
+                        <h2 class="fw-bold mb-4">{{ business.name }}</h2>
+                        
+                        <div class="mt-auto pt-5">
+                            <div class="bg-white bg-opacity-10 p-3 rounded-4 mb-3">
+                                <small class="d-block text-white-50">Duration Rule</small>
+                                <span class="small">Service times are fixed by the business for quality assurance.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 p-4 p-lg-5">
+                        <form method="post" novalidate id="booking-flow-form">
+                            {% csrf_token %}
+
+                            <div class="step-content" id="step-1">
+                                <h3 class="fw-bold text-dark mb-4">Select Service</h3>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-secondary small">What are you booking?</label>
+                                    {{ form.service }}
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-secondary small">Preferred Staff (Optional)</label>
+                                    {{ form.staff }}
+                                </div>
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-primary px-5 rounded-pill btn-lg next-step">Next &rarr;</button>
+                                </div>
+                            </div>
+
+                            <div class="step-content d-none" id="step-2">
+                                <h3 class="fw-bold text-dark mb-4">Pick a Time</h3>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary small">Date</label>
+                                        {{ form.appointment_date }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-secondary small">Start Time</label>
+                                        {{ form.appointment_start_time }}
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-link text-decoration-none text-muted prev-step">Go Back</button>
+                                    <button type="button" class="btn btn-primary px-5 rounded-pill btn-lg next-step">Continue</button>
+                                </div>
+                            </div>
+
+                            <div class="step-content d-none" id="step-3">
+                                <h3 class="fw-bold text-dark mb-4">Almost Done</h3>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-secondary small">Notes for the business</label>
+                                    {{ form.notes }}
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-link text-decoration-none text-muted prev-step">Go Back</button>
+                                    <button type="submit" class="btn btn-success px-5 rounded-pill btn-lg shadow">Confirm Booking</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: #f0f9ff; }
+    .btn-primary { background-color: #2563eb; border-color: #2563eb; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    
+    .step-dot { 
+        width: 12px; height: 12px; background-color: #e2e8f0; 
+        border-radius: 50%; border: 2px solid #fff; z-index: 5;
+    }
+    .step-dot.active { background-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2); }
+
+    .form-control, .form-select {
+        border: 1px solid #e2e8f0;
+        padding: 14px;
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.05);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentStep = 1;
+    const formSteps = document.querySelectorAll('.step-content');
+    const progressBar = document.getElementById('progress-bar');
+    
+    function updateUI() {
+        formSteps.forEach((step, i) => {
+            step.classList.toggle('d-none', i !== (currentStep - 1));
+        });
+        
+        // Update dots and progress bar
+        progressBar.style.width = (currentStep === 1) ? '33%' : (currentStep === 2) ? '66%' : '100%';
+        document.getElementById('dot-2').classList.toggle('active', currentStep >= 2);
+        document.getElementById('dot-3').classList.toggle('active', currentStep >= 3);
+    }
+
+    document.querySelectorAll('.next-step').forEach(btn => {
+        btn.addEventListener('click', () => { currentStep++; updateUI(); });
+    });
+
+    document.querySelectorAll('.prev-step').forEach(btn => {
+        btn.addEventListener('click', () => { currentStep--; updateUI(); });
+    });
+
+    // Min date protection
+    const dateInput = document.querySelector('input[type="date"]');
+    if (dateInput) dateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
+});
+</script>
+{% endblock %}

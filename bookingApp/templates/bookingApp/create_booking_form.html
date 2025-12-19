@@ -1,0 +1,10 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}Create Booking Form{% endblock %}
+{% block content %}
+<h2>Create Booking Form for {{ business.name }}</h2>
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Create Booking Form</button>
+</form>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}{{ business.name }} | BookingApp{% endblock %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-lg-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Businesses</a></li>
+                <li class="breadcrumb-item active">{{ business.name }}</li>
+            </ol>
+        </nav>
+        <h1 class="display-4 fw-bold text-dark">{{ business.name }}</h1>
+        <div class="d-flex align-items-center mb-3">
+            <span class="badge bg-primary px-3 py-2 rounded-pill me-2">Verified Business</span>
+            <span class="text-muted"><i class="bi bi-geo-alt"></i> Official Booking Partner</span>
+        </div>
+        <p class="lead text-secondary">
+            {% if business.description %}
+                {{ business.description }}
+            {% else %}
+                Welcome to {{ business.name }}. We are committed to providing top-tier professional services tailored to your needs.
+            {% endif %}
+        </p>
+    </div>
+    
+    {% if user == business.owner %}
+    <div class="col-lg-4">
+        <div class="card border-0 bg-primary bg-opacity-10 rounded-4 p-3 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#2563eb" class="bi bi-megaphone-fill me-2" viewBox="0 0 16 16">
+                        <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0v-11zm-1 .724c-2.067.95-4.539 1.486-7 1.486-.5 0-1 .036-1.5.107V12.08c.5.071 1 .107 1.5.107 2.461 0 4.933.536 7 1.486V3.224z"/>
+                    </svg>
+                    <h6 class="fw-bold text-primary mb-0">Owner Tools</h6>
+                </div>
+                <p class="small text-dark mb-3">Use this link on your website or social media to get bookings:</p>
+                <div class="input-group input-group-sm mb-2">
+                    <input type="text" class="form-control border-primary text-muted bg-white" id="bookingLink" value="{{ request.build_absolute_uri }}" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copyLink()">Copy</button>
+                </div>
+                <div id="copyFeedback" class="text-success small fw-bold" style="display: none;">Link copied!</div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-lg-4 text-center d-none d-lg-block">
+        <div class="p-5 bg-light rounded-circle d-inline-block border shadow-sm">
+             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<hr class="my-5 opacity-25">
+
+<div class="row g-5">
+    <div class="col-md-7">
+        <h3 class="fw-bold mb-4">Our Services</h3>
+        <div class="row g-3">
+            {% for service in business.services.all %}
+            <div class="col-12">
+                <div class="d-flex p-3 border rounded-3 bg-white hover-shadow-sm transition-all">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1 fw-bold">{{ service.name }}</h6>
+                        <p class="small text-muted mb-0">{{ service.description|truncatechars:80 }}</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-primary">${{ service.price }}</div>
+                        <div class="small text-secondary">{{ service.default_length_minutes }} min</div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted fst-italic">Please check our booking forms for specific pricing.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card border-0 shadow-lg sticky-top" style="top: 100px; border-radius: 20px;">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3">Book an Appointment</h4>
+                <p class="text-muted small mb-4">Select a booking portal below to see available time slots.</p>
+                
+                {% if booking_forms %}
+                    <div class="d-grid gap-3">
+                        {% for form in booking_forms %}
+                            <a href="{% url 'book_appointment' form.id %}" class="btn btn-outline-primary btn-lg py-3 text-start position-relative overflow-hidden shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold">{{ form.name }}</div>
+                                        <div class="small opacity-75 fw-normal" style="font-size: 0.75rem;">View Availability</div>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning rounded-3 mb-0">
+                        Online booking is currently unavailable for this business.
+                    </div>
+                {% endif %}
+                
+                <div class="mt-4 text-center">
+                    <p class="text-muted extra-small">Secure booking powered by BookingApp</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyLink() {
+        var copyText = document.getElementById("bookingLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        
+        var feedback = document.getElementById("copyFeedback");
+        feedback.style.display = "block";
+        setTimeout(function() {
+            feedback.style.display = "none";
+        }, 2000);
+    }
+</script>
+
+<style>
+    .transition-all { transition: all 0.2s ease-in-out; }
+    .hover-shadow-sm:hover {
+        background-color: #f8faff !important;
+        border-color: #2563eb !important;
+        transform: translateX(5px);
+    }
+    .extra-small { font-size: 0.7rem; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; }
+</style>
+{% endblock %}

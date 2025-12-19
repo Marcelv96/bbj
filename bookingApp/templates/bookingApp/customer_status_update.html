@@ -1,0 +1,50 @@
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+    
+    <div style="padding: 20px; text-align: center; {% if status == 'confirmed' %}background-color: #22c55e;{% else %}background-color: #ef4444;{% endif %}">
+        <h2 style="color: white; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+            Appointment {{ status|title }}
+        </h2>
+    </div>
+
+    <div style="padding: 30px; background-color: #ffffff;">
+        <p style="font-size: 16px; color: #475569;">Hi <strong>{{ appointment.customer.username }}</strong>,</p>
+        
+        {% if status == 'confirmed' %}
+            <p style="font-size: 16px; color: #475569;">Great news! Your booking at <strong>{{ business.name }}</strong> has been approved. See the details below.</p>
+        {% else %}
+            <p style="font-size: 16px; color: #475569;">We're sorry, but your booking request at <strong>{{ business.name }}</strong> was not accepted for the requested time.</p>
+        {% endif %}
+
+        <div style="background-color: #f8fafc; border-radius: 8px; padding: 20px; margin: 25px 0; border-left: 4px solid #cbd5e1;">
+            <p style="margin: 5px 0; color: #1e293b;"><strong>Service:</strong> {{ appointment.service.name }}</p>
+            <p style="margin: 5px 0; color: #1e293b;"><strong>Staff:</strong> {{ appointment.staff.name|default:"Any Available" }}</p>
+            <p style="margin: 5px 0; color: #1e293b;"><strong>Date:</strong> {{ appointment.appointment_date|date:"l, F j, Y" }}</p>
+            <p style="margin: 5px 0; color: #1e293b;"><strong>Time:</strong> {{ appointment.appointment_start_time|time:"H:i" }}</p>
+        </div>
+
+        {% if status == 'confirmed' and gcal_link %}
+        <div style="text-align: center; margin: 25px 0; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+            <p style="margin-top: 0; margin-bottom: 15px; font-weight: bold; color: #1e293b; font-size: 14px;">Add to your calendar to get a reminder:</p>
+            <a href="{{ gcal_link }}" target="_blank"
+               style="display: inline-flex; align-items: center; padding: 12px 20px; background-color: #ffffff; color: #3c4043; text-decoration: none; border: 1px solid #dadce0; border-radius: 6px; font-weight: 500; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+               <img src="https://www.gstatic.com/calendar/images/dynamiclogo_2020q4/calendar_31_2x.png" width="20" height="20" style="margin-right: 12px; vertical-align: middle;" alt="GCal Icon">
+               Save to Google Calendar
+            </a>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ site_url }}{% url 'business_detail' business.id %}" 
+               style="display: inline-block; padding: 14px 30px; background-color: #2563eb; color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px;">
+               Book Another Appointment
+            </a>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 15px;">You can view all your bookings by logging into your account.</p>
+        </div>
+    </div>
+
+    <div style="background-color: #f1f5f9; padding: 15px; text-align: center;">
+        <p style="font-size: 11px; color: #94a3b8; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+            Sent by {{ business.name }} via BookingApp
+        </p>
+    </div>
+</div>
