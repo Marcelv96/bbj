@@ -1,11 +1,125 @@
 {% extends 'bookingApp/base.html' %}
-{% block title %}Register Business{% endblock %}
+{% block title %}Register Business | YourSaaS{% endblock %}
+
 {% block content %}
-<h1>Register Your Business</h1>
-<form method="post" novalidate>
+<div class="container-fluid px-4 px-md-5 py-5" style="max-width: 1400px;">
+
+  <div class="mb-5">
+    <h1 class="fw-bold tracking-tight text-dark display-5">Business Registration</h1>
+    <p class="text-muted fs-5">Set up your workspace and start managing your business.</p>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-4 p-md-5">
+      <form method="post" enctype="multipart/form-data" novalidate>
   {% csrf_token %}
-  {{ form.as_p }}
-  <button class="btn btn-primary" type="submit">Register</button>
+
+  <div class="row g-4">
+    {% for field in form %}
+      <div class="{% if field.name == 'description' or field.name == 'address' %}col-12{% elif 'open' in field.name or 'close' in field.name %}col-md-6 col-lg-3{% else %}col-lg-6{% endif %}">
+
+        <label for="{{ field.id_for_label }}" class="form-label fw-semibold small text-uppercase mb-2 tracking-wider">
+          {{ field.label }}
+        </label>
+
+        {{ field.errors }}
+
+        <div class="input-wrapper">
+          {{ field }}
+        </div>
+
+        {% if field.help_text %}
+          <div class="form-text mt-2 small text-muted">{{ field.help_text|safe }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-5 pt-5 border-top">
+    <button class="btn btn-indigo-main btn-lg w-100 py-3 fw-bold rounded-3 shadow-indigo" type="submit">
+      Create Business Workspace
+    </button>
+  </div>
 </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  body {
+    background-color: #f9fafb; /* Neutral-50 */
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+
+  .tracking-tight { letter-spacing: -0.03em; }
+  .tracking-wider { letter-spacing: 0.05em; color: #4b5563; }
+
+  /* Indigo #6366f1 Implementation */
+  :root {
+    --indigo-primary: #6366f1;
+    --indigo-hover: #4f46e5;
+    --indigo-soft: rgba(99, 102, 241, 0.1);
+  }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb !important;
+  }
+
+  /* Wide Input Styling */
+  input, select, textarea {
+    display: block;
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+    font-size: 1rem;
+    color: #111827;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 10px !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--indigo-primary);
+    box-shadow: 0 0 0 4px var(--indigo-soft);
+    background-color: #fff;
+  }
+
+  /* Indigo Primary Button */
+  .btn-indigo-main {
+    background-color: var(--indigo-primary);
+    color: white;
+    border: none;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+  }
+
+  .btn-indigo-main:hover {
+    background-color: var(--indigo-hover);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+  }
+
+  .shadow-indigo {
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1), 0 2px 4px -1px rgba(99, 102, 241, 0.06);
+  }
+
+  .text-indigo-link {
+    color: var(--indigo-primary);
+  }
+
+  /* Django Error Overrides */
+  .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px 0;
+    color: #ef4444;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+</style>
 {% endblock %}
-    

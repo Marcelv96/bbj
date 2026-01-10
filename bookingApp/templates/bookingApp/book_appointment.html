@@ -1,143 +1,428 @@
-{% extends 'bookingApp/base.html' %}
-{% block title %}Book | {{ business.name }}{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment | {{ business.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-{% block content %}
-<div class="container py-5 mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            
-            <div class="stepper mb-5 px-5">
-                <div class="progress" style="height: 4px; background-color: #e2e8f0;">
-                    <div id="progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 33%;"></div>
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Manrope', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'slide-up': 'slideUp 0.4s ease-out forwards',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { color: #1c1917; }
+        
+        /* Step Logic */
+        .step-panel { display: none; }
+        .step-panel.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e7e5e4; border-radius: 20px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #d6d3d1; }
+
+        /* Time Pill Styling */
+        .time-pill { 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: 1px solid transparent; 
+        }
+        .time-pill:hover { 
+            background-color: #e7e5e4; 
+            transform: translateY(-1px);
+        }
+        .time-pill.selected { 
+            background-color: #1c1917; 
+            color: #ffffff; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: scale(1);
+        }
+
+        /* Form Inputs */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.2s;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
+        /* Loading Spinner */
+        .spinner { display: none; }
+        .loading .spinner { display: inline-block; }
+        .loading .btn-text { display: none; }
+
+        /* Glass Backdrop for Mobile */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex items-center justify-center py-8 px-4 sm:px-6 bg-[#FDFCF8] overflow-x-hidden">
+
+    <div class="fixed inset-0 w-full h-full pointer-events-none -z-10">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-32 left-20 w-96 h-96 bg-stone-200 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000"></div>
+        <div class="absolute inset-0 opacity-[0.4]" style="background-image: radial-gradient(#d6d3d1 1px, transparent 1px); background-size: 32px 32px;"></div>
+    </div>
+    <div class="w-full max-w-lg glass-panel rounded-[2rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col relative border border-white/50 ring-1 ring-stone-900/5">
+        
+        <div class="px-8 pt-10 pb-6 z-10">
+            <div class="flex justify-between items-start mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-stone-900">{{ business.name }}</h1>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
+                        <p class="text-stone-400 text-xs font-medium uppercase tracking-wider">Book Appointment</p>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-between mt-n3">
-                    <div class="step-dot active"></div>
-                    <div class="step-dot" id="dot-2"></div>
-                    <div class="step-dot" id="dot-3"></div>
+                <div class="flex items-center gap-1">
+                    <div id="dot-1" class="w-2 h-2 rounded-full bg-stone-900 transition-all duration-300"></div>
+                    <div id="dot-2" class="w-2 h-2 rounded-full bg-stone-200 transition-all duration-300"></div>
+                    <div id="dot-3" class="w-2 h-2 rounded-full bg-stone-200 transition-all duration-300"></div>
                 </div>
             </div>
+            
+            <div class="h-[2px] w-full bg-stone-100 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-stone-900 transition-all duration-700 ease-out w-1/3"></div>
+            </div>
+        </div>
 
-            <div class="card border-0 shadow-lg" style="border-radius: 24px; background: #ffffff;">
-                <div class="row g-0">
-                    <div class="col-md-4 p-5 text-white" style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); border-top-left-radius: 24px; border-bottom-left-radius: 24px;">
-                        <h6 class="text-uppercase small fw-bold opacity-75 mb-3">Booking At</h6>
-                        <h2 class="fw-bold mb-4">{{ business.name }}</h2>
+        <form method="POST" id="main-booking-form" action="." class="flex-1 flex flex-col">
+            {% csrf_token %}
+            <input type="hidden" name="appointment_start_time" id="hidden-time">
+
+            <div class="px-8 py-2 flex-1 relative min-h-[300px]">
+                
+                <div class="step-panel active" id="p1">
+                    <h2 class="text-xl font-semibold text-stone-900 mb-6 animate-slide-up">Select Experience</h2>
+                    <div class="space-y-6 animate-slide-up" style="animation-delay: 0.1s;">
                         
-                        <div class="mt-auto pt-5">
-                            <div class="bg-white bg-opacity-10 p-3 rounded-4 mb-3">
-                                <small class="d-block text-white-50">Duration Rule</small>
-                                <span class="small">Service times are fixed by the business for quality assurance.</span>
+                        <div class="group relative">
+                            <label class="text-[11px] uppercase tracking-widest font-bold text-stone-400 mb-2 block ml-1">Treatment</label>
+                            <div class="relative">
+                                <select name="service" id="svc" class="w-full p-4 bg-stone-50 rounded-xl border border-transparent focus:bg-white focus:border-stone-200 focus:ring-4 focus:ring-stone-100 outline-none transition-all appearance-none cursor-pointer text-stone-800 font-medium" required>
+                                    <option value="" disabled selected>Choose a service...</option>
+                                    {% for s in form.fields.service.queryset %}
+                                    <option value="{{ s.id }}" data-price="{{ s.price }}">
+                                        {{ s.name }} — R{{ s.price|floatformat:0 }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="group relative">
+                            <label class="text-[11px] uppercase tracking-widest font-bold text-stone-400 mb-2 block ml-1">Specialist</label>
+                            <div class="relative">
+                                <select name="staff" id="stf" class="w-full p-4 bg-stone-50 rounded-xl border border-transparent focus:bg-white focus:border-stone-200 focus:ring-4 focus:ring-stone-100 outline-none transition-all appearance-none cursor-pointer text-stone-800 font-medium">
+                                    <option value="">Any Available Specialist</option>
+                                    {% for st in form.fields.staff.queryset %}
+                                    <option value="{{ st.id }}">{{ st.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-md-8 p-4 p-lg-5">
-                        <form method="post" novalidate id="booking-flow-form">
-                            {% csrf_token %}
+                <div class="step-panel" id="p2">
+                    <h2 class="text-xl font-semibold text-stone-900 mb-2 animate-slide-up">Availability</h2>
+                    <p class="text-sm text-stone-500 mb-6 animate-slide-up">Select a date to view open slots.</p>
+                    
+                    <div class="animate-slide-up" style="animation-delay: 0.1s;">
+                        <div class="relative mb-6">
+                            <input type="date" name="appointment_date" id="date-pick" class="w-full p-4 bg-stone-50 rounded-xl border border-transparent focus:bg-white focus:border-stone-200 focus:ring-4 focus:ring-stone-100 outline-none transition-all text-stone-800 font-medium font-sans">
+                        </div>
 
-                            <div class="step-content" id="step-1">
-                                <h3 class="fw-bold text-dark mb-4">Select Service</h3>
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold text-secondary small">What are you booking?</label>
-                                    {{ form.service }}
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold text-secondary small">Preferred Staff (Optional)</label>
-                                    {{ form.staff }}
-                                </div>
-                                <div class="text-end">
-                                    <button type="button" class="btn btn-primary px-5 rounded-pill btn-lg next-step">Next &rarr;</button>
+                        <div class="bg-stone-50 rounded-2xl p-4 border border-stone-100">
+                            <div id="slot-grid" class="grid grid-cols-3 gap-3 max-h-[280px] overflow-y-auto custom-scroll pr-1">
+                                <div class="col-span-3 flex flex-col items-center justify-center py-12 text-stone-400">
+                                    <i class="far fa-calendar text-2xl mb-2 opacity-50"></i>
+                                    <p class="text-sm">Select a date above</p>
                                 </div>
                             </div>
-
-                            <div class="step-content d-none" id="step-2">
-                                <h3 class="fw-bold text-dark mb-4">Pick a Time</h3>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold text-secondary small">Date</label>
-                                        {{ form.appointment_date }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold text-secondary small">Start Time</label>
-                                        {{ form.appointment_start_time }}
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <button type="button" class="btn btn-link text-decoration-none text-muted prev-step">Go Back</button>
-                                    <button type="button" class="btn btn-primary px-5 rounded-pill btn-lg next-step">Continue</button>
-                                </div>
-                            </div>
-
-                            <div class="step-content d-none" id="step-3">
-                                <h3 class="fw-bold text-dark mb-4">Almost Done</h3>
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold text-secondary small">Notes for the business</label>
-                                    {{ form.notes }}
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <button type="button" class="btn btn-link text-decoration-none text-muted prev-step">Go Back</button>
-                                    <button type="submit" class="btn btn-success px-5 rounded-pill btn-lg shadow">Confirm Booking</button>
-                                </div>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
+
+                <div class="step-panel" id="p3">
+                    <h2 class="text-xl font-semibold text-stone-900 mb-6 animate-slide-up">Your Details</h2>
+                    
+                    <div class="space-y-4 mb-8 animate-slide-up" style="animation-delay: 0.1s;">
+                        <input type="text" name="guest_name" placeholder="Full Name" class="w-full p-4 bg-stone-50 rounded-xl border border-transparent focus:bg-white focus:border-stone-200 focus:ring-4 focus:ring-stone-100 outline-none transition-all placeholder:text-stone-400" required>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="email" id="client-email" name="guest_email" placeholder="Email Address" class="w-full p-4 bg-stone-50 rounded-xl border border-transparent focus:bg-white focus:border-stone-200 focus:ring-4 focus:ring-stone-100 outline-none transition-all placeholder:text-stone-400" required>
+                            <input type="tel" name="guest_phone" placeholder="Mobile Number" class="w-full p-4 bg-stone-50 rounded-xl border border-transparent focus:bg-white focus:border-stone-200 focus:ring-4 focus:ring-stone-100 outline-none transition-all placeholder:text-stone-400" required>
+                        </div>
+                    </div>
+
+                    <div id="deposit-summary-box" class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm relative overflow-hidden animate-slide-up" style="animation-delay: 0.2s;">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-stone-900"></div>
+                        
+                        <div class="flex justify-between items-center mb-4 pb-4 border-b border-dashed border-stone-200">
+                            <div>
+                                <span class="text-[10px] text-stone-400 uppercase tracking-widest block mb-1">Service</span>
+                                <span class="text-sm font-bold text-stone-800 leading-tight block max-w-[200px]" id="summary-service-name">---</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] text-stone-400 uppercase tracking-widest block mb-1">Total</span>
+                                <span class="text-lg font-bold text-stone-900" id="summary-total">R0</span>
+                            </div>
+                        </div>
+                        
+                        <div id="deposit-calculation-row" class="flex justify-between items-center bg-stone-50 -mx-6 -mb-6 p-6 mt-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-stone-600">
+                                    <i class="fas fa-lock text-xs"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-sm font-bold text-stone-900">Deposit Due</span>
+                                    <span class="text-[10px] text-stone-500 uppercase tracking-tight" id="deposit-meta-text">Secure slot</span>
+                                </div>
+                            </div>
+                            <span class="text-2xl font-bold text-stone-900" id="summary-deposit">R0</span>
+                        </div>
+                    </div>
+
+                    {% if business.deposit_policy %}
+                    <div class="mt-6 flex gap-3 text-stone-500 px-2 animate-slide-up" style="animation-delay: 0.3s;">
+                        <i class="fas fa-info-circle mt-0.5 text-xs"></i>
+                        <p class="text-[11px] leading-relaxed">
+                            <span class="font-bold text-stone-700">Policy:</span> {{ business.deposit_policy }} 
+                            (Cancellation: {{ business.reschedule_window_hours }}h notice).
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-        </div>
+
+            <div class="p-8 border-t border-stone-50 flex gap-4 mt-4 bg-white/50 backdrop-blur-sm">
+                <button type="button" id="backBtn" class="hidden w-16 h-14 rounded-xl border border-stone-200 text-stone-400 hover:text-stone-900 hover:border-stone-900 transition-all flex items-center justify-center bg-white">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                
+                <button type="button" id="nextBtn" class="flex-1 bg-stone-900 text-white h-14 rounded-xl font-bold tracking-tight hover:bg-black hover:shadow-lg hover:shadow-stone-200 transition-all flex items-center justify-center gap-2 group">
+                    <span>Continue</span>
+                    <i class="fas fa-arrow-right text-sm transition-transform group-hover:translate-x-1"></i>
+                </button>
+                
+                <button type="submit" id="subBtn" class="hidden flex-1 bg-stone-900 text-white h-14 rounded-xl font-bold tracking-tight hover:bg-black hover:shadow-lg hover:shadow-stone-200 transition-all">
+                    <span class="btn-text">Complete Booking</span>
+                    <span class="spinner"><i class="fas fa-circle-notch fa-spin"></i> Processing</span>
+                </button>
+            </div>
+        </form>
     </div>
-</div>
-
-<style>
-    body { background-color: #f0f9ff; }
-    .btn-primary { background-color: #2563eb; border-color: #2563eb; }
-    .btn-primary:hover { background-color: #1d4ed8; }
-    
-    .step-dot { 
-        width: 12px; height: 12px; background-color: #e2e8f0; 
-        border-radius: 50%; border: 2px solid #fff; z-index: 5;
-    }
-    .step-dot.active { background-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2); }
-
-    .form-control, .form-select {
-        border: 1px solid #e2e8f0;
-        padding: 14px;
-        border-radius: 12px;
-        transition: all 0.2s;
-    }
-    .form-control:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.05);
-    }
-</style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let currentStep = 1;
-    const formSteps = document.querySelectorAll('.step-content');
-    const progressBar = document.getElementById('progress-bar');
+    let step = 1;
+    const next = document.getElementById('nextBtn');
+    const back = document.getElementById('backBtn');
+    const sub = document.getElementById('subBtn');
+    const bar = document.getElementById('progress-bar');
     
-    function updateUI() {
-        formSteps.forEach((step, i) => {
-            step.classList.toggle('d-none', i !== (currentStep - 1));
-        });
+    // Config
+    const depositType = "{{ business.deposit_type }}"; 
+    const depositFixedAmount = parseFloat("{{ business.deposit_amount|default:0 }}");
+    const depositPercentValue = parseFloat("{{ business.deposit_percentage|default:0 }}");
+    const hasPayfastCreds = "{{ business.payfast_merchant_id }}" !== "None" && "{{ business.payfast_merchant_id }}" !== "";
+
+    // Elements
+    const svcSelect = document.getElementById('svc');
+    const stfSelect = document.getElementById('stf');
+    const dateIn = document.getElementById('date-pick');
+    const grid = document.getElementById('slot-grid');
+
+    function update() {
+        document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(`p${step}`).classList.add('active');
+
+        back.classList.toggle('hidden', step === 1);
+        next.classList.toggle('hidden', step === 3);
+        sub.classList.toggle('hidden', step !== 3);
+
+        // Update Progress Bar
+        bar.style.width = `${(step / 3) * 100}%`;
         
-        // Update dots and progress bar
-        progressBar.style.width = (currentStep === 1) ? '33%' : (currentStep === 2) ? '66%' : '100%';
-        document.getElementById('dot-2').classList.toggle('active', currentStep >= 2);
-        document.getElementById('dot-3').classList.toggle('active', currentStep >= 3);
+        // Update Dots
+        document.getElementById('dot-1').className = `w-2 h-2 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-stone-900' : 'bg-stone-200'}`;
+        document.getElementById('dot-2').className = `w-2 h-2 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-stone-900' : 'bg-stone-200'}`;
+        document.getElementById('dot-3').className = `w-2 h-2 rounded-full transition-all duration-300 ${step >= 3 ? 'bg-stone-900' : 'bg-stone-200'}`;
+
+        if(step === 3) calculateDynamicSummary();
     }
 
-    document.querySelectorAll('.next-step').forEach(btn => {
-        btn.addEventListener('click', () => { currentStep++; updateUI(); });
+    function calculateDynamicSummary() {
+        const totalEl = document.getElementById('summary-total');
+        const depositEl = document.getElementById('summary-deposit');
+        const depositRow = document.getElementById('deposit-calculation-row');
+        const serviceNameEl = document.getElementById('summary-service-name');
+        const subBtn = document.getElementById('subBtn');
+        const depositMeta = document.getElementById('deposit-meta-text');
+
+        if (svcSelect.selectedIndex > 0) {
+            const selectedOption = svcSelect.options[svcSelect.selectedIndex];
+            const price = parseFloat(selectedOption.getAttribute('data-price') || 0);
+            const serviceName = selectedOption.text.split(' — ')[0]; // Adjusted split based on template
+
+            serviceNameEl.innerText = serviceName;
+            totalEl.innerText = `R${price.toFixed(0)}`;
+
+            let calcDeposit = 0;
+
+            if (hasPayfastCreds) {
+                if (depositType === 'percentage') {
+                    calcDeposit = (depositPercentValue / 100) * price;
+                    depositMeta.innerText = `${depositPercentValue}% Deposit`;
+                } else {
+                    calcDeposit = depositFixedAmount;
+                    depositMeta.innerText = `Booking Fee`;
+                }
+            }
+
+            if (calcDeposit > 0) {
+                depositRow.classList.remove('hidden');
+                depositRow.classList.add('flex');
+                depositEl.innerText = `R${calcDeposit.toFixed(0)}`;
+                subBtn.querySelector('.btn-text').innerText = `Pay R${calcDeposit.toFixed(0)} & Book`;
+            } else {
+                depositRow.classList.add('hidden');
+                depositRow.classList.remove('flex');
+                subBtn.querySelector('.btn-text').innerText = "Confirm Appointment";
+            }
+        }
+    }
+
+    // Dynamic Staff Filtering
+    svcSelect.addEventListener('change', async () => {
+        const s = svcSelect.value;
+        if(!s) return;
+        stfSelect.innerHTML = '<option value="">Checking availability...</option>';
+        try {
+            const response = await fetch(`{% url 'get_staff_for_service' %}?service_id=${s}`);
+            const data = await response.json();
+            stfSelect.innerHTML = '<option value="">Any Available Specialist</option>';
+            data.staff_list.forEach(staff => {
+                const opt = document.createElement('option');
+                opt.value = staff.id;
+                opt.textContent = staff.name;
+                stfSelect.appendChild(opt);
+            });
+            getSlots();
+        } catch(e) { console.error("Staff filter error", e); }
     });
 
-    document.querySelectorAll('.prev-step').forEach(btn => {
-        btn.addEventListener('click', () => { currentStep--; updateUI(); });
+    next.addEventListener('click', () => {
+        if(step === 1 && !svcSelect.value) {
+            svcSelect.focus();
+            return; 
+        }
+        if(step === 2 && !document.getElementById('hidden-time').value) {
+            alert("Please select a time slot.");
+            return;
+        }
+        step++; update();
     });
 
-    // Min date protection
-    const dateInput = document.querySelector('input[type="date"]');
-    if (dateInput) dateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
-});
+    back.addEventListener('click', () => { step--; update(); });
+    
+    // Set min date to today
+    dateIn.min = new Date().toISOString().split("T")[0];
+
+    async function getSlots() {
+        const s = svcSelect.value;
+        const d = dateIn.value;
+        const st = stfSelect.value;
+        
+        if(!s || !d) return;
+        
+        grid.innerHTML = '<div class="col-span-3 text-center py-8"><i class="fas fa-circle-notch fa-spin text-stone-300 text-xl"></i></div>';
+        
+        try {
+            const response = await fetch(`/ajax/available-slots/?business_id={{ business.id }}&service_id=${s}&date=${d}&staff_id=${st}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const data = await response.json();
+            grid.innerHTML = '';
+            
+            if(data.slots.length > 0) {
+                data.slots.forEach(slot => {
+                    const b = document.createElement('div');
+                    b.className = 'time-pill py-3 px-2 rounded-lg text-center text-xs font-bold cursor-pointer bg-white border border-stone-100 text-stone-600 shadow-sm';
+                    b.innerText = slot.label;
+                    b.onclick = () => {
+                        document.querySelectorAll('.time-pill').forEach(x => x.classList.remove('selected'));
+                        b.classList.add('selected');
+                        document.getElementById('hidden-time').value = slot.value;
+                    };
+                    grid.appendChild(b);
+                });
+            } else {
+                grid.innerHTML = '<div class="col-span-3 text-center py-6 bg-stone-50 rounded-lg"><p class="text-stone-400 font-medium text-xs uppercase tracking-wide">No slots available</p></div>';
+            }
+        } catch(e) { grid.innerHTML = '<p class="text-center text-red-400 text-xs">Error loading slots</p>'; }
+    }
+
+    dateIn.addEventListener('change', getSlots);
+    stfSelect.addEventListener('change', getSlots);
+
+    document.getElementById('main-booking-form').onsubmit = function() {
+        sub.classList.add('loading');
+        sub.disabled = true;
+        sub.classList.add('opacity-75', 'cursor-not-allowed');
+    };
 </script>
-{% endblock %}
+</body>
+</html>

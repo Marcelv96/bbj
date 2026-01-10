@@ -1,0 +1,9 @@
+{
+  "name": "Booking App",
+  "short_name": "Booking",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#317EFB",
+  "gcm_sender_id": "482941778795"
+}

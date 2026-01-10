@@ -1,138 +1,845 @@
-{% extends 'bookingApp/base.html' %}
-{% block title %}{{ business.name }} | BookingApp{% endblock %}
+{% load custom_filters %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>{{ business.name }} | Premium Online Booking</title>
 
-{% block content %}
-<div class="row mb-5">
-    <div class="col-lg-8">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Businesses</a></li>
-                <li class="breadcrumb-item active">{{ business.name }}</li>
-            </ol>
-        </nav>
-        <h1 class="display-4 fw-bold text-dark">{{ business.name }}</h1>
-        <div class="d-flex align-items-center mb-3">
-            <span class="badge bg-primary px-3 py-2 rounded-pill me-2">Verified Business</span>
-            <span class="text-muted"><i class="bi bi-geo-alt"></i> Official Booking Partner</span>
-        </div>
-        <p class="lead text-secondary">
-            {% if business.description %}
-                {{ business.description }}
-            {% else %}
-                Welcome to {{ business.name }}. We are committed to providing top-tier professional services tailored to your needs.
-            {% endif %}
-        </p>
-    </div>
-    
-    {% if user == business.owner %}
-    <div class="col-lg-4">
-        <div class="card border-0 bg-primary bg-opacity-10 rounded-4 p-3 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#2563eb" class="bi bi-megaphone-fill me-2" viewBox="0 0 16 16">
-                        <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0v-11zm-1 .724c-2.067.95-4.539 1.486-7 1.486-.5 0-1 .036-1.5.107V12.08c.5.071 1 .107 1.5.107 2.461 0 4.933.536 7 1.486V3.224z"/>
-                    </svg>
-                    <h6 class="fw-bold text-primary mb-0">Owner Tools</h6>
-                </div>
-                <p class="small text-dark mb-3">Use this link on your website or social media to get bookings:</p>
-                <div class="input-group input-group-sm mb-2">
-                    <input type="text" class="form-control border-primary text-muted bg-white" id="bookingLink" value="{{ request.build_absolute_uri }}" readonly>
-                    <button class="btn btn-primary" type="button" onclick="copyLink()">Copy</button>
-                </div>
-                <div id="copyFeedback" class="text-success small fw-bold" style="display: none;">Link copied!</div>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="col-lg-4 text-center d-none d-lg-block">
-        <div class="p-5 bg-light rounded-circle d-inline-block border shadow-sm">
-             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </div>
-    </div>
-    {% endif %}
-</div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<hr class="my-5 opacity-25">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
-<div class="row g-5">
-    <div class="col-md-7">
-        <h3 class="fw-bold mb-4">Our Services</h3>
-        <div class="row g-3">
-            {% for service in business.services.all %}
-            <div class="col-12">
-                <div class="d-flex p-3 border rounded-3 bg-white hover-shadow-sm transition-all">
-                    <div class="flex-grow-1">
-                        <h6 class="mb-1 fw-bold">{{ service.name }}</h6>
-                        <p class="small text-muted mb-0">{{ service.description|truncatechars:80 }}</p>
-                    </div>
-                    <div class="text-end">
-                        <div class="fw-bold text-primary">${{ service.price }}</div>
-                        <div class="small text-secondary">{{ service.default_length_minutes }} min</div>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <p class="text-muted fst-italic">Please check our booking forms for specific pricing.</p>
-            {% endfor %}
-        </div>
-    </div>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        body: ['"Inter"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#6366f1',   /* Indigo 500 */
+                            dark: '#0f172a',      /* Slate 900 */
+                            surface: '#f8fafc',   /* Slate 50 */
+                            border: '#e2e8f0',    /* Slate 200 */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-    <div class="col-md-5">
-        <div class="card border-0 shadow-lg sticky-top" style="top: 100px; border-radius: 20px;">
-            <div class="card-body p-4">
-                <h4 class="fw-bold mb-3">Book an Appointment</h4>
-                <p class="text-muted small mb-4">Select a booking portal below to see available time slots.</p>
-                
-                {% if booking_forms %}
-                    <div class="d-grid gap-3">
-                        {% for form in booking_forms %}
-                            <a href="{% url 'book_appointment' form.id %}" class="btn btn-outline-primary btn-lg py-3 text-start position-relative overflow-hidden shadow-sm">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="fw-bold">{{ form.name }}</div>
-                                        <div class="small opacity-75 fw-normal" style="font-size: 0.75rem;">View Availability</div>
-                                    </div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                </div>
+    <style>
+        /* --- CORE AESTHETICS --- */
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+
+        /* Glass Panels */
+        .glass-panel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            border-radius: 1rem; /* Rounded-xl */
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: #6366f1; /* Brand Primary */
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Typography */
+        .h-display { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; letter-spacing: -0.025em; }
+        .mini-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Hero Overlay */
+        .hero-overlay {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.6) 60%, #0f172a 100%);
+        }
+
+        /* Nav Link */
+        .nav-link { position: relative; color: #64748b; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.2s; }
+        .nav-link.active { color: #6366f1; }
+        .nav-link.active::after {
+            content: ''; position: absolute; bottom: -24px; left: 0; width: 100%; height: 3px;
+            background: #6366f1; border-top-left-radius: 4px; border-top-right-radius: 4px;
+        }
+
+        /* Modal Styles */
+        .modal-viewport { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+        .step-wrapper { display: flex; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 300%; height: 100%; }
+        .step-panel { width: 33.333%; padding: 2rem; flex-shrink: 0; height: min-content; }
+
+        /* Slot Buttons */
+        .slot-btn {
+            border: 1px solid #e2e8f0; color: #475569; transition: all 0.2s;
+            border-radius: 0.5rem; font-weight: 700; font-size: 0.8rem;
+        }
+        .slot-btn:hover { border-color: #6366f1; color: #6366f1; background: #f5f3ff; }
+        .slot-btn.selected {
+            background-color: #6366f1 !important; color: white !important; border-color: #6366f1 !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Inputs */
+        .input-modern {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            color: #0f172a; font-weight: 600; outline: none; transition: all 0.2s;
+        }
+        .input-modern:focus { border-color: #6366f1; background: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+
+        /* Animations */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-enter { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
+</head>
+<body>
+
+    <header class="relative w-full h-[400px] md:h-[400px] bg-slate-900 overflow-hidden group">
+        {% if business.cover_image %}
+            <img src="{{ business.cover_image.url }}" alt="{{ business.name }}" class="w-full h-full object-cover opacity-90 scale-105 group-hover:scale-100 transition-transform duration-[2s]">
+        {% else %}
+            <div class="w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900 via-slate-900 to-black"></div>
+        {% endif %}
+
+        <div class="absolute inset-0 hero-overlay"></div>
+
+        <nav class="absolute top-0 left-0 w-full z-50 p-6">
+            <div class="max-w-[1400px] mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    {% if request.user.staff_profile %}
+                        {% if is_admin_staff or is_owner %}
+                            <a href="{% if is_owner %}{% url 'owner_dashboard' user_business_id %}{% else %}{% url 'staff_dashboard' %}{% endif %}"
+                               class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider hover:bg-white hover:text-indigo-600 transition-all">
+                                <i class="fa-solid fa-gauge-high mr-2"></i> Dashboard
                             </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <a href="/" class="h-10 w-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white hover:bg-white hover:text-indigo-600 transition-all shadow-lg">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </a>
+            </div>
+        </nav>
+
+        <div class="absolute bottom-0 left-0 w-full p-6 md:p-12 pb-16 z-10">
+            <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div class="animate-enter max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/20 border border-indigo-400/30 backdrop-blur-sm mb-6">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-indigo-100">Verified Business</span>
+                    </div>
+
+                    <h1 class="text-5xl md:text-7xl h-display text-white mb-6 leading-[0.9]">
+                        {{ business.name }}
+                    </h1>
+
+                    <div class="flex flex-wrap items-center gap-6 text-slate-300 font-medium text-sm">
+                        <div class="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5">
+                            <i class="fa-solid fa-location-dot text-indigo-400"></i>
+                            <span>{{ business.address }}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-star text-amber-400"></i>
+                            <span class="font-bold text-white">{{ average_rating|default:"5.0" }}</span>
+                            <span class="text-slate-500">Rating</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-start md:items-end gap-4 animate-enter" style="animation-delay: 0.1s">
+                    <div class="flex items-center gap-3">
+                        <button onclick="copyPageUrl(this)" class="group flex items-center gap-2 bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-xl text-white transition-all">
+                            <i class="fa-solid fa-link text-xs group-hover:text-indigo-400 transition-colors"></i>
+                            <span class="text-[10px] font-bold uppercase tracking-wider btn-text">Share</span>
+                        </button>
+
+                        {% if business.instagram_url or business.facebook_url or business.twitter_url %}
+                            <div class="h-8 w-[1px] bg-white/20 mx-1"></div>
+                            {% if business.instagram_url %}
+                            <a href="{{ business.instagram_url }}" target="_blank" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-gradient-to-tr hover:from-purple-500 hover:to-orange-500 transition-all"><i class="fa-brands fa-instagram"></i></a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <button onclick="openBookingModal(1)" class="bg-brand-primary hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-widest shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all flex items-center gap-3">
+                        <span>Book Appointment</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200">
+        <div class="max-w-[1400px] mx-auto px-6">
+            <div class="flex gap-8 h-16 overflow-x-auto hide-scrollbar items-center">
+                <a href="#services" class="nav-link">Services</a>
+                {% if business.description %}<a href="#about" class="nav-link">About</a>{% endif %}
+                <a href="#reviews" class="nav-link">Reviews</a>
+                <a href="#location" class="nav-link">Location</a>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-[1400px] mx-auto px-4 md:px-6 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+            <div class="lg:col-span-8 space-y-16">
+
+                <section id="services" class="scroll-mt-32">
+                    <div class="glass-panel p-6 md:p-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
+                            <div>
+                                <div class="mini-label mb-2">Live Schedule</div>
+                                <h2 class="text-2xl h-display text-slate-900">Check Availability</h2>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto bg-slate-50 p-1.5 rounded-2xl border border-slate-200">
+                                <input type="date" id="availabilityDate"
+                                       class="bg-white border-0 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:ring-0 shadow-sm w-full md:w-auto"
+                                       value="{% now 'Y-m-d' %}" min="{% now 'Y-m-d' %}">
+
+                                <select id="availabilityStaff" class="bg-white border-0 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:ring-0 shadow-sm w-full md:w-auto">
+                                    <option value="">All Staff</option>
+                                    {% for staff in staff_members %}
+                                    <option value="{{ staff.id }}">{{ staff.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="slotsContainer" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                            <div class="col-span-full py-12 flex flex-col items-center justify-center text-slate-400">
+                                <i class="fa-solid fa-circle-notch fa-spin text-2xl text-indigo-500 mb-3"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider">Scanning Schedule...</span>
+                            </div>
+                        </div>
+
+                        <div id="noSlotsMessage" class="hidden py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">No availability found for this date</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="scroll-mt-32">
+                    <div class="flex justify-between items-end mb-8">
+                        <div>
+                            <div class="mini-label mb-2">Menu</div>
+                            <h2 class="text-3xl h-display text-slate-900">Services</h2>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="scrollServices(-1)" class="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </button>
+                            <button onclick="scrollServices(1)" class="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="services-carousel" class="flex overflow-x-auto gap-5 pb-10 -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar snap-x snap-mandatory">
+                        {% for s in services %}
+                        <div onclick="openBookingModal(1, '{{ s.id }}')"
+                             class="flex-none w-[85vw] md:w-[350px] snap-center glass-panel p-6 cursor-pointer group flex flex-col h-full relative overflow-hidden">
+
+                            <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                            <div class="flex justify-between items-start mb-4 pl-2">
+                                <h3 class="font-bold text-lg text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight w-2/3">{{ s.name }}</h3>
+                                <div class="text-lg h-display text-slate-900">R{{ s.price|floatformat:0 }}</div>
+                            </div>
+
+                            <p class="text-slate-500 text-sm mb-8 leading-relaxed line-clamp-2 pl-2 flex-grow">
+                                {{ s.description|default:"Professional service tailored to your needs." }}
+                            </p>
+
+                            <div class="mt-auto flex items-center justify-between pt-4 border-t border-slate-50 pl-2">
+                                <div class="mini-label text-slate-400">
+                                    <i class="fa-regular fa-clock text-indigo-500 mr-1.5"></i> {{ s.default_length_minutes }} min
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all transform group-hover:rotate-45">
+                                    <i class="fa-solid fa-arrow-up text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
                         {% endfor %}
                     </div>
-                {% else %}
-                    <div class="alert alert-warning rounded-3 mb-0">
-                        Online booking is currently unavailable for this business.
+                </section>
+
+                {% if business.description %}
+                <section id="about" class="scroll-mt-32">
+                    <div class="bg-slate-900 rounded-2xl p-8 md:p-12 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-600 rounded-full blur-[100px] opacity-20 translate-x-1/2 -translate-y-1/2"></div>
+
+                        <div class="relative z-10">
+                            <div class="mini-label text-indigo-300 mb-3">Our Story</div>
+                            <h2 class="text-3xl h-display text-white mb-6">About Us</h2>
+                            <div class="prose prose-invert prose-lg text-slate-400 leading-relaxed max-w-none font-medium">
+                                {{ business.description|linebreaks }}
+                            </div>
+                        </div>
                     </div>
+                </section>
                 {% endif %}
-                
-                <div class="mt-4 text-center">
-                    <p class="text-muted extra-small">Secure booking powered by BookingApp</p>
+
+                <section id="reviews" class="scroll-mt-32">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <div class="mini-label mb-2">Feedback</div>
+                            <h2 class="text-3xl h-display text-slate-900">Reviews</h2>
+                        </div>
+                        <div class="text-right hidden md:block">
+                            <div class="text-3xl font-black text-slate-900">{{ average_rating|default:"5.0" }}</div>
+                            <div class="text-xs font-bold text-amber-400 uppercase tracking-widest">Average Rating</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-8 mb-10 bg-slate-50/50">
+                        <h4 class="font-bold text-slate-900 mb-6">Write a Review</h4>
+                        <form method="POST" action="{% url 'leave_review' business.id %}" class="space-y-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="rating" id="form-rating" value="5">
+
+                            <div class="flex gap-2 mb-4">
+                                {% for i in "12345" %}
+                                <button type="button" class="star-input text-2xl text-slate-300 hover:text-amber-400 active transition-colors" data-val="{{ i }}">
+                                    <i class="fa-solid fa-star"></i>
+                                </button>
+                                {% endfor %}
+                            </div>
+
+                            <div class="relative">
+                                <textarea name="comment" rows="3" required placeholder="How was your experience?"
+                                          class="input-modern w-full p-4 resize-none"></textarea>
+                            </div>
+
+                            <button type="submit" class="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-indigo-600 transition-colors">
+                                Post Review
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-4">
+                        {% for r in reviews %}
+                        <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm hover:border-indigo-100 transition-colors">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-sm">
+                                        {% if r.user.username %}{{ r.user.username|first|upper }}{% else %}{{ r.guest_name|first|upper }}{% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-slate-900 text-sm">
+                                            {% if r.user.username %}{{ r.user.username }}{% else %}{{ r.guest_name }}{% endif %}
+                                        </div>
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase">{{ r.created_at|date:"M d, Y" }}</div>
+                                    </div>
+                                </div>
+                                <div class="flex text-amber-400 text-xs gap-0.5">
+                                    {% for i in r.rating|range %}<i class="fa-solid fa-star"></i>{% endfor %}
+                                </div>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed">"{{ r.comment }}"</p>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
+                            <p class="mini-label text-slate-400">No reviews yet</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+
+            <aside class="lg:col-span-4">
+                <div class="sticky top-24 space-y-6">
+
+                    <div id="location" class="glass-panel overflow-hidden">
+                        <div class="h-56 bg-slate-200 relative">
+                            <iframe width="100%" height="100%" frameborder="0" style="border:0"
+                                src="https://maps.google.com/maps?q={{ business.address|urlencode }}&output=embed"
+                                allowfullscreen class="grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+                            </iframe>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-map-pin text-indigo-500"></i> Location
+                            </h3>
+                            <p class="text-sm text-slate-500 mb-6 font-medium leading-relaxed">{{ business.address }}</p>
+
+                            <div class="space-y-3 mb-6">
+                                {% if business.contact_number %}
+                                <a href="tel:{{ business.contact_number }}" class="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-indigo-50 group transition-colors">
+                                    <span class="text-xs font-bold text-slate-600">Phone</span>
+                                    <span class="text-xs font-bold text-slate-900 group-hover:text-indigo-600">{{ business.contact_number }}</span>
+                                </a>
+                                {% endif %}
+                                {% if business.owner.email %}
+                                <a href="mailto:{{ business.owner.email }}" class="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-indigo-50 group transition-colors">
+                                    <span class="text-xs font-bold text-slate-600">Email</span>
+                                    <span class="text-xs font-bold text-slate-900 group-hover:text-indigo-600 truncate max-w-[150px]">{{ business.owner.email }}</span>
+                                </a>
+                                {% endif %}
+                            </div>
+
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ business.address|urlencode }}" target="_blank"
+                               class="block w-full py-3 text-center bg-slate-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-indigo-600 transition-colors shadow-lg">
+                                Get Directions
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6">
+                        <h3 class="font-bold text-slate-900 mb-6 flex items-center gap-2">
+                            <i class="fa-regular fa-clock text-indigo-500"></i> Operating Hours
+                        </h3>
+                        <div class="space-y-3">
+                            {% for day, times in operating_hours.items %}
+                            <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-50 last:border-0 last:pb-0">
+                                <span class="font-bold text-slate-400 uppercase tracking-wider w-12">{{ day|slice:":3" }}</span>
+                                {% if times.is_closed %}
+                                    <span class="font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded">Closed</span>
+                                {% else %}
+                                    <span class="font-bold text-slate-700">{{ times.open_time|time:"H:i" }} - {{ times.close_time|time:"H:i" }}</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+        </div>
+    </main>
+
+
+    <div id="booking-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onclick="closeBookingModal()"></div>
+
+        <div class="relative z-10 bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-enter">
+
+            <div class="p-6 border-b border-slate-100 flex-shrink-0 bg-white z-20">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <div class="mini-label text-indigo-600 mb-1" id="step-label">Step 1</div>
+                        <h3 class="text-xl h-display text-slate-900">New Reservation</h3>
+                    </div>
+
+                    <div id="summary-header-badge" class="hidden md:block bg-slate-50 border border-slate-100 rounded-lg px-4 py-2">
+                        <div id="summary-text" class="text-xs font-bold text-slate-500 uppercase">Select a service...</div>
+                    </div>
+
+                    <button onclick="closeBookingModal()" class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="flex gap-2 h-1.5">
+                    <div id="pb-1" class="flex-1 rounded-full bg-indigo-600 transition-colors duration-300"></div>
+                    <div id="pb-2" class="flex-1 rounded-full bg-slate-100 transition-colors duration-300"></div>
+                    <div id="pb-3" class="flex-1 rounded-full bg-slate-100 transition-colors duration-300"></div>
                 </div>
             </div>
+
+            <form id="bookingForm" method="POST" action="{% url 'book_appointment' business.id %}" class="flex flex-col flex-1 overflow-hidden relative bg-slate-50/50">
+                {% csrf_token %}
+                <input type="hidden" name="appointment_start_time" id="final-time-input">
+
+                <div class="modal-viewport">
+                    <div id="step-wrapper" class="step-wrapper">
+
+                        <div class="step-panel">
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
+                                <label class="mini-label block mb-3">Select Treatment</label>
+                                <div class="relative">
+                                    <select name="service" id="svc-select" required class="input-modern w-full h-12 px-4 appearance-none cursor-pointer">
+                                        <option value="" disabled selected>Choose from menu...</option>
+                                        {% for s in services %}
+                                        <option value="{{ s.id }}">R{{ s.price|floatformat:0 }} — {{ s.name }} ({{ s.default_length_minutes }}m)</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <label class="mini-label block mb-3">Preferred Professional</label>
+                                <div class="relative">
+                                    <select name="staff" id="staff-select" class="input-modern w-full h-12 px-4 appearance-none cursor-pointer" onchange="fetchSlots()">
+                                        <option value="">Any Available Specialist</option>
+                                        {% for st in staff_members %}
+                                        <option value="{{ st.id }}">{{ st.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-panel">
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
+                                <label class="mini-label block mb-3">Select Date</label>
+                                <input type="date" name="appointment_date" id="date-input"
+                                       class="input-modern w-full h-12 px-4" onchange="fetchSlots()">
+                            </div>
+
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex-1 min-h-[200px]">
+                                <label class="mini-label block mb-3">Available Slots</label>
+                                <div id="slots-container" class="grid grid-cols-3 gap-3">
+                                    <div class="col-span-3 text-center py-12 text-slate-400 text-xs font-bold uppercase">
+                                        Select a date above to view times
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-panel">
+                            {% if business.deposit_required %}
+                            <div class="bg-indigo-50/50 border border-indigo-100 p-5 rounded-xl mb-6">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-shield-halved text-indigo-600"></i>
+                                    <h4 class="text-xs font-black uppercase tracking-widest text-indigo-900">Deposit Required</h4>
+                                </div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-sm font-medium text-indigo-700">Due Now:</span>
+                                    <span class="text-xl font-black text-indigo-600">R{{ business.deposit_amount|floatformat:2 }}</span>
+                                </div>
+                                <p class="text-[10px] text-indigo-500 leading-relaxed opacity-80">
+                                    Payment secured via PayFast.
+                                </p>
+                            </div>
+                            {% endif %}
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="mini-label block mb-2">Full Name</label>
+                                    <input type="text" name="guest_name" class="input-modern w-full h-12 px-4"
+                                           value="{{ user.get_full_name }}" required placeholder="e.g. John Doe">
+                                </div>
+                                <div>
+                                    <label class="mini-label block mb-2">Email Address</label>
+                                    <input type="email" name="guest_email" class="input-modern w-full h-12 px-4"
+                                           value="{{ user.email }}" required placeholder="john@example.com">
+                                </div>
+                                <div>
+                                    <label class="mini-label block mb-2">Phone Number</label>
+                                    <input type="tel" name="guest_phone" class="input-modern w-full h-12 px-4"
+                                           value="{{ user.profile.phone_number }}" required placeholder="082 123 4567">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="p-6 border-t border-slate-200 bg-white flex gap-4 z-20">
+                    <button type="button" id="prevBtn" onclick="moveStep(-1)"
+                            class="hidden px-6 py-3 rounded-xl border border-slate-200 text-slate-500 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-colors">
+                        Back
+                    </button>
+                    <button type="button" id="nextBtn" onclick="moveStep(1)"
+                            class="flex-1 bg-slate-900 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:bg-indigo-600 transition-colors">
+                        Continue
+                    </button>
+                    <button type="submit" id="submitBtn"
+                            class="hidden flex-1 bg-brand-primary text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-indigo-500/40 hover:bg-indigo-500 transition-colors">
+                        Confirm Booking
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<script>
-    function copyLink() {
-        var copyText = document.getElementById("bookingLink");
-        copyText.select();
-        copyText.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(copyText.value);
-        
-        var feedback = document.getElementById("copyFeedback");
-        feedback.style.display = "block";
-        setTimeout(function() {
-            feedback.style.display = "none";
-        }, 2000);
-    }
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- AVAILABILITY WIDGET LOGIC ---
+            const dateInput = document.getElementById('availabilityDate');
+            const staffInput = document.getElementById('availabilityStaff');
+            const container = document.getElementById('slotsContainer');
+            const noSlotsMsg = document.getElementById('noSlotsMessage');
+            const businessId = "{{ business.id }}";
 
-<style>
-    .transition-all { transition: all 0.2s ease-in-out; }
-    .hover-shadow-sm:hover {
-        background-color: #f8faff !important;
-        border-color: #2563eb !important;
-        transform: translateX(5px);
-    }
-    .extra-small { font-size: 0.7rem; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; }
-</style>
-{% endblock %}
+            function fetchAvailability() {
+                const date = dateInput.value;
+                const staffId = staffInput.value;
+
+                container.innerHTML = '<div class="col-span-full py-12 flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-indigo-500 mb-3"></i><span class="text-xs font-bold uppercase tracking-wider">Scanning Schedule...</span></div>';
+                noSlotsMsg.classList.add('hidden');
+
+                fetch(`/business/${businessId}/api/availability/?date=${date}&staff_id=${staffId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        container.innerHTML = '';
+                        if (data.slots.length === 0) {
+                            noSlotsMsg.classList.remove('hidden');
+                            return;
+                        }
+                        data.slots.forEach(slot => {
+                            const btn = document.createElement('button');
+                            // Updated aesthetic classes
+                            btn.className = 'py-3 px-2 text-sm font-bold text-indigo-600 bg-white border border-indigo-100 rounded-lg shadow-sm hover:bg-indigo-600 hover:text-white hover:shadow-md transition-all text-center';
+                            btn.textContent = slot;
+                            btn.onclick = function() {
+                                document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
+                            };
+                            container.appendChild(btn);
+                        });
+                    })
+                    .catch(error => {
+                        container.innerHTML = '<div class="col-span-full text-center text-rose-500 text-xs font-bold">Error loading slots.</div>';
+                    });
+            }
+
+            fetchAvailability();
+            dateInput.addEventListener('change', fetchAvailability);
+            staffInput.addEventListener('change', fetchAvailability);
+
+            // --- STAR RATING LOGIC ---
+            const starBtns = document.querySelectorAll('.star-input');
+            const ratingInput = document.getElementById('form-rating');
+            starBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const val = btn.dataset.val;
+                    ratingInput.value = val;
+                    starBtns.forEach(b => {
+                        b.classList.toggle('active', b.dataset.val <= val);
+                        b.classList.toggle('text-amber-400', b.dataset.val <= val);
+                        b.classList.toggle('text-slate-300', b.dataset.val > val);
+                    });
+                });
+            });
+
+            // --- DATE INPUT MIN ---
+            const dtInput = document.getElementById('date-input');
+            if(dtInput) dtInput.min = new Date().toISOString().split("T")[0];
+        });
+
+        // --- SERVICE SCROLL LOGIC ---
+        function scrollServices(direction) {
+            const container = document.getElementById('services-carousel');
+            const scrollAmount = window.innerWidth < 768 ? window.innerWidth * 0.85 : 400;
+            if (container) {
+                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // --- MODAL & WIZARD LOGIC ---
+        let curStep = 1;
+        const totSteps = 3;
+        const wrap = document.getElementById('step-wrapper');
+        const modal = document.getElementById('booking-modal');
+
+        // Filter Staff by Service
+        async function filterStaffByService(serviceId) {
+            const staffSelect = document.getElementById('staff-select');
+            if (!staffSelect || !serviceId) return;
+
+            // Show a loading state in the dropdown
+            const originalFirstOptionText = "Any Available Specialist";
+            staffSelect.options[0].textContent = "Filtering specialists...";
+
+            try {
+                // Use the same URL structure as your other successful calls
+                const response = await fetch(`/ajax/get-staff-for-service/?service_id=${serviceId}`);
+                const data = await response.json();
+
+                // The key from your view is 'staff_list' (based on previous steps)
+                const staffList = data.staff_list || [];
+
+                // Clear all current options
+                staffSelect.innerHTML = '';
+
+                // 1. Re-add the "Any" option
+                const anyOpt = document.createElement('option');
+                anyOpt.value = "";
+                anyOpt.textContent = originalFirstOptionText;
+                staffSelect.appendChild(anyOpt);
+
+                // 2. Add only the qualified staff
+                if (staffList.length > 0) {
+                    staffList.forEach(staff => {
+                        const opt = document.createElement('option');
+                        opt.value = staff.id;
+                        opt.textContent = staff.name;
+                        staffSelect.appendChild(opt);
+                    });
+                }
+
+            } catch (error) {
+                console.error("Staff filter error:", error);
+                staffSelect.options[0].textContent = "Error loading staff";
+            } finally {
+                // Ensure "Any" is selected if nothing else is
+                if (!staffSelect.value) staffSelect.selectedIndex = 0;
+                // If the date is already selected, refresh slots for the new staff list
+                if (document.getElementById('date-input').value) fetchSlots();
+            }
+        }
+
+        // Open Modal
+        function openBookingModal(step = 1, serviceId = null) {
+            if (!modal) return;
+            const serviceSelect = document.getElementById('svc-select');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            if (serviceId && serviceSelect) {
+                serviceSelect.value = serviceId;
+                if (typeof filterStaffByService === "function") filterStaffByService(serviceId);
+            }
+            goToStep(step);
+        }
+
+        // Close Modal
+        function closeBookingModal() {
+            if (!modal) return;
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Event listener for manual service change in modal
+        const svcSelect = document.getElementById('svc-select');
+        if (svcSelect) {
+            svcSelect.addEventListener('change', function() {
+                filterStaffByService(this.value);
+            });
+        }
+
+        // Wizard Navigation
+        function moveStep(d) {
+            const n = curStep + d;
+            if (n >= 1 && n <= totSteps) {
+                if(d > 0 && !valStep(curStep)) return;
+                goToStep(n);
+            }
+        }
+
+        function valStep(s) {
+            if(s === 1 && !document.getElementById('svc-select').value) {
+                alert('Please select a service to continue.'); return false;
+            }
+            if(s === 2 && !document.getElementById('final-time-input').value) {
+                alert('Please select a time slot.'); return false;
+            }
+            return true;
+        }
+
+        function goToStep(s) {
+            curStep = s;
+            wrap.style.transform = `translateX(-${(s - 1) * 33.3333}%)`;
+
+            // Labels & Progress
+            const labels = ['Service', 'Date & Time', 'Details'];
+            document.getElementById('step-label').textContent = `Step ${s}: ${labels[s-1]}`;
+
+            for(let i=1; i<=3; i++) {
+                const b = document.getElementById(`pb-${i}`);
+                if (i <= s) {
+                    b.classList.remove('bg-slate-100');
+                    b.classList.add('bg-indigo-600');
+                } else {
+                    b.classList.remove('bg-indigo-600');
+                    b.classList.add('bg-slate-100');
+                }
+            }
+
+            // Buttons visibility
+            document.getElementById('prevBtn').classList.toggle('hidden', s === 1);
+            document.getElementById('nextBtn').classList.toggle('hidden', s === 3);
+            document.getElementById('submitBtn').classList.toggle('hidden', s !== 3);
+
+            if(s === 3) genSumm();
+        }
+
+        function genSumm() {
+            const sel = document.getElementById('svc-select');
+            const name = sel.options[sel.selectedIndex].text;
+            const date = document.getElementById('date-input').value;
+            const time = document.getElementById('final-time-input').value;
+            document.getElementById('summary-text').innerHTML = `
+                <div class="truncate max-w-[150px]">${name}</div>
+                <div class="text-[10px] opacity-70">${date} @ ${time}</div>
+            `;
+        }
+
+        async function fetchSlots() {
+            const d = document.getElementById('date-input').value;
+            const s = document.getElementById('svc-select').value;
+            const st = document.getElementById('staff-select') ? document.getElementById('staff-select').value : '';
+            const container = document.getElementById('slots-container');
+
+            if(!d || !s) return;
+            container.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i></div>';
+
+            try {
+                const res = await fetch(`/ajax/available-slots/?business_id={{ business.id }}&service_id=${s}&date=${d}&staff_id=${st}`);
+                const data = await res.json();
+                container.innerHTML = '';
+
+                if(data.slots && data.slots.length > 0) {
+                    data.slots.forEach(slot => {
+                        const b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'slot-btn py-3';
+                        b.textContent = slot.value;
+                        b.onclick = () => {
+                            document.querySelectorAll('.slot-btn').forEach(x => x.classList.remove('selected'));
+                            b.classList.add('selected');
+                            document.getElementById('final-time-input').value = slot.value;
+                        };
+                        container.appendChild(b);
+                    });
+                } else {
+                    container.innerHTML = '<div class="col-span-3 text-center py-8 text-rose-400 font-bold text-xs uppercase tracking-wider">Fully Booked</div>';
+                }
+            } catch(e) { container.innerHTML = 'Error fetching slots'; }
+        }
+
+        // --- SCROLL SPY ---
+        const nLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+        window.addEventListener('scroll', () => {
+            let curr = "";
+            sections.forEach(s => {
+                if (pageYOffset >= (s.offsetTop - 200)) curr = s.getAttribute('id');
+            });
+            nLinks.forEach(l => {
+                l.classList.remove('active');
+                if (l.getAttribute('href').includes(curr)) l.classList.add('active');
+            });
+        });
+
+        // --- COPY URL ---
+        function copyPageUrl(btn) {
+            const url = window.location.href;
+            const btnText = btn.querySelector('.btn-text');
+            const icon = btn.querySelector('i');
+            navigator.clipboard.writeText(url).then(() => {
+                const originalText = btnText.innerText;
+                btnText.innerText = "COPIED";
+                icon.className = "fa-solid fa-check text-xs text-emerald-400";
+                setTimeout(() => {
+                    btnText.innerText = originalText;
+                    icon.className = "fa-solid fa-link text-xs group-hover:text-indigo-400";
+                }, 2000);
+            }).catch(err => console.error('Failed to copy: ', err));
+        }
+    </script>
+</body>
+</html>

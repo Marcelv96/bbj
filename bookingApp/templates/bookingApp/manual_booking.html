@@ -1,0 +1,273 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}Manual Booking | {{ business.name }}{% endblock %}
+
+{% block content %}
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* ... (Keep your existing CSS styles) ... */
+    :root { --accent: #6366f1; --bg: #fcfcfd; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); padding-bottom: 100px; }
+    .master-wrapper { display: grid; grid-template-columns: 320px 1fr; background: white; width: 100%; max-width: 1100px; margin: 2rem auto; min-height: 650px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); overflow: hidden; }
+    .summary-side { background: #111827; padding: 3rem 2rem; color: white; display: flex; flex-direction: column; }
+    .form-side { padding: 3rem 4rem; position: relative; }
+    @media (max-width: 850px) { .master-wrapper { display: block; margin: 1rem; width: auto; } .summary-side { display: none; } .form-side { padding: 1.5rem; } }
+    .h-title { font-size: 1.8rem; font-weight: 800; color: #111827; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+    .form-group { margin-bottom: 1.25rem; }
+    label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 0.05em; }
+    input, select, textarea { width: 100% !important; padding: 0.8rem 1.25rem !important; background: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 6px !important; font-size: 15px !important; transition: all 0.2s ease; }
+    input:focus, select:focus { background: white !important; border-color: var(--accent) !important; outline: none !important; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important; }
+    .btn-next { background: #0f172a; color: white; width: 100%; padding: 1rem; border-radius: 6px; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 1.5rem; transition: all 0.2s; cursor: pointer; }
+    .btn-next:hover { background: #1e293b; transform: translateY(-1px); }
+    .btn-back { width: 100%; text-align: center; color: #94a3b8; font-size: 13px; font-weight: 600; margin-top: 1.25rem; display: block; cursor: pointer; }
+    .summary-item { margin-bottom: 1.5rem; border-left: 3px solid #374151; padding-left: 1.25rem; transition: all 0.3s ease; }
+    .summary-item.active { border-left-color: var(--accent); }
+    .summary-val { display: block; font-weight: 600; font-size: 15px; color: white; margin-top: 2px; }
+    .summary-key { display: block; font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
+    .error-msg { background: #fef2f2; color: #dc2626; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-weight: 600; font-size: 13px; border: 1px solid #fee2e2; display: none; }
+    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .d-none { display: none; }
+</style>
+
+<div class="master-wrapper">
+    <div class="summary-side">
+        <span class="text-[10px] uppercase tracking-widest text-slate-500 font-black mb-10">Manual Booking Entry</span>
+
+        <div class="summary-item active" id="sum-1">
+            <span class="summary-key">1. Professional & Service</span>
+            <span class="summary-val" id="prev-service">---</span>
+        </div>
+        <div class="summary-item" id="sum-2">
+            <span class="summary-key">2. Time & Date</span>
+            <span class="summary-val" id="prev-date">---</span>
+        </div>
+        <div class="summary-item" id="sum-3">
+            <span class="summary-key">3. Client Identity</span>
+            <span class="summary-val" id="prev-name">---</span>
+        </div>
+    </div>
+
+    <div class="form-side">
+        <div id="error-alert" class="error-msg"></div>
+        <form method="post" id="booking-form" novalidate>
+            {% csrf_token %}
+
+            <div class="step-view fade-in" id="step-1">
+                <span class="text-indigo-600 font-bold text-[10px] uppercase tracking-widest">Step 01</span>
+                <h1 class="h-title">Service Details</h1>
+
+                <div class="form-group">
+                    <label>Assign Staff Member</label>
+                    {{ form.staff }}
+                </div>
+                <div class="form-group">
+                    <label>Service Selection</label>
+                    {{ form.service }}
+                </div>
+                <button type="button" class="btn-next next-trigger">
+                    Check Availability <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <div class="step-view d-none" id="step-2">
+                <span class="text-indigo-600 font-bold text-[10px] uppercase tracking-widest">Step 02</span>
+                <h1 class="h-title">Schedule</h1>
+
+                <div class="form-group">
+                    <label>Appointment Date</label>
+                    {{ form.appointment_date }}
+                </div>
+                <div class="form-group">
+                    <label>Available Slots</label>
+                    <select name="appointment_start_time" id="id_time_slots">
+                        <option value="">Select a date above</option>
+                    </select>
+                </div>
+                <button type="button" class="btn-next next-trigger">
+                    Enter Client Details <i class="fa-solid fa-user text-xs"></i>
+                </button>
+                <span class="btn-back prev-trigger">Back to Service</span>
+            </div>
+
+            <div class="step-view d-none" id="step-3">
+                <span class="text-indigo-600 font-bold text-[10px] uppercase tracking-widest">Step 03</span>
+                <h1 class="h-title">Client Identity</h1>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="guest_name" id="id_name" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address (Optional)</label>
+                    <input type="email" name="guest_email" id="id_email" placeholder="john@example.com">
+                    <p class="text-[10px] text-slate-400 mt-1">Required if you want to send a deposit link via email.</p>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number (Optional)</label>
+                    <input type="text" name="guest_phone" id="id_phone" placeholder="012 345 6789">
+                    <p class="text-[10px] text-slate-400 mt-1">Required if you want to generate a WhatsApp deposit link.</p>
+                </div>
+                <div class="form-group">
+                    <label>Admin Notes</label>
+                    {{ form.notes }}
+                </div>
+
+                <button type="submit" class="btn-next" style="background: var(--accent);">
+                    {% if business.deposit_required %}
+                        Confirm & Generate Payment Link <i class="fa-solid fa-wallet"></i>
+                    {% else %}
+                        Confirm Booking <i class="fa-solid fa-check"></i>
+                    {% endif %}
+                </button>
+                <span class="btn-back prev-trigger">Back to Schedule</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentStep = 1;
+
+    // Selectors
+    const nameIn = document.getElementById('id_name');
+    const emailIn = document.getElementById('id_email');
+    const staffIn = document.querySelector('select[name="staff"]');
+    const serviceIn = document.querySelector('select[name="service"]');
+    const dateIn = document.querySelector('input[name="appointment_date"]');
+    const timeSelect = document.getElementById('id_time_slots');
+    const errorBox = document.getElementById('error-alert');
+
+    function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateView(n) {
+        errorBox.style.display = 'none';
+
+        // Toggle Steps
+        document.querySelectorAll('.step-view').forEach((v, i) => {
+            v.classList.toggle('d-none', i !== (n - 1));
+            if(i === (n-1)) v.classList.add('fade-in');
+        });
+
+        // Toggle Sidebar Summary
+        document.querySelectorAll('.summary-item').forEach((s, i) => {
+            s.classList.toggle('active', i === (n - 1));
+        });
+
+        currentStep = n;
+        updatePreview();
+    }
+
+    function updatePreview() {
+        const staffText = staffIn?.options[staffIn.selectedIndex]?.text || '';
+        const serviceText = serviceIn?.options[serviceIn.selectedIndex]?.text || '';
+        document.getElementById('prev-service').textContent = serviceText ? `${serviceText} (${staffText})` : '---';
+
+        const timeVal = timeSelect?.value || '';
+        document.getElementById('prev-date').textContent = dateIn.value ? `${dateIn.value} ${timeVal}` : '---';
+
+        document.getElementById('prev-name').textContent = nameIn.value || '---';
+    }
+
+    // Navigation Validation Logic
+    document.querySelectorAll('.next-trigger').forEach(btn => {
+        btn.addEventListener('click', () => {
+
+            // Validate Step 1: Service/Staff
+            if (currentStep === 1) {
+                if (!serviceIn.value) return showError("Please select a service");
+                if (!staffIn.value) return showError("Please assign a staff member");
+            }
+
+            // Validate Step 2: Date/Time
+            if (currentStep === 2) {
+                if (!dateIn.value) return showError("Please select a date");
+                if (!timeSelect.value || timeSelect.value === "") return showError("Please select a valid time slot");
+            }
+
+            // Step 3 (Client) is validated on form submit (HTML required attribute)
+
+            updateView(currentStep + 1);
+        });
+    });
+
+    document.querySelectorAll('.prev-trigger').forEach(btn => {
+        btn.addEventListener('click', () => updateView(currentStep - 1));
+    });
+
+    // Dynamic Availability Fetcher
+    async function fetchAvailability() {
+        const sID = serviceIn.value;
+        const staffID = staffIn.value;
+        const dateVal = dateIn.value;
+
+        if (!sID || !dateVal) return;
+
+        timeSelect.innerHTML = '<option>Checking availability...</option>';
+        updatePreview();
+
+        try {
+            const response = await fetch(`/get-manual-availability/{{ business.id }}/?staff_id=${staffID}&service_id=${sID}&date=${dateVal}`);
+            const data = await response.json();
+
+            timeSelect.innerHTML = '';
+
+            if (data.slots && data.slots.length > 0) {
+                data.slots.forEach(slot => {
+                    const opt = document.createElement('option');
+                    opt.value = slot;
+                    opt.innerText = slot;
+                    timeSelect.appendChild(opt);
+                });
+            } else {
+                timeSelect.innerHTML = '<option value="">No slots available</option>';
+            }
+        } catch (e) {
+            timeSelect.innerHTML = '<option value="">Error loading schedule</option>';
+        }
+        updatePreview();
+    }
+
+    // Listeners
+    [staffIn, serviceIn, dateIn].forEach(el => el?.addEventListener('change', fetchAvailability));
+    timeSelect.addEventListener('change', updatePreview);
+    [nameIn, emailIn].forEach(el => el?.addEventListener('input', updatePreview));
+});
+// Inside manual_booking.html script tag
+document.getElementById('id_service').addEventListener('change', function() {
+    const serviceId = this.value;
+    const staffSelect = document.getElementById('id_staff');
+
+    if (!serviceId) {
+        staffSelect.innerHTML = '<option value="">Select a service first</option>';
+        return;
+    }
+
+    // Use the dynamic URL name from your urls.py
+    fetch("{% url 'get_staff_for_service' %}?service_id=" + serviceId)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            staffSelect.innerHTML = '<option value="">No preference</option>';
+            // Note: Use 'staff_list' to match the view logic below
+            data.staff_list.forEach(staff => {
+                const option = document.createElement('option');
+                option.value = staff.id;
+                option.textContent = staff.name;
+                staffSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching staff:', error);
+        });
+});
+</script>
+{% endblock %}

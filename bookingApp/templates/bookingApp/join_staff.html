@@ -1,0 +1,185 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}Join Team | Command Center{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    /* --- 1. MODERN SAAS IDENTITY --- */
+    :root {
+        --brand-primary: #4f46e5; /* Indigo 600 */
+        --brand-hover: #4338ca;
+        --bg-soft: #f8fafc;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-soft);
+        color: var(--text-main);
+    }
+
+    /* --- 2. SOFT GRADIENT BACKGROUND --- */
+    .viewport-underlay {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: radial-gradient(circle at top right, #e0e7ff, transparent),
+                    radial-gradient(circle at bottom left, #f1f5f9, transparent);
+        background-color: #ffffff;
+    }
+
+    /* --- 3. THE SAAS CARD --- */
+    .join-wrapper {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+    }
+
+    .saas-card {
+        background: white;
+        width: 100%;
+        max-width: 440px;
+        padding: 2.5rem;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 
+                    0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* --- 4. TYPOGRAPHY --- */
+    .h-saas {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text-main);
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .sub-saas {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        text-align: center;
+        margin-bottom: 2rem;
+        display: block;
+    }
+
+    /* --- 5. FORM ELEMENTS --- */
+    .field-label {
+        font-size: 0.815rem;
+        font-weight: 600;
+        color: var(--text-main);
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    input[name="company_code"] {
+        width: 100% !important;
+        background: #ffffff !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        padding: 0.875rem 1rem !important;
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+        color: var(--text-main) !important;
+        text-align: center !important;
+        outline: none !important;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    input[name="company_code"]:focus {
+        border-color: var(--brand-primary) !important;
+        ring: 2px;
+        ring-color: #c7d2fe;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
+    }
+
+    input[name="company_code"]::placeholder {
+        color: #cbd5e1;
+        letter-spacing: normal;
+    }
+
+    /* --- 6. BUTTONS --- */
+    .btn-saas {
+        background: var(--brand-primary);
+        color: white;
+        padding: 0.875rem;
+        font-weight: 600;
+        font-size: 0.935rem;
+        border-radius: 8px;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        margin-top: 1.5rem;
+    }
+
+    .btn-saas:hover {
+        background: var(--brand-hover);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+
+    .btn-secondary {
+        margin-top: 1.25rem;
+        width: 100%;
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .btn-secondary:hover {
+        color: var(--text-main);
+    }
+</style>
+
+<div class="viewport-underlay"></div>
+
+<div class="join-wrapper">
+    <div class="saas-card">
+        <header>
+            <div class="flex justify-center mb-6">
+                <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-building-user text-indigo-600 text-xl"></i>
+                </div>
+            </div>
+            <h1 class="h-saas">Join your company</h1>
+            <span class="sub-saas">Enter your credentials to get started</span>
+        </header>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="field-label">Employer Access Code</label>
+                <input type="text" name="company_code" placeholder="e.g. BIZ-1234" required autofocus>
+                <p class="mt-2 text-[12px] text-slate-400 text-center">
+                    This code is provided the business owner.
+                </p>
+            </div>
+
+            <button type="submit" class="btn-saas">
+                Continue to Team
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </form>
+
+        <a href="{% url 'home' %}" class="btn-secondary">Cancel and go back</a>
+    </div>
+</div>
+{% endblock %}

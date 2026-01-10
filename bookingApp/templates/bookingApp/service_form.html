@@ -1,10 +1,132 @@
 {% extends 'bookingApp/base.html' %}
+
+{% block title %}{% if edit_mode %}Edit{% else %}Add{% endif %} Service | {{ business.name }}{% endblock %}
+
 {% block content %}
-<h2>Add New Service for {{ business.name }}</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Save Service</button>
-    <a href="{% url 'owner_dashboard' business.id %}" class="btn btn-secondary">Cancel</a>
-</form>
+<div class="min-h-screen flex items-center justify-center px-4 py-12 bg-slate-50/50">
+    <div class="w-full max-w-[500px] animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+                </span>
+                <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-indigo-700">Service Management</span>
+            </div>
+
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-3">
+                {% if edit_mode %}Update{% else %}Create{% endif %}
+                <span class="text-indigo-600">Service</span>
+            </h1>
+            <p class="text-slate-500 text-sm font-medium">
+                Set your pricing and duration for <span class="text-slate-800 font-bold border-b-2 border-indigo-200">{{ business.name }}</span>
+            </p>
+        </div>
+
+        <div class="bg-white rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 rounded-md overflow-hidden">
+            <div class="p-8 md:p-10">
+                <form method="post" novalidate class="space-y-5">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="p-4 bg-red-50 rounded-2xl border border-red-100 text-red-600 text-xs font-bold flex items-center gap-3">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            {{ form.non_field_errors|first }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                    <div class="space-y-1.5">
+                        <label for="{{ field.id_for_label }}" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                            {{ field.label }}
+                        </label>
+
+                        <div class="relative group">
+                            <div class="absolute left-4 text-slate-300 group-focus-within:text-indigo-600 transition-colors pointer-events-none z-10
+                                {% if 'description' in field.name.lower %}top-4{% else %}top-1/2 -translate-y-1/2{% endif %}">
+
+                                {% if 'price' in field.name.lower %}
+                                    <span class="font-bold text-sm">R</span>
+                                {% elif 'minutes' in field.name.lower %}
+                                    <i class="fa-solid fa-hourglass-half text-sm"></i>
+                                {% elif 'name' in field.name.lower %}
+                                    <i class="fa-solid fa-signature text-sm"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-align-left text-sm"></i>
+                                {% endif %}
+                            </div>
+
+                            {{ field }}
+                        </div>
+
+                        {% if field.errors %}
+                            <div class="flex items-center mt-1.5 text-red-500 text-[10px] font-bold px-1 uppercase tracking-tight">
+                                <i class="fa-solid fa-circle-exclamation me-1.5"></i> {{ field.errors|first }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="pt-6 space-y-4">
+                        <button type="submit"
+                                class="w-full flex items-center justify-center px-8 py-4 bg-slate-900 text-white rounded-sm font-bold shadow-xl shadow-slate-200 hover:bg-indigo-600 hover:-translate-y-1 transition-all duration-300 group">
+                            {% if edit_mode %}Update Changes{% else %}Publish Service{% endif %}
+                            <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+
+                        <a href="{% url 'owner_dashboard' business.id %}"
+                           class="w-full flex items-center justify-center px-8 py-4 bg-slate-50 text-slate-400 rounded-sm font-bold hover:bg-slate-100 hover:text-slate-600 transition-all no-underline text-sm uppercase tracking-widest">
+                            Discard & Exit
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <p class="text-center mt-8 text-slate-400 text-[10px] font-medium uppercase tracking-[0.2em]">
+            Secure Business Dashboard &copy; 2026
+        </p>
+    </div>
+</div>
+
+<style>
+    /* Global style for all inputs and textareas */
+    input[type="text"],
+    input[type="number"],
+    textarea {
+        width: 100% !important;
+        /* Force padding-left to 3rem to make room for the icon */
+        padding: 1rem 1rem 1rem 3rem !important;
+        background-color: #fcfdfe !important;
+        border: 2px solid #f1f5f9 !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        color: #1e293b !important;
+        outline: none !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        display: block;
+    }
+
+    /* Focus State */
+    input:focus, textarea:focus {
+        background-color: #ffffff !important;
+        border-color: #6366f1 !important;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1) !important;
+    }
+
+    /* Textarea specific height */
+    textarea {
+        min-height: 120px;
+        line-height: 1.6;
+        resize: none;
+    }
+
+    /* Remove number spinners */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
 {% endblock %}

@@ -1,0 +1,1285 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en-ZA" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<link rel="icon" type="image/x-icon" href="/media/landing/f.png">
+<title>GetMeBooked | Salon & Barber Booking App South Africa</title>
+<meta name="description" content="The easiest booking app for South African salons, barbers, and nail studios. Reduce no-shows with PayFast deposits.">
+<meta name="theme-color" content="#4f46e5">
+<meta name="author" content="GetMeBooked Technologies">
+<link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+<!-- Open Graph / Social Sharing -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="GetMeBooked | Salon & Barber Booking App South Africa">
+<meta property="og:description" content="Eliminate no-shows, automate your admin, and grow your salon business with GetMeBooked.">
+<meta property="og:image" content="https://getmebooked.co.za/static/og-image-v2026.jpg">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:site_name" content="GetMeBooked">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GetMeBooked | Salon & Barber Booking App South Africa">
+<meta name="twitter:description" content="Reduce no-shows, automate your bookings, and grow your business. GetMeBooked is trusted by salons across SA.">
+<meta name="twitter:image" content="https://getmebooked.co.za/static/og-image-v2026.jpg">
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "GetMeBooked",
+  "url": "{{ request.build_absolute_uri }}",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "author": {
+    "@type": "Organization",
+    "name": "GetMeBooked Technologies",
+    "url": "https://getmebooked.co.za"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "149.00",
+    "priceCurrency": "ZAR",
+    "availability": "https://schema.org/InStock"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "215"
+  },
+  "screenshot": "https://getmebooked.co.za/static/og-image-v2026.jpg",
+  "featureList": "PayFast Deposits, Email Integration, Staff Roster, Revenue Analytics"
+}
+</script>
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { -webkit-font-smoothing: antialiased; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Animations */
+        @keyframes float-y { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .animate-float { animation: float-y 6s ease-in-out infinite; }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); opacity: 1; }
+            80%, 100% { opacity: 0; }
+        }
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            left: -4px; top: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid #4f46e5;
+            animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        /* Range Slider */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 28px; width: 28px;
+            border-radius: 50%; background: #4f46e5; cursor: pointer;
+            margin-top: -12px;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);
+            border: 2px solid #fff;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; cursor: pointer;
+            background: #e2e8f0; border-radius: 999px;
+        }
+
+        /* The starting state */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+/* The state when visible */
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+    </style>
+</head>
+<body class="bg-white text-slate-900 selection:bg-brand-600 selection:text-white overflow-x-hidden">
+
+<div class="fixed top-0 left-0 right-0 z-50 px-4 pt-4 lg:pt-6 transition-all duration-300" id="navbarContainer">
+    <nav class="bg-white/80 backdrop-blur-xl border border-white/60 shadow-lg shadow-slate-200/40 rounded-full px-5 py-3 lg:px-8 lg:py-4 w-full max-w-6xl mx-auto flex justify-between items-center transition-all" id="navbar">
+
+        <a href="/" class="flex items-center gap-2.5 group">
+            <div class="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-200 group-hover:rotate-6 transition-transform">
+                <i class="fa fa-calendar-check text-sm"></i>
+            </div>
+            <span class="font-display font-extrabold text-xl tracking-tight text-slate-900">
+                Get<span class="text-brand-600">Me</span>Booked
+
+            </span>
+        </a>
+
+        <div class="hidden lg:flex items-center gap-8">
+            <a href="#demo" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">Demo</a>
+            <a href="#how-it-works" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">How it Works</a>
+            <a href="#features" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">Features</a>
+            <a href="#roi" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">Revenue</a>
+            <a href="#pricing" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">Pricing</a>
+        </div>
+
+        <div class="hidden lg:flex items-center gap-4">
+            {% if user.is_authenticated %}
+                <a href="{% url 'login_dispatch' %}" class="text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-brand-600 transition-colors">Dashboard</a>
+                <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<a href="javascript:void(0)"
+   onclick="document.getElementById('logout-form').submit();"
+   class="bg-slate-100 text-slate-600 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-slate-200 transition-all">
+    Sign Out
+</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-brand-600 transition-colors">Log In</a>
+                <a href="{% url 'register' %}" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-brand-600 hover:scale-105 transition-all shadow-lg shadow-slate-300/50">
+                    Get Started!
+                </a>
+            {% endif %}
+        </div>
+
+        <button id="mobileMenuBtn" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 border border-slate-100 text-slate-900 transition-all active:scale-95">
+            <i class="fa-solid fa-bars-staggered" id="menuIcon"></i>
+        </button>
+    </nav>
+</div>
+
+<div id="mobileMenu" class="fixed inset-0 z-[100] pointer-events-none opacity-0 transition-opacity duration-300 mb-5">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleMenu()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white shadow-2xl translate-x-full transition-transform duration-500 pointer-events-auto flex flex-col p-6" id="mobileDrawer">
+        <div class="flex justify-between items-center mb-8">
+            <span class="font-display font-extrabold text-xl tracking-tight">Menu</span>
+            <button onclick="toggleMenu()" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full text-slate-500 hover:bg-slate-100">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div class="flex flex-col gap-6 flex-1">
+            <a href="#demo" onclick="toggleMenu()" class="text-xl font-bold text-slate-900 hover:text-brand-600">Demo</a>
+            <a href="#how-it-works" onclick="toggleMenu()" class="text-xl font-bold text-slate-900 hover:text-brand-600">How it Works</a>
+            <a href="#features" onclick="toggleMenu()" class="text-xl font-bold text-slate-900 hover:text-brand-600">Features</a>
+            <a href="#roi" onclick="toggleMenu()" class="text-xl font-bold text-slate-900 hover:text-brand-600">Calculators</a>
+            <a href="#pricing" onclick="toggleMenu()" class="text-xl font-bold text-slate-900 hover:text-brand-600">Pricing</a>
+        </div>
+        <div class="grid gap-3 pt-6 border-t border-slate-100">
+            {% if user.is_authenticated %}
+                <a href="{% url 'login_dispatch' %}" class="w-full bg-brand-600 text-white text-center py-4 rounded-xl font-bold shadow-lg">Go to Dashboard</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="w-full border border-slate-200 text-slate-700 text-center py-4 rounded-xl font-bold">Log In</a>
+                <a href="{% url 'register' %}" class="w-full bg-slate-900 text-white text-center py-4 rounded-xl font-bold shadow-xl">Get Started!</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="relative overflow-hidden bg-[#0f172a]">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[500px] lg:w-[800px] h-[500px] lg:h-[800px] bg-brand-600/20 blur-[100px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] lg:w-[900px] h-[600px] lg:h-[900px] bg-purple-600/20 blur-[120px] rounded-full"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-500/5 blur-[120px] rounded-full"></div>
+    </div>
+
+<div class="relative bg-slate-950 overflow-hidden border-y border-white/5">
+
+    <div class="absolute inset-0 z-0 pointer-events-none h-[120%] -top-[10%] w-full">
+
+    <img
+        id="hero-parallax-img"
+        src="/media/landing/111.jpg"
+        alt="Background"
+        class="block w-full h-full object-cover opacity-50 will-change-transform"
+        fetchpriority="high"
+        loading="eager"
+    >
+
+
+
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-transparent to-slate-950"></div>
+</div>
+
+    <section id="hero" class="relative pt-40 pb-20 lg:pt-36 lg:pb-32 z-10 top-0">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+
+            <div class="text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600/20 text-white border-2 border-indigo-600 text-[9px] font-lighter mb-8 uppercase tracking-[0.2em] shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-star text-yellow-500"></i> Trusted by 50+ Studios
+                </div>
+
+<h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tight animate__animated animate__fadeInUp">
+    Chats Don’t Pay the bills.<br/>
+    <span class="bg-gradient-to-r from-indigo-400 via-indigo-500 to-violet-500 bg-clip-text text-transparent">
+Bookings </span>Do!
+</h1>
+
+<p class="text-lg lg:text-xl text-slate-300 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0 animate__animated animate__fadeInUp animate__delay-1s">
+Lock in appointments with deposits and automated reminders that reduce no-shows and simply boost attendance.
+</p>
+
+                <div class="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start animate__animated animate__fadeInUp animate__delay-1s">
+                    <a href="{% url 'register' %}" class="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-indigo-400 via-indigo-500 to-violet-500 text-white font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-3 rounded-2xl shadow-xl shadow-indigo-900/40 group">
+                        Get Started! <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                    <a href="#demo" class="w-full sm:w-auto px-10 py-5 bg-slate-800/20 text-white border border-slate-700 font-bold hover:bg-slate-700/20 transition-all rounded-2xl">
+                        Take A Look
+                    </a>
+                </div>
+            </div>
+
+            <div class="relative w-full max-w-2xl mx-auto lg:ml-auto">
+                <div class="hidden lg:block relative perspective-[2000px] animate__animated animate__fadeInRight">
+
+                    <div class="absolute -inset-10 bg-indigo-600/20 blur-[100px] rounded-full z-0"></div>
+
+                    <div class="relative transform rotate-x-[2deg] rotate-y-[-8deg] group-hover:rotate-0 transition-all duration-1000 ease-out z-20 group">
+
+                        <div class="bg-slate-900/60 backdrop-blur-2xl rounded-[1.5rem] shadow-[0_0_60px_rgba(0,0,0,0.8)] border-1 border-indigo-600/40 overflow-hidden group-hover:border-indigo-600 transition-all">
+
+                            <div class="bg-slate-800/50 px-6 py-4 flex items-center gap-4 border-b border-white/5">
+                                <div class="flex gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-slate-600"></div>
+                                    <div class="w-3 h-3 rounded-full bg-slate-600"></div>
+                                    <div class="w-3 h-3 rounded-full bg-slate-600"></div>
+                                </div>
+                                <div class="bg-black/40 rounded-lg px-4 py-1.5 text-[10px] text-indigo-400 flex-1 text-center font-bold tracking-widest uppercase">
+                                    www.getmebooked.co.za
+                                </div>
+                            </div>
+
+                            <div class="relative w-full aspect-[18/10] bg-black/20 overflow-hidden flex items-center justify-center">
+                                <div id="desktop-carousel" class="flex h-full w-full transition-transform duration-1000 ease-in-out">
+                                    <div class="w-full h-full flex-shrink-0 p-8 flex items-center justify-center">
+                                        <img src="/media/landing/sc10.jpg" alt="Dashboard" class="max-w-full max-h-full object-contain drop-shadow-2xl">
+                                    </div>
+                                    <div class="w-full h-full flex-shrink-0 p-8 flex items-center justify-center">
+                                        <img src="/media/landing/sc11.jpg" alt="Calendar" class="max-w-full max-h-full object-contain drop-shadow-2xl">
+                                    </div>
+                                    <div class="w-full h-full flex-shrink-0 p-8 flex items-center justify-center">
+                                        <img src="/media/landing/sc12.jpg" alt="Analytics" class="max-w-full max-h-full object-contain drop-shadow-2xl">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="absolute -top-8 -left-10 bg-indigo-600 p-5 rounded-2xl shadow-2xl animate-float z-30 border-2 border-indigo-400/20">
+                            <div class="flex items-center gap-4">
+                                <i class="fa-solid fa-check-circle text-white text-xl"></i>
+                                <div>
+                                    <p class="text-[10px] font-bold text-indigo-200 uppercase tracking-widest">Refferal Successful</p>
+                                    <p class="text-sm font-black text-white uppercase">+30 Days</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="absolute -bottom-8 -right-6 bg-white p-5 rounded-2xl shadow-2xl animate-float-delayed z-30 border-2 border-slate-100">
+                            <div class="flex items-center gap-4">
+                                <i class="fa-solid fa-wallet text-emerald-400 text-xl"></i>
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Deposit Received</p>
+                                    <p class="text-sm font-black text-slate-900 uppercase">+R250.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="demo" class="relative py-32 z-10">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-7xl font-display font-black text-white mb-8 tracking-tight">
+                Experience the <span class="bg-gradient-to-r from-indigo-400 via-indigo-500 to-violet-500 bg-clip-text text-transparent">Magic.</span>
+            </h2>
+            <p class="text-slate-300 mb-14 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                Walk through the booking flow yourself. See how easy it is for your clients to secure their spot and pay their deposit.
+            </p>
+
+            <div class="flex flex-col items-center gap-10">
+                <button onclick="openDemoModal()"
+                    class="group relative w-full sm:w-auto px-10 py-5 bg-indigo-600/20 border-2 border-indigo-600 text-white font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-3 rounded-2xl shadow-xl shadow-indigo-900/40 group">
+                    <span class="text-lg">Try Our Demo</span>
+                    <i class="fa-solid fa-envelope-circle-check text-white text-2xl"></i>
+                </button>
+<hr class="max-w-[50%] w-50"
+                <!-- Floating Chevron -->
+                <a href="#how-it-works" class="-mt-2 animate-bounce text-slate-200  hover:text-slate-300 transition">
+                    <p>Incase you're not convinced yet</p>
+                    <i class="fa-solid fa-chevron-down text-3xl"></i>
+                </a>
+            </div>
+
+
+        </div>
+    </section>
+    <div class="max-w-7xl mb-8 mx-auto px-6">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-10 text-center">Powering South Africa's Top Studios</p>
+
+        <div class="relative flex overflow-x-hidden">
+            <div class="animate-marquee flex items-center gap-12 md:gap-24 whitespace-nowrap px-4">
+                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-scissors"></i> THE BARBER CLUB</div>
+                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-gem"></i> LUXE NAILS</div>
+                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-pen-nib"></i> INK STUDIO</div>
+                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-spa"></i> PURE SKIN</div>
+                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-scissors"></i> THE BARBER CLUB</div>
+                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-gem"></i> LUXE NAILS</div>
+                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-pen-nib"></i> INK STUDIO</div>
+            </div>
+        </div>
+    </div>
+
+
+<style>
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+        animation: marquee 25s linear infinite;
+    }
+</style>
+</div>
+
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+    }
+    .animate-float { animation: float 6s ease-in-out infinite; }
+    .animate-float-delayed { animation: float 6s ease-in-out infinite 3s; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const parallaxImg = document.getElementById('hero-parallax-img');
+        const heroSection = document.getElementById('hero');
+
+        // Optimization: Use requestAnimationFrame for smooth 60fps scrolling
+        let ticking = false;
+
+        function updateParallax() {
+            const scrollY = window.scrollY;
+
+            // Only animate if we are within the hero section's visibility range
+            // This prevents wasted calculations when the user is at the bottom of the page
+            if (scrollY <= (heroSection.offsetHeight + 400)) {
+                // The factor (0.4) determines the speed.
+                // 0.4 means the image moves at 40% of the scroll speed (slower than foreground)
+                const translateY = scrollY * 0.4;
+                parallaxImg.style.transform = `translate3d(0, ${translateY}px, 0)`;
+            }
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        }, { passive: true });
+    });
+</script>
+</div>
+
+
+
+<section id="how-it-works" class="py-16 md:py-32 bg-slate-50 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16 md:mb-24">
+            <span class="px-4 py-1.5 bg-brand-100 text-brand-700 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">The Onboarding</span>
+            <h2 class="text-4xl md:text-6xl font-display font-black text-slate-900 mt-6 tracking-tight">
+                Up and running in <span class="text-brand-600 relative inline-block">10 min.
+                    <svg class="absolute -bottom-2 left-0 w-full" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="2" fill="transparent" class="text-brand-200"/></svg>
+                </span>
+            </h2>
+        </div>
+
+        <div class="relative">
+            <div class="hidden md:block absolute top-12 left-[15%] right-[15%] h-[2px] bg-slate-200"></div>
+
+            <div class="flex md:grid md:grid-cols-3 gap-6 md:gap-12 overflow-x-auto snap-x snap-mandatory pb-8 md:pb-0 scrollbar-hide">
+
+                <div class="min-w-[80%] md:min-w-0 snap-center group relative">
+                    <div class="relative z-10 w-20 h-20 md:w-24 md:h-24 mx-auto bg-white border-2 border-slate-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-xl shadow-slate-200/50 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-list-check text-2xl md:text-3xl text-brand-600"></i>
+                    </div>
+                    <div class="text-center px-4">
+                        <div class="inline-block px-3 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-full mb-4">STEP 01</div>
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mb-3">Set Your Menu</h3>
+                        <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-[280px] mx-auto">Add your services, staff, and hours. Control your calendar with ease.</p>
+                    </div>
+                </div>
+
+                <div class="min-w-[80%] md:min-w-0 snap-center group relative">
+                    <div class="relative z-10 w-20 h-20 md:w-24 md:h-24 mx-auto bg-white border-2 border-slate-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-xl shadow-slate-200/50 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-credit-card text-2xl md:text-3xl text-brand-600"></i>
+                    </div>
+                    <div class="text-center px-4">
+                        <div class="inline-block px-3 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-full mb-4">STEP 02</div>
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mb-3">Link PayFast</h3>
+                        <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-[280px] mx-auto">Connect your merchant details for high-speed payouts and healthy cashflow.</p>
+                    </div>
+                </div>
+
+                <div class="min-w-[80%] md:min-w-0 snap-center group relative">
+                    <div class="relative z-10 w-20 h-20 md:w-24 md:h-24 mx-auto bg-brand-600 border-4 border-white rounded-[2rem] flex items-center justify-center mb-6 shadow-xl shadow-brand-200 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-rocket text-2xl md:text-3xl text-white"></i>
+                    </div>
+                    <div class="text-center px-4">
+                        <div class="inline-block px-3 py-1 bg-brand-600 text-white text-[10px] font-bold rounded-full mb-4">LIVE</div>
+                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mb-3">Share Your Link</h3>
+                        <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-[280px] mx-auto">One link for your bio. Your 24/7 digital receptionist is ready.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="flex justify-center gap-1.5 mt-8 md:hidden">
+            <div class="w-8 h-1 bg-brand-600 rounded-full"></div>
+            <div class="w-2 h-1 bg-slate-300 rounded-full"></div>
+            <div class="w-2 h-1 bg-slate-300 rounded-full"></div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<section id="features" class="py-24 md:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div class="max-w-2xl">
+                <h2 class="text-5xl md:text-7xl font-display font-black text-slate-900 tracking-tighter leading-[0.9]">
+                    Everything to <br>
+                    <span class="text-brand-600">scale your studio.</span>
+                </h2>
+            </div>
+            <p class="text-slate-500 text-lg md:max-w-xs leading-relaxed font-medium">
+                Ditch the manual admin and get back to the chair.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4">
+
+            <div class="md:col-span-2 md:row-span-2 relative overflow-hidden bg-slate-900 rounded-[3rem] p-10 flex flex-col justify-between group">
+                <div class="absolute top-0 right-0 w-80 h-80 bg-brand-600/20 blur-[100px] rounded-full -mr-20 -mt-20"></div>
+
+                <div class="relative z-10">
+                    <span class="bg-brand-500/20 text-brand-400 border border-brand-500/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Revenue Protection</span>
+                    <h3 class="text-3xl md:text-4xl font-black text-white mt-8 mb-4 tracking-tight">Non-Refundable <br> Deposits.</h3>
+                    <p class="text-slate-400 text-lg max-w-sm">Stop losing hundreds every week. Collect deposits upfront via PayFast and eliminate no-shows instantly.</p>
+                </div>
+
+                <div class="relative z-10 mt-12 flex items-center gap-4">
+                    <div class="flex -space-x-3">
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center text-xs"><i class="fa-solid fa-credit-card text-brand-400"></i></div>
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center text-xs"><i class="fa-solid fa-building-columns text-brand-400"></i></div>
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center text-xs text-brand-400 font-bold">R</div>
+                    </div>
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Supports All SA Banks</span>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 bg-brand-50 rounded-[3rem] p-10 flex flex-col md:flex-row items-center gap-8 group overflow-hidden border border-brand-100/50">
+                <div class="flex-1">
+                    <span class="text-brand-600 font-black uppercase tracking-widest text-[10px]">Automation</span>
+                    <h3 class="text-3xl font-black text-slate-900 mt-4 mb-2">Smart Reminders</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Automated "Are you still coming?" messages via SMS & Email. We handle the awkward talks.</p>
+                </div>
+                <div class="w-full md:w-48 bg-white p-4 rounded-2xl shadow-xl shadow-brand-200/50 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span class="text-[8px] font-bold text-slate-400">SENDING...</span>
+                    </div>
+                    <p class="text-[10px] font-medium text-slate-600 italic">"Hi Lerato, see you at 2pm! ✨"</p>
+                </div>
+            </div>
+
+            <div class="md:col-span-1 bg-white border border-slate-100 rounded-[3rem] p-8 hover:border-brand-200 transition-all shadow-sm">
+                <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-chart-pie text-slate-900"></i>
+                </div>
+                <h3 class="text-xl font-black text-slate-900 mb-2 leading-tight">Growth <br> Analytics</h3>
+                <p class="text-slate-500 text-xs">Track your revenue, busiest hours, staff and top services.</p>
+            </div>
+
+            <div class="md:col-span-1 bg-white border border-slate-100 rounded-[3rem] p-8 hover:border-brand-200 transition-all shadow-sm">
+                <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-user-group text-slate-900"></i>
+                </div>
+                <h3 class="text-xl font-black text-slate-900 mb-2 leading-tight">Staff <br> Dashboards</h3>
+                <p class="text-slate-500 text-xs">Individual access for artists and stylists to manage their own schedules, linked to the business profile.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<style>
+    /* Utility to hide scrollbars for the horizontal steps */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<section id="roi" class="py-16 md:py-24 bg-white relative overflow-hidden">
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+            <div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-700 uppercase tracking-wider mb-4">
+                    Revenue Recovery
+                </span>
+                <h2 class="text-3xl md:text-4xl font-display font-black text-slate-900 mb-6 tracking-tight">
+                    Stop losing money on <span class="text-brand-600">no-shows.</span>
+                </h2>
+                <p class="text-slate-500 text-lg mb-8 leading-relaxed max-w-md">
+                    No-shows are expensive. Calculate how much you could recover by securing bookings with PayFast deposits.
+                </p>
+
+                <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-8">
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">PayFast Fees</p>
+                        <p class="text-sm font-bold text-slate-700">3.2% + R2.00</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Payout Speed</p>
+                        <p class="text-sm font-bold text-slate-700">Instant to Wallet</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 rounded-[2rem] p-2 md:p-3 border border-slate-200 shadow-sm">
+                <div class="bg-white rounded-[1.7rem] p-8 shadow-xl shadow-slate-200/50">
+                    <div class="space-y-8 mb-10">
+                        <div>
+                            <div class="flex justify-between mb-4 items-center">
+                                <label class="font-bold text-[11px] text-slate-400 uppercase tracking-widest">Monthly No-shows</label>
+                                <span class="text-xl font-black text-brand-600" id="apptVal">10</span>
+                            </div>
+                            <input type="range" id="apptRange" min="5" max="50" value="10" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-4 items-center">
+                                <label class="font-bold text-[11px] text-slate-400 uppercase tracking-widest">Deposit Amount</label>
+                                <span class="text-xl font-black text-brand-600" id="priceVal">R150</span>
+                            </div>
+                            <input type="range" id="priceRange" min="100" max="1000" step="50" value="150" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-2xl p-6 text-center text-white overflow-hidden relative group">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-500/20 blur-2xl rounded-full -mr-12 -mt-12 transition-all group-hover:bg-brand-500/40"></div>
+                        <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 relative z-10">Recoverable Monthly Revenue</h3>
+                        <div id="roiTotal" class="text-4xl md:text-5xl font-display font-black tracking-tight mb-2 relative z-10">R1,448</div>
+                        <p class="text-[10px] text-slate-500 italic relative z-10">Estimated net recovery after fees</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="pricing" class="py-20 bg-slate-50 border-y border-slate-200">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="grid lg:grid-cols-12 gap-16 items-start">
+
+            <div class="lg:col-span-5">
+                <div class="bg-white rounded-[2.5rem] p-10 border border-slate-200 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 px-4 py-1 bg-brand-600 text-white text-[10px] font-black uppercase tracking-widest rounded-bl-xl">Best Value</div>
+
+                    <div class="flex items-baseline gap-2 mb-6">
+                        <span class="text-6xl font-display font-black text-slate-900">R149</span>
+                        <span class="text-slate-400 font-bold">/mo</span>
+                    </div>
+
+                    <p class="text-slate-500 mb-8 text-sm">Everything you need to manage your studio, with no hidden commissions or per-booking fees.</p>
+
+                    <ul class="space-y-4 mb-10">
+                        <li class="flex items-center gap-3 text-sm font-bold text-slate-700">
+                            <div class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-[8px]"><i class="fa-solid fa-check"></i></div>
+                            Unlimited Bookings & Staff
+                        </li>
+                        <li class="flex items-center gap-3 text-sm font-bold text-slate-700">
+                            <div class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-[8px]"><i class="fa-solid fa-check"></i></div>
+                            Booking Link & Website Widget
+                        </li>
+                        <li class="flex items-center gap-3 text-sm font-bold text-slate-700">
+                            <div class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-[8px]"><i class="fa-solid fa-check"></i></div>
+                            Public Booking Page
+                        </li>
+                        <li class="flex items-center gap-3 text-sm font-bold text-slate-700">
+                            <div class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-[8px]"><i class="fa-solid fa-check"></i></div>
+                            Automated Reminders & Notifications
+                        </li>
+                        <li class="flex items-center gap-3 text-sm font-bold text-slate-700">
+                            <div class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-[8px]"><i class="fa-solid fa-check"></i></div>
+                            Instant PayFast Payouts
+                        </li>
+                    </ul>
+
+                    <a href="{% url 'register' %}" class="block w-full bg-slate-900 text-white text-center py-4 rounded-xl font-bold text-sm hover:bg-brand-600 transition-all shadow-lg uppercase tracking-widest">
+                        Get Started Now
+                    </a>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 py-4">
+    <div class="mb-5 text-center">
+        <h2 class="text-3xl font-display font-black text-slate-900 uppercase tracking-widest">FAQ</h2>
+    </div>
+
+    <div class="divide-y divide-slate-200 border-t border-slate-200">
+        <div class="faq-item group">
+            <button class="faq-toggle w-full py-6 flex flex-row-reverse items-center justify-start gap-4 text-right">
+                <i class="fa-solid fa-chevron-down text-slate-300 text-[10px] transition-transform duration-300 icon-chevron"></i>
+                <span class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors">
+                    Do I need my own website?
+                </span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 text-right">
+                <p class="pb-6 text-slate-500 text-sm leading-relaxed pr-8">
+                    No. We provide your own booking link. Drop it in your Instagram bio, WhatsApp, or Google listing and start taking bookings immediately. If you do have a website, we also offer a clean pop-up booking widget so clients don't leave your site when booking.
+                </p>
+            </div>
+        </div>
+
+        <div class="faq-item group">
+            <button class="faq-toggle w-full py-6 flex flex-row-reverse items-center justify-start gap-4 text-right">
+                <i class="fa-solid fa-chevron-down text-slate-300 text-[10px] transition-transform duration-300 icon-chevron"></i>
+                <span class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors">
+                    Does GetMeBooked take a cut from my deposits?
+                </span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 text-right">
+                <p class="pb-6 text-slate-500 text-sm leading-relaxed pr-8">
+                    No, GetMeBooked does not take a percentage or commission from your deposits. The funds are transferred directly from the client to your PayFast wallet. Please note that while GetMeBooked doesn't charge a fee, standard PayFast transaction fees will still apply.
+                </p>
+            </div>
+        </div>
+
+        <div class="faq-item group">
+            <button class="faq-toggle w-full py-6 flex flex-row-reverse items-center justify-start gap-4 text-right">
+                <i class="fa-solid fa-chevron-down text-slate-300 text-[10px] transition-transform duration-300 icon-chevron"></i>
+                <span class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors">
+                    How do I collect deposit money?
+                </span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 text-right">
+                <p class="pb-6 text-slate-500 text-sm leading-relaxed pr-8">
+                    We connect directly to your PayFast account. Clients pay their deposit when booking and the money goes straight into your account, instantly.
+                </p>
+            </div>
+        </div>
+
+        <div class="faq-item group">
+            <button class="faq-toggle w-full py-6 flex flex-row-reverse items-center justify-start gap-4 text-right">
+                <i class="fa-solid fa-chevron-down text-slate-300 text-[10px] transition-transform duration-300 icon-chevron"></i>
+                <span class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors">
+                    Will this help reduce no-shows?
+                </span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 text-right">
+                <p class="pb-6 text-slate-500 text-sm leading-relaxed pr-8">
+                    Yes. Deposits, automatic reminders, and clear booking confirmations dramatically reduce no-shows. Clients are far more likely to show up when they’ve paid and received reminders.
+                </p>
+            </div>
+        </div>
+
+        <div class="faq-item group">
+            <button class="faq-toggle w-full py-6 flex flex-row-reverse items-center justify-start gap-4 text-right">
+                <i class="fa-solid fa-chevron-down text-slate-300 text-[10px] transition-transform duration-300 icon-chevron"></i>
+                <span class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors">
+                    Is this easy to set up?
+                </span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 text-right">
+                <p class="pb-6 text-slate-500 text-sm leading-relaxed pr-8">
+                    Very. Most businesses are live in under 10 minutes. No technical skills required, just add your services, availability, and payment details.
+                </p>
+            </div>
+        </div>
+
+        <div class="faq-item group border-b border-slate-200">
+            <button class="faq-toggle w-full py-6 flex flex-row-reverse items-center justify-start gap-4 text-right">
+                <i class="fa-solid fa-chevron-down text-slate-300 text-[10px] transition-transform duration-300 icon-chevron"></i>
+                <span class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors">
+                    What if I want to cancel?
+                </span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 text-right">
+                <p class="pb-6 text-slate-500 text-sm leading-relaxed pr-8">
+                    No contracts. You can cancel anytime directly from your dashboard with one click. No penalties.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .faq-item.active .line-h { transform: rotate(90deg); opacity: 0; }
+    .faq-item.active .line-v { background-color: #6366f1; }
+    .faq-item.active .faq-toggle span { color: #6366f1; }
+</style>
+
+<script>
+    document.querySelectorAll('.faq-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const item = button.parentElement;
+            const answer = item.querySelector('.faq-answer');
+            const isOpen = item.classList.contains('active');
+
+            document.querySelectorAll('.faq-item').forEach(el => {
+                el.classList.remove('active');
+                el.querySelector('.faq-answer').style.maxHeight = null;
+            });
+
+            if (!isOpen) {
+                item.classList.add('active');
+                answer.style.maxHeight = answer.scrollHeight + "px";
+            }
+        });
+    });
+</script>
+
+
+
+
+<div id="demoModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 transition-opacity">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+
+        <div class="bg-slate-50 border-b border-slate-100 px-8 py-5 flex justify-between items-center">
+            <div>
+                <h3 class="text-slate-900 font-bold text-xl">Book Appointment</h3>
+                <p id="step-indicator" class="text-slate-500 text-sm mt-1">Step 1 of 4: Select Service</p>
+            </div>
+            <button onclick="closeDemoModal()" class="text-slate-400 hover:text-red-500 transition text-2xl font-bold">&times;</button>
+        </div>
+
+        <div class="w-full bg-slate-100 h-1.5">
+            <div id="progress-bar" class="bg-indigo-600 h-1.5 transition-all duration-300" style="width: 25%"></div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8">
+
+            <div id="step-1" class="step-content space-y-4">
+                <h4 class="text-lg font-bold text-slate-800 mb-4">Choose a Service</h4>
+                <div class="grid grid-cols-1 gap-4">
+                    <div onclick="selectService('Gents Fade & Beard Trim', 350, this)" class="service-card cursor-pointer border-2 border-indigo-600 bg-indigo-50 p-5 rounded-xl flex justify-between items-center transition-all">
+                        <div>
+                            <div class="font-bold text-slate-900">Gents Fade & Beard Trim</div>
+                            <div class="text-sm text-slate-500 mt-1">45 Mins • R350</div>
+                        </div>
+                        <div class="h-6 w-6 rounded-full border-2 border-indigo-600 flex items-center justify-center bg-indigo-600 text-white check-mark">✓</div>
+                    </div>
+
+                    <div onclick="selectService('Hot Towel Shave', 200, this)" class="service-card cursor-pointer border-2 border-slate-200 p-5 rounded-xl flex justify-between items-center hover:border-indigo-300 transition-all">
+                        <div>
+                            <div class="font-bold text-slate-900">Hot Towel Shave</div>
+                            <div class="text-sm text-slate-500 mt-1">30 Mins • R200</div>
+                        </div>
+                        <div class="h-6 w-6 rounded-full border-2 border-slate-300 flex items-center justify-center text-transparent check-mark">✓</div>
+                    </div>
+
+                    <div onclick="selectService('Full House Special', 550, this)" class="service-card cursor-pointer border-2 border-slate-200 p-5 rounded-xl flex justify-between items-center hover:border-indigo-300 transition-all">
+                        <div>
+                            <div class="font-bold text-slate-900">Full House Special</div>
+                            <div class="text-sm text-slate-500 mt-1">90 Mins • R550</div>
+                        </div>
+                        <div class="h-6 w-6 rounded-full border-2 border-slate-300 flex items-center justify-center text-transparent check-mark">✓</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-2" class="step-content hidden space-y-8">
+                <div>
+                    <h4 class="text-lg font-bold text-slate-800 mb-4">Select Professional</h4>
+                    <div class="flex gap-6">
+                        <div onclick="selectStaff('Sarah', this)" class="staff-card cursor-pointer text-center group">
+                            <div class="w-16 h-16 rounded-full bg-indigo-100 border-4 border-indigo-600 flex items-center justify-center text-indigo-700 font-bold text-xl mx-auto mb-2 transition-all">S</div>
+                            <span class="font-medium text-slate-900">Sarah</span>
+                        </div>
+                        <div onclick="selectStaff('Mike', this)" class="staff-card cursor-pointer text-center group opacity-60 hover:opacity-100">
+                            <div class="w-16 h-16 rounded-full bg-slate-100 border-4 border-transparent flex items-center justify-center text-slate-500 font-bold text-xl mx-auto mb-2 transition-all">M</div>
+                            <span class="font-medium text-slate-500">Mike</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold text-slate-800 mb-4">Available Slots (Tomorrow)</h4>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="selectTime('09:00 AM', this)" class="time-btn py-2 px-3 rounded-lg border border-slate-200 text-sm font-medium hover:border-indigo-500 transition-colors">09:00 AM</button>
+                        <button onclick="selectTime('10:30 AM', this)" class="time-btn py-2 px-3 rounded-lg bg-indigo-600 text-white border-indigo-600 text-sm font-medium shadow-md">10:30 AM</button>
+                        <button onclick="selectTime('12:00 PM', this)" class="time-btn py-2 px-3 rounded-lg border border-slate-200 text-sm font-medium hover:border-indigo-500">12:00 PM</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-3" class="step-content hidden space-y-6">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5">
+                    <h5 class="text-indigo-900 font-bold text-xs uppercase tracking-wide mb-2">Booking Summary</h5>
+                    <p class="text-indigo-700 text-lg font-medium" id="summary-text"></p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Your Name</label>
+                        <input type="text" id="client_name" placeholder="John Doe" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
+                        <input type="email" id="client_email" placeholder="john@example.com" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                        <p class="text-xs text-slate-500 mt-1">We will send your receipt here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-4" class="step-content hidden">
+                <div class="border rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-sky-500 p-4 flex justify-between items-center text-white">
+                        <div class="font-black text-xl italic tracking-tighter uppercase">payfast</div>
+
+                        <div class="flex items-center gap-1 text-[10px] uppercase font-bold opacity-80">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg>
+                            Demo Checkout
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 space-y-6">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                            <div>
+                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Merchant</p>
+                                <p class="text-slate-800 font-bold">The Grooming Lounge</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Deposit Amount</p>
+                                <p class="text-2xl font-black text-slate-900" id="payfast-amount">R0.00</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-tight">Select Payment Method</p>
+
+                            <div class="border-2 border-sky-500 bg-white p-4 rounded-lg flex items-center gap-4 cursor-pointer relative">
+                                <div class="w-10 h-7 bg-slate-100 rounded border flex items-center justify-center text-[8px] font-black text-slate-400">VISA</div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-slate-800">Credit / Debit Card</p>
+                                    <p class="text-[11px] text-slate-500">Visa, Mastercard, Amex</p>
+                                </div>
+                                <div class="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                                    <div class="w-2 h-2 rounded-full bg-white"></div>
+                                </div>
+                            </div>
+
+                            <div class="border border-slate-200 bg-white p-4 rounded-lg flex items-center gap-4 opacity-50 grayscale cursor-not-allowed">
+                                <div class="w-10 h-7 bg-slate-100 rounded border flex items-center justify-center text-[8px] font-black text-slate-400">EFT</div>
+                                <div class="flex-1 text-sm font-bold text-slate-800">Instant EFT</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
+            <button id="btn-back" onclick="changeStep(-1)" class="text-slate-500 font-semibold px-4 py-2 hover:text-slate-800 hidden">Back</button>
+
+            <button id="btn-next" onclick="changeStep(1)" class="ml-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2">
+                <span id="btn-text">Continue</span>
+                <svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. STATE MANAGEMENT
+    let currentStep = 1;
+    let formData = {
+        service: "Gents Fade & Beard Trim",
+        price: 350,
+        staff: "Sarah",
+        time: "10:30 AM",
+        name: "",
+        email: ""
+    };
+
+    // 2. MODAL CONTROLS
+    function openDemoModal() {
+        document.getElementById('demoModal').classList.replace('hidden', 'flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDemoModal() {
+        document.getElementById('demoModal').classList.replace('flex', 'hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    // 3. SELECTION LOGIC
+    function selectService(serviceName, price, el) {
+        formData.service = serviceName;
+        formData.price = price;
+
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.classList.remove('border-indigo-600', 'bg-indigo-50');
+            card.classList.add('border-slate-200');
+            card.querySelector('.check-mark').classList.replace('bg-indigo-600', 'text-transparent');
+            card.querySelector('.check-mark').classList.remove('text-white', 'border-indigo-600');
+            card.querySelector('.check-mark').classList.add('border-slate-300');
+        });
+
+        el.classList.remove('border-slate-200');
+        el.classList.add('border-indigo-600', 'bg-indigo-50');
+        el.querySelector('.check-mark').classList.replace('text-transparent', 'bg-indigo-600');
+        el.querySelector('.check-mark').classList.add('text-white', 'border-indigo-600');
+        el.querySelector('.check-mark').classList.remove('border-slate-300');
+    }
+
+    function selectStaff(staffName, el) {
+        formData.staff = staffName;
+        document.querySelectorAll('.staff-card div').forEach(div => {
+            div.classList.remove('bg-indigo-100', 'border-indigo-600', 'text-indigo-700');
+            div.classList.add('bg-slate-100', 'border-transparent', 'text-slate-500');
+        });
+        const activeDiv = el.querySelector('div');
+        activeDiv.classList.add('bg-indigo-100', 'border-indigo-600', 'text-indigo-700');
+    }
+
+    function selectTime(timeSlot, el) {
+        formData.time = timeSlot;
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-md');
+            btn.classList.add('border-slate-200', 'text-slate-800');
+        });
+        el.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-md');
+    }
+
+    // 4. NAVIGATION LOGIC
+    function changeStep(direction) {
+        if (currentStep === 3 && direction === 1) {
+            const emailInput = document.getElementById('client_email');
+            if (!emailInput.value || !emailInput.value.includes('@')) {
+                alert("Please enter a valid email address.");
+                emailInput.focus();
+                return;
+            }
+            formData.name = document.getElementById('client_name').value || "Valued Client";
+            formData.email = emailInput.value;
+        }
+
+        if (currentStep === 4 && direction === 1) {
+            submitBooking();
+            return;
+        }
+
+        const nextStep = currentStep + direction;
+        document.getElementById(`step-${currentStep}`).classList.add('hidden');
+        document.getElementById(`step-${nextStep}`).classList.remove('hidden');
+        currentStep = nextStep;
+        updateUI();
+    }
+
+    function updateUI() {
+        const progress = (currentStep / 4) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+
+        const titles = ["Select Service", "Professional & Time", "Final Details", "Secure Payment"];
+        document.getElementById('step-indicator').innerText = `Step ${currentStep} of 4: ${titles[currentStep-1]}`;
+
+        document.getElementById('btn-back').classList.toggle('hidden', currentStep === 1);
+
+        const nextBtn = document.getElementById('btn-next');
+        const btnText = document.getElementById('btn-text');
+
+        if (currentStep === 3) {
+            btnText.innerText = "Proceed to Payment";
+            document.getElementById('summary-text').innerText = `${formData.service} with ${formData.staff} @ ${formData.time}`;
+        } else if (currentStep === 4) {
+            nextBtn.classList.replace('bg-indigo-600', 'bg-indigo-600');
+            btnText.innerText = `Complete Demo`;
+            document.getElementById('payfast-amount').innerText = `R${formData.price}`;
+        } else {
+            nextBtn.classList.replace('bg-[#da2128]', 'bg-indigo-600');
+            btnText.innerText = "Continue";
+        }
+    }
+
+    // 5. API SUBMISSION (FIXED)
+    async function submitBooking() {
+        const nextBtn = document.getElementById('btn-next');
+        const btnText = document.getElementById('btn-text');
+
+        nextBtn.disabled = true;
+        btnText.innerText = "Processing...";
+
+        try {
+            const response = await fetch('/api/demo-booking/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]') ?
+                                   document.querySelector('[name=csrfmiddlewaretoken]').value : ''
+                },
+                body: JSON.stringify({
+                    email: formData.email,
+                    name: formData.name,
+                    service: formData.service,
+                    price: formData.price,
+                    staff: formData.staff,
+                    time: formData.time,
+                    send_email: true
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("🎉 Appointment Booked! Check your email for confirmation.");
+                closeDemoModal();
+                location.reload();
+            } else {
+                alert("Error: " + (result.message || "Failed to book."));
+                nextBtn.disabled = false;
+                btnText.innerText = `Pay R${formData.price}`;
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Network error. Please check your connection.");
+            nextBtn.disabled = false;
+            btnText.innerText = `Pay R${formData.price}`;
+        }
+    }
+</script>
+<footer class="bg-white border-t border-slate-100 pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-10 mb-16">
+            <div class="col-span-1 md:col-span-2">
+                <a href="/" class="flex items-center gap-2 mb-6">
+                     <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white">
+                        <i class="fa fa-calendar-check text-xs"></i>
+                    </div>
+                    <span class="font-display font-extrabold text-xl tracking-tight text-slate-900">Get<span class="text-brand-600">Me</span>Booked</span>
+                </a>
+                <p class="text-slate-500 text-sm leading-relaxed max-w-sm">
+                    South Africa's dedicated appointment operating system. Built in Pretoria, used nationwide.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-slate-900 mb-6">Product</h4>
+                <ul class="space-y-4 text-sm text-slate-500">
+                    <li><a href="#features" class="hover:text-brand-600">Features</a></li>
+                    <li><a href="#pricing" class="hover:text-brand-600">Pricing</a></li>
+                    <li><a href="{% url 'login' %}" class="hover:text-brand-600">Login</a></li>
+                    <li><a href="{% url 'register' %}" class="hover:text-brand-600">Sign Up</a></li>
+                    <li><a href="{% static 'downloads/getmebooked.apk' %}" download="GetMeBooked.apk" class="hover:text-brand-600">Download Android App</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-slate-900 mb-6">Legal</h4>
+                <ul class="space-y-4 text-sm text-slate-500">
+                    <li><a href="{% url 'terms' %}" class="hover:text-brand-600">Terms of Service</a></li>
+                    <li><a href="{% url 'privacy' %}" class="hover:text-brand-600">Privacy Policy</a></li>
+                    <li><a href="mailto:getmebookedinfo@gmail.com" class="hover:text-brand-600">Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-slate-100 pt-10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-slate-400 font-medium">&copy; 2026 GetMeBooked Technologies.</p>
+            <div class="flex items-center gap-4 opacity-50 grayscale">
+               <i class="fa-solid fa-lock text-xs text-slate-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Secure Payments via PayFast</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // --- 1. NAVBAR SCROLL ---
+    window.addEventListener('scroll', () => {
+        const nav = document.getElementById('navbar');
+        const container = document.getElementById('navbarContainer');
+        if (window.scrollY > 20) {
+            nav.classList.add('py-3', 'shadow-md');
+            nav.classList.remove('py-4', 'shadow-lg');
+            container.classList.remove('pt-6');
+            container.classList.add('pt-2');
+        } else {
+            nav.classList.remove('py-3', 'shadow-md');
+            nav.classList.add('py-4', 'shadow-lg');
+            container.classList.add('pt-6');
+            container.classList.remove('pt-2');
+        }
+    });
+
+    // --- 2. MOBILE MENU ---
+    const menu = document.getElementById('mobileMenu');
+    const drawer = document.getElementById('mobileDrawer');
+
+    function toggleMenu() {
+        const isOpen = menu.classList.contains('pointer-events-auto');
+        if (isOpen) {
+            menu.classList.remove('pointer-events-auto', 'opacity-100');
+            menu.classList.add('pointer-events-none', 'opacity-0');
+            drawer.classList.add('translate-x-full');
+            document.body.style.overflow = '';
+        } else {
+            menu.classList.add('pointer-events-auto', 'opacity-100');
+            menu.classList.remove('pointer-events-none', 'opacity-0');
+            drawer.classList.remove('translate-x-full');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    document.getElementById('mobileMenuBtn').addEventListener('click', toggleMenu);
+
+    // --- 3. ROI CALCULATOR ---
+    const apptRange = document.getElementById('apptRange');
+    const priceRange = document.getElementById('priceRange');
+    const apptVal = document.getElementById('apptVal');
+    const priceVal = document.getElementById('priceVal');
+    const roiTotal = document.getElementById('roiTotal');
+
+    function updateROI() {
+        const appts = parseInt(apptRange.value, 10) || 0;
+        const price = parseInt(priceRange.value, 10) || 0;
+
+        apptVal.innerText = appts;
+        priceVal.innerText = `R${price}`;
+
+        // Payfast Standard: 3.2% + R2.00 + VAT(15%)
+        const percentageFee = 0.032;
+        const fixedFee = 2.00;
+        const vat = 1.15;
+
+        const singleFee = ((price * percentageFee) + fixedFee) * vat;
+        const revenue = appts * price;
+        const totalFees = appts * singleFee;
+        const net = revenue - totalFees;
+
+        roiTotal.innerText = `R${Math.max(0, net).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
+    }
+
+    apptRange.oninput = updateROI;
+    priceRange.oninput = updateROI;
+    updateROI();
+
+    // --- 4. FAQ ACCORDION ---
+    document.querySelectorAll('.faq-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('.fa-chevron-down');
+            const isOpen = content.style.maxHeight;
+
+            // Close all
+            document.querySelectorAll('.faq-content').forEach(el => el.style.maxHeight = null);
+            document.querySelectorAll('.fa-chevron-down').forEach(el => el.classList.remove('rotate-180'));
+
+            if (!isOpen) {
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.classList.add('rotate-180');
+            }
+        });
+    });
+
+    // --- 5. SMOOTH SCROLL ---
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                window.scrollTo({
+                    top: target.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+  const observerOptions = {
+    threshold: 0.1 // Trigger when 10% of the element is visible
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        // Optional: Stop observing once revealed
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  // Target all elements with the reveal class
+  const revealElements = document.querySelectorAll(".reveal-on-scroll");
+  revealElements.forEach((el) => observer.observe(el));
+});
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.getElementById('desktop-carousel');
+        const slides = carousel.children;
+        const totalSlides = slides.length;
+        let currentIndex = 0;
+
+        function rotateCarousel() {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            const offset = currentIndex * 100;
+            carousel.style.transform = `translateX(-${offset}%)`;
+        }
+
+        // Rotate every 4 seconds
+        setInterval(rotateCarousel, 4000);
+    });
+</script>
+</body>
+</html>

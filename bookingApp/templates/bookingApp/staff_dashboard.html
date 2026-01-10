@@ -1,0 +1,429 @@
+{% extends 'bookingApp/base.html' %}
+{% load custom_filters %}
+
+{% block title %}Staff Dashboard | {{ user.staff_profile.business.name }}{% endblock %}
+
+{% block content %}
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    /* --- 1. CORE VISUAL IDENTITY (MATCHING OWNER/ANALYTICS) --- */
+    :root {
+        --brand-indigo: #6366f1;
+        --brand-indigo-dark: #4f46e5;
+        --brand-indigo-soft: #eef2ff;
+        --surface-ground: #f8fafc;
+        --surface-card: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--surface-ground);
+        color: var(--text-main);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- 2. CONTAINERS & PANELS --- */
+    .spa-width { max-width: 1400px; margin: 0 auto; padding: 0 1rem; width: 100%; }
+
+    .glass-panel {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        border-radius: 1rem;
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .glass-panel:hover {
+        border-color: var(--brand-indigo);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+    }
+
+    .glass-panel-interactive { cursor: pointer; }
+    .glass-panel-interactive:hover { transform: translateY(-2px); }
+
+    /* --- 3. TYPOGRAPHY --- */
+    .h-mega-sm {
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        color: var(--text-main);
+    }
+
+    .mini-label {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    /* --- 4. BUTTONS & NAV --- */
+    .nav-pill {
+        padding: 0.5rem 1.25rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        border-radius: 9999px;
+        transition: all 0.2s;
+        color: var(--text-muted);
+        background: transparent;
+        border: 1px solid transparent;
+        white-space: nowrap;
+    }
+
+    .nav-pill:hover { color: var(--brand-indigo); background: white; border-color: var(--border-color); }
+
+    .nav-pill.active {
+        background: var(--brand-indigo);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Secondary Pills for sub-tabs */
+    .filter-pill {
+        padding: 0.4rem 1rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+        color: var(--text-muted);
+        background: white;
+        border: 1px solid var(--border-color);
+    }
+    .filter-pill:hover { border-color: var(--brand-indigo); color: var(--brand-indigo); }
+    .filter-pill.active { background: var(--text-main); color: white; border-color: var(--text-main); }
+
+    /* Buttons */
+    .btn-primary {
+        background: var(--brand-indigo);
+        color: white;
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-primary:hover { background: var(--brand-indigo-dark); transform: translateY(-1px); }
+
+    .btn-secondary {
+        background: white;
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-secondary:hover { border-color: var(--brand-indigo); color: var(--brand-indigo); }
+
+    /* --- 5. INPUTS --- */
+    .input-modern {
+        background: white;
+        border: 1px solid var(--border-color);
+        padding: 0.6rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        outline: none;
+        width: 100%;
+        color: var(--text-main);
+        transition: border-color 0.2s;
+    }
+    .input-modern:focus { border-color: var(--brand-indigo); }
+
+    /* Animations */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeUp 0.3s ease-out forwards; }
+</style>
+
+<div class="min-h-screen py-8 md:py-12">
+
+    <header class="mb-8">
+        <div class="spa-width">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="px-2 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-wider rounded-md">Staff Portal</span>
+                        <span class="text-slate-300">•</span>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="mini-label !mb-0 text-slate-500">Active</span>
+                        </div>
+                    </div>
+                    <h1 class="h-mega-sm tracking-tight text-slate-900">{{ user.get_full_name|default:user.username }}</h1>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="sticky top-4 z-40 mb-8">
+        <div class="spa-width">
+            <div class="glass-panel p-2 flex overflow-x-auto gap-2 bg-white/90 backdrop-blur-md">
+                <button class="nav-pill active" onclick="switchMainTab(event, 'tab-appointments')">My Schedule</button>
+                <button class="nav-pill" onclick="switchMainTab(event, 'tab-services')">Services</button>
+                <button class="nav-pill" onclick="switchMainTab(event, 'tab-hours')">Work Hours</button>
+                <button class="nav-pill" onclick="switchMainTab(event, 'tab-blocks')">Time Off</button>
+
+            </div>
+        </div>
+    </div>
+
+    <main class="spa-width min-h-[500px]">
+
+        <section id="tab-appointments" class="tab-pane block animate-fade-up">
+
+            <div class="flex gap-2 mb-6">
+                <button class="filter-pill active" onclick="switchSubTab(event, 'sub-today')">Today</button>
+                <button class="filter-pill" onclick="switchSubTab(event, 'sub-upcoming')">Upcoming</button>
+                <button class="filter-pill" onclick="switchSubTab(event, 'sub-history')">History</button>
+                <a href="{% url 'manual_booking' business.id %}" class="inline-flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-all shadow-sm shadow-indigo-100">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>Booking</span>
+                    </a>
+            </div>
+
+            <div id="sub-today" class="sub-pane block space-y-3">
+                {% for appt in todays_appointments %}
+                <div class="glass-panel p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 border-l-indigo-500 hover:border-indigo-500">
+                    <div class="flex items-center gap-5">
+                        <div class="bg-indigo-50 text-indigo-600 rounded-lg px-4 py-3 min-w-[80px] text-center border border-indigo-100">
+                            <span class="block text-sm font-black">{{ appt.appointment_start_time|time:"H:i" }}</span>
+                            <span class="block text-[9px] font-bold uppercase tracking-wider opacity-70">Start</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-lg">
+                                {{ appt.guest_name }}
+                            </h4>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">{{ appt.service.name }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'appointment_detail' appt.pk %}" class="btn-secondary !rounded-full !w-10 !h-10 !p-0 flex items-center justify-center">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="glass-panel p-12 text-center">
+                    <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fa-regular fa-calendar text-slate-300"></i>
+                    </div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">No appointments today</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div id="sub-upcoming" class="sub-pane hidden space-y-3">
+                {% for appt in upcoming %}
+                <div class="glass-panel p-4 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-5">
+                        <div class="bg-slate-50 text-slate-900 rounded-lg px-4 py-2 min-w-[80px] text-center border border-slate-100">
+                            <span class="block text-sm font-black">{{ appt.appointment_start_time|time:"H:i" }}</span>
+                            <span class="block text-[9px] font-bold uppercase text-indigo-500">{{ appt.appointment_date|date:"d M" }}</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">{% if appt.customer %}{{ appt.customer.get_full_name }}{% else %}{{ appt.guest_name }}{% endif %}</h4>
+                            <p class="text-xs text-slate-400">{{ appt.service.name }}</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'appointment_detail' appt.pk %}" class="btn-secondary !rounded-full !w-8 !h-8 !p-0 flex items-center justify-center">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="glass-panel p-12 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">No upcoming bookings</div>
+                {% endfor %}
+            </div>
+
+            <div id="sub-history" class="sub-pane hidden space-y-2">
+                {% for appt in past %}
+                <div class="glass-panel p-3 flex items-center justify-between opacity-80 hover:opacity-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase w-12">{{ appt.appointment_date|date:"d M" }}</span>
+                        <h4 class="font-bold text-slate-700 text-sm">{% if appt.customer %}{{ appt.customer.get_full_name }}{% else %}{{ appt.guest_name }}{% endif %}</h4>
+                    </div>
+                    <span class="text-[9px] font-black text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded">{{ appt.status }}</span>
+                </div>
+                {% empty %}
+                <div class="glass-panel p-12 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">No history found</div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="tab-services" class="tab-pane hidden animate-fade-up">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="font-black text-xl text-slate-900">My Skills</h3>
+                    <p class="text-xs text-slate-400 font-medium">Select services you are qualified to perform</p>
+                </div>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="update_services" value="true">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    {% for checkbox in service_form.services %}
+                    <label class="glass-panel glass-panel-interactive p-4 flex items-center gap-4 cursor-pointer group">
+                        <div class="relative flex items-center justify-center w-5 h-5">
+                            {{ checkbox.tag }}
+                            </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-700 group-hover:text-indigo-600 transition-colors">
+                            {{ checkbox.choice_label }}
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn-primary px-8">
+                    Update Service List
+                </button>
+            </form>
+        </section>
+
+        <section id="tab-hours" class="tab-pane hidden animate-fade-up">
+            <div class="glass-panel p-6 lg:p-8 max-w-3xl">
+                <div class="mb-6 border-b border-slate-100 pb-4">
+                    <h3 class="font-black text-lg text-slate-900">Weekly Schedule</h3>
+                    <p class="text-xs text-slate-400">Set your standard availability.</p>
+                </div>
+
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    {% for day_val, day_label in day_choices %}
+                    <div class="flex items-center justify-between gap-4 py-2">
+                        <label class="text-[10px] font-black uppercase text-slate-500 w-24">{{ day_label }}</label>
+                        <div class="flex items-center gap-3 flex-1 max-w-xs">
+                            <input type="time" name="{{ day_val }}_open" class="input-modern !py-2 text-xs"
+                                   value="{{ hours|get_item:day_val|get_attr:'open_time'|time:'H:i' }}">
+                            <span class="text-[9px] font-bold text-slate-300">TO</span>
+                            <input type="time" name="{{ day_val }}_close" class="input-modern !py-2 text-xs"
+                                   value="{{ hours|get_item:day_val|get_attr:'close_time'|time:'H:i' }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="pt-6 mt-4 border-t border-slate-100">
+                        <button type="submit" name="update_hours" class="btn-primary w-full md:w-auto">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section id="tab-blocks" class="tab-pane hidden animate-fade-up space-y-8">
+            <div class="glass-panel p-6 border-l-4 border-l-rose-400">
+                <h3 class="font-bold text-slate-900 mb-4">Request Time Off</h3>
+                <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    {% csrf_token %}
+                    <div class="space-y-1">
+                        <label class="mini-label">Date</label>
+                        <input type="date" name="block_date" class="input-modern" required>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="mini-label">Start Time</label>
+                        <input type="time" name="start_time" class="input-modern" required>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="mini-label">End Time</label>
+                        <input type="time" name="end_time" class="input-modern" required>
+                    </div>
+                    <button type="submit" name="add_block" class="btn-primary !bg-slate-900 w-full">
+                        <i class="fa-solid fa-plus text-xs"></i> Add Block
+                    </button>
+                </form>
+            </div>
+
+            <div>
+                <h3 class="mini-label mb-3">Active Time Blocks</h3>
+                <div class="space-y-3">
+                    {% for block in blocks %}
+                    <div class="glass-panel p-4 flex justify-between items-center border border-slate-100">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center">
+                                <i class="fa-regular fa-calendar-xmark"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-900 text-sm">{{ block.block_date|date:"D, d M Y" }}</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ block.start_time|time:"H:i" }} — {{ block.end_time|time:"H:i" }}</p>
+                            </div>
+                        </div>
+                        <form method="POST" class="m-0">
+                            {% csrf_token %}
+                            <input type="hidden" name="block_id" value="{{ block.id }}">
+                            <button type="submit" name="delete_block" class="text-slate-300 hover:text-rose-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <div class="glass-panel p-8 text-center text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                        No time off scheduled
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+    function switchMainTab(evt, tabId) {
+        // Hide all main panes
+        document.querySelectorAll('.tab-pane').forEach(p => {
+            p.classList.add('hidden');
+            p.classList.remove('block');
+        });
+        // Remove active from all main nav items
+        document.querySelectorAll('.nav-pill').forEach(btn => btn.classList.remove('active'));
+
+        // Show selected pane
+        document.getElementById(tabId).classList.remove('hidden');
+        document.getElementById(tabId).classList.add('block');
+        evt.currentTarget.classList.add('active');
+
+        // Ensure fade animation replays
+        const pane = document.getElementById(tabId);
+        pane.classList.remove('animate-fade-up');
+        void pane.offsetWidth; // Trigger reflow
+        pane.classList.add('animate-fade-up');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchSubTab(evt, subId) {
+        // Hide all sub panes within appointments
+        document.querySelectorAll('.sub-pane').forEach(p => {
+            p.classList.add('hidden');
+            p.classList.remove('block');
+        });
+        // Remove active from all filter pills
+        document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+
+        // Show selected sub pane
+        document.getElementById(subId).classList.remove('hidden');
+        document.getElementById(subId).classList.add('block');
+        evt.currentTarget.classList.add('active');
+    }
+</script>
+{% endblock %}

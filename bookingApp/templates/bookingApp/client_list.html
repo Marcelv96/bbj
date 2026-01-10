@@ -1,0 +1,223 @@
+{% extends "bookingApp/base.html" %}
+{% block content %}
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+    
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .spa-width { max-width: 1600px; margin: 0 auto; padding: 0 1rem; }
+
+    /* COMPACT TOGGLE SWITCH UI */
+    .switch-wrapper {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .toggle-input { display: none; }
+
+    .toggle-track {
+        width: 40px;
+        height: 22px;
+        background-color: #e2e8f0;
+        border-radius: 999px;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toggle-thumb {
+        width: 16px;
+        height: 16px;
+        background-color: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .toggle-input:checked + .toggle-track {
+        background-color: #6366f1;
+    }
+    .toggle-input:checked + .toggle-track .toggle-thumb {
+        left: 21px;
+    }
+
+    .htmx-request .toggle-track {
+        opacity: 0.5;
+        cursor: wait;
+    }
+
+    tr:hover td { background-color: #f1f5f9; }
+
+    /* Micro-typography for mobile density */
+    .mobile-label { font-size: 7px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
+    .mobile-value { font-size: 10px; font-weight: 800; }
+</style>
+
+<div class="min-h-screen pb-20">
+    <header class="bg-white border-b border-slate-200 pt-8 md:pt-12 pb-6 md:pb-8">
+        <div class="spa-width">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6">
+                <div>
+                    <h1 class="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 mb-1 md:mb-2">All Clients<span class="text-indigo-600">.</span></h1>
+                    <p class="text-xs md:text-sm text-slate-500 font-semibold tracking-tight">Full lifecycle tracking for {{ clients.count }} verified clients.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="sticky mb-3 top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 py-3 md:py-4">
+        <div class="spa-width">
+            <form method="GET" class="relative group">
+                <i class="fa-solid fa-search absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors"></i>
+                <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Instant Search Clients..." 
+                       class="w-full pl-11 md:pl-14 pr-4 md:pr-6 py-3 md:py-4 bg-slate-100 border-none rounded-xl md:rounded-2xl text-xs md:text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
+            </form>
+        </div>
+    </div>
+
+    <main class="spa-width mt-6 md:mt-8">
+        <div class="hidden lg:block bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-2xl shadow-slate-200/50">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                        <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Client Identity</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Engagement</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">LTV (Revenue)</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Service Profile</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Acquisition</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Deposit Bypass</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for client in clients %}
+                    <tr class="group transition-colors duration-150">
+                        <td class="px-6 py-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-sm shadow-lg">
+                                    {{ client.name|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <p class="font-extrabold text-slate-900 text-sm leading-tight mb-1">{{ client.name }}</p>
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-[10px] text-slate-400 font-bold"><i class="fa-solid fa-envelope mr-1"></i> {{ client.email|default:"No Email" }}</span>
+                                        <span class="text-[10px] text-indigo-500 font-black"><i class="fa-solid fa-phone mr-1"></i> {{ client.phone|default:"No Phone" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-black text-slate-800">{{ client.appointment_count }} Bookings</span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase">Activity Level Tracking</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6">
+                            <div class="flex flex-col">
+                                <span class="text-base font-black text-emerald-600">R {{ client.total_spent|floatformat:2 }}</span>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Net Revenue</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6">
+                            <div class="flex flex-col max-w-[180px]">
+                                <span class="text-xs font-black text-slate-700 truncate mb-1">Pref: {{ client.most_selected_service }}</span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase leading-none">Last: {{ client.last_service }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-black text-slate-700">{{ client.created_at|date:"D, d M Y" }}</span>
+                                <span class="text-[9px] font-black uppercase text-indigo-400">Added to Database</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6">
+                            <form hx-post="{% url 'toggle_client_exemption' client.id %}"
+                                  hx-trigger="change from:find input"
+                                  hx-target="this"
+                                  hx-swap="outerHTML"
+                                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                  class="flex flex-col items-center justify-center">
+                                
+                                <label class="switch-wrapper">
+                                    <input type="checkbox" name="exempt" class="toggle-input" 
+                                           {% if client.deposit_exempt %}checked{% endif %}>
+                                    <div class="toggle-track">
+                                        <div class="toggle-thumb"></div>
+                                    </div>
+                                </label>
+                                <span class="mt-2 text-[9px] font-black uppercase tracking-widest {% if client.deposit_exempt %}text-indigo-600{% else %}text-slate-300{% endif %}">
+                                    {% if client.deposit_exempt %}NO DEPOSIT{% else %}DEPOSIT REQUIRED{% endif %}
+                                </span>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="lg:hidden grid grid-cols-2 gap-3">
+            {% for client in clients %}
+            <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-black text-[10px]">
+                            {{ client.name|slice:":1"|upper }}
+                        </div>
+                        
+                        <form hx-post="{% url 'toggle_client_exemption' client.id %}"
+                              hx-trigger="change from:find input"
+                              hx-target="this"
+                              hx-swap="outerHTML"
+                              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                              class="flex flex-col items-end">
+                            <label class="switch-wrapper">
+                                <input type="checkbox" name="exempt" class="toggle-input" {% if client.deposit_exempt %}checked{% endif %}>
+                                <div class="toggle-track">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </label>
+                            <span class="text-[6px] font-black uppercase mt-1 {% if client.deposit_exempt %}text-indigo-600{% else %}text-slate-300{% endif %}">
+                                {% if client.deposit_exempt %}NO DEPOSIT{% else %}DEPOSIT REQUIRED{% endif %}
+                            </span>
+                        </form>
+                    </div>
+
+                    <div class="mb-3">
+                        <h3 class="font-black text-slate-900 text-[11px] leading-tight truncate">{{ client.name }}</h3>
+                        <p class="text-[9px] font-bold text-indigo-500 truncate">{{ client.phone|default:"NO PHONE" }}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-1.5 mb-3">
+                        <div class="bg-slate-50 rounded-lg p-1.5 border border-slate-100 text-center">
+                            <p class="mobile-label text-slate-400">Visits</p>
+                            <p class="mobile-value text-slate-800">{{ client.appointment_count }}</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-lg p-1.5 border border-slate-100 text-center">
+                            <p class="mobile-label text-slate-400">Spent</p>
+                            <p class="mobile-value text-emerald-600">R{{ client.total_spent|floatformat:0 }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100 space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="mobile-label text-slate-400">Pref</span>
+                        <span class="text-[8px] font-black text-slate-700 truncate max-w-[45px]">{{ client.most_selected_service }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="mobile-label text-slate-400">Last</span>
+                        <span class="text-[8px] font-black text-slate-700 truncate max-w-[45px]">{{ client.last_service }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+{% endblock %}

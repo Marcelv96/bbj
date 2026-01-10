@@ -1,0 +1,173 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}Terms of Service | GetMeBooked{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-white min-vh-100">
+    <div class="row border-bottom py-5 px-2 px-lg-2">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-baseline">
+                <div>
+                    <h1 class="display-3 fw-900 text-dark mb-2 tracking-tighter">Terms of Service</h1>
+                    <p class="fs-5 text-muted mb-0">GetMeBooked Platform Operating Agreement</p>
+                </div>
+                <div class="text-md-end mt-3 mt-md-0">
+                    <span class="text-uppercase fw-800 small ls-1 text-muted">Last Updated</span>
+                    <p class="h6 fw-900 text-dark mb-0">31 December 2025</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="legal-body px-2 px-lg-2">
+
+        <div class="row py-5 border-bottom">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">01. Service Scope</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-4 text-dark lh-base mb-4">GetMeBooked is a scheduling infrastructure provider. We facilitate the connection between independent Business Owners (Salons, Barbers, and Clinics) and their clients.</p>
+                <p class="text-secondary fs-5">We are not a service provider, employer, or agent for any business listed on the platform. Any contract for physical services is strictly between the User and the Business Owner. We do not guarantee the quality, safety, or legality of services rendered at physical locations.</p>
+            </div>
+        </div>
+
+        <div class="row py-5 border-bottom">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">02. Financial Policy</h5>
+            </div>
+            <div class="col-xl-9">
+                <div class="p-4 bg-light rounded-3 mb-4 border-start border-primary border-4">
+                    <p class="fs-4 fw-800 text-dark mb-0">Subscription & Deposit Infrastructure</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-6 border-end-md">
+                        <h6 class="fw-800 text-dark text-uppercase small ls-1 mb-3">02.1 Platform Subscriptions</h6>
+                        <p class="fs-6 text-secondary">Access to GetMeBooked management tools is provided on a <strong>month-to-month</strong> basis. Business Owners manage renewals manually via their dashboard.</p>
+                        <ul class="text-secondary small ps-3">
+                            <li class="mb-2"><strong>Additive Renewal:</strong> When a renewal payment is processed, <strong>30 days are added to your current expiration date</strong>. Renewing early does not result in lost days.</li>
+                            <li class="mb-2"><strong>Alerts & Access:</strong> A payment link is always available. Alerts will appear as your subscription nears its end.</li>
+                            <li><strong>Grace Period:</strong> Failure to renew by the expiration date will result in the immediate suspension of your public booking page.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6 class="fw-800 text-dark text-uppercase small ls-1 mb-3">02.2 Merchant Deposits</h6>
+                        <p class="fs-6 text-secondary">Business Owners may require deposits via their own <strong>PayFast Merchant account</strong>. GetMeBooked provides the integration but does not touch these funds.</p>
+                        <ul class="text-secondary small ps-3">
+                            <li class="mb-2"><strong>Direct Flow:</strong> Payments go directly from Client to Business Owner.</li>
+                            <li><strong>Disputes:</strong> All refund requests for booking deposits must be settled directly with the Business Owner.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row py-5 border-bottom">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">03. Booking Lifecycle</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-4 text-dark lh-base mb-4">The confirmation process depends on the business's deposit settings.</p>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 h-100">
+                            <h6 class="fw-800 text-dark mb-2">Deposit-Required Bookings</h6>
+                            <p class="small text-secondary mb-0">Upon requesting a slot, clients receive an automated PayFast payment link via email. 
+                            <strong>The appointment is automatically confirmed only once payment is successful.</strong> 
+                            Requests that remain unpaid for more than <strong>2 hours</strong> are automatically cancelled by the system to release the time slot.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 h-100">
+                            <h6 class="fw-800 text-dark mb-2">Standard Bookings</h6>
+                            <p class="small text-secondary mb-0">For services not requiring a deposit, appointments enter a "Pending" state. 
+                            Business Owners must <strong>manually confirm or decline</strong> these requests through the Management Portal. A pending request is not a guarantee of service.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="fs-6 text-secondary"><strong class="text-dark">Cancellations:</strong> Users are subject to the specific business's local no-show and late-cancellation policies once a booking is confirmed.</p>
+            </div>
+        </div>
+
+        <div class="row py-5 border-bottom">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">04. Data Security</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-5 text-secondary mb-4">We prioritize the integrity of your business data and financial credentials.</p>
+                <div class="p-3 bg-indigo-50 rounded-3 border border-indigo-100 mb-0">
+                    <p class="small text-indigo-800 mb-0">
+                        <strong>Encryption Standard:</strong> PayFast Merchant IDs and security keys are stored using industry-standard encryption. We never store raw credit card details or client payment information on our local servers. Data is used strictly to facilitate the booking and subscription renewal process.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row py-5">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">05. Content Integrity</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-5 text-secondary">Users may leave one review per business entity. Reviews must be honest and based on first-hand service experiences. We reserve the right to remove content that is defamatory, fraudulent, or violates community standards.</p>
+            </div>
+        </div>
+
+        <div class="row py-5">
+            <div class="col-12">
+                <div class="bg-dark text-white p-5 rounded-4 d-flex flex-column flex-lg-row justify-content-between align-items-center gap-4">
+                    <div>
+                        <h2 class="fw-900 mb-1">Agreement</h2>
+                        <p class="text-white-50 mb-0">By continuing to use this platform, you agree to these Terms of Service.</p>
+                    </div>
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5 py-3 fw-800 rounded-3">Accept Terms</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #1a1a1a;
+        letter-spacing: -0.01em;
+    }
+
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .ls-1 { letter-spacing: 0.1em; }
+    .tracking-tighter { letter-spacing: -0.04em; }
+
+    .text-primary { color: #6366f1 !important; }
+    .text-indigo-800 { color: #3730a3 !important; }
+    .bg-indigo-50 { background-color: #eef2ff !important; }
+    .border-indigo-100 { border-color: #e0e7ff !important; }
+    
+    .btn-primary { background-color: #6366f1; border: none; }
+    .btn-primary:hover { background-color: #4f46e5; }
+
+    .legal-body .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    /* Column divider for financial policy */
+    @media (min-width: 768px) {
+        .border-end-md { border-right: 1px solid #dee2e6; }
+    }
+
+    @media (min-width: 1600px) {
+        .legal-body, .container-fluid > .row {
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    p { line-height: 1.6; }
+</style>
+{% endblock %}

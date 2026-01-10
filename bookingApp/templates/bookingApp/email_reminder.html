@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 60px 24px;">
+        <tr>
+            <td align="center">
+                <table width="100%" style="max-width: 800px;" cellpadding="0" cellspacing="0">
+                    
+                    <tr>
+                        <td style="padding-bottom: 60px; border-bottom: 1px solid #e5e7eb;">
+                            <table width="100%">
+                                <tr>
+                                    <td style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #000000; text-transform: uppercase;">
+                                        GetMeBooked
+                                    </td>
+                                    <td align="right">
+                                        <div style="width: 12px; height: 12px; background-color: #6366f1; border-radius: 50%; display: inline-block;"></div>
+                                        <span style="font-size: 12px; font-weight: 700; color: #6366f1; text-transform: uppercase; margin-left: 4px;">Reminder</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 80px 0 60px 0;">
+                            <h1 style="font-size: 84px; font-weight: 900; line-height: 0.85; margin: 0; color: #000000; letter-spacing: -4px;">
+                                Coming up<br/>soon.
+                            </h1>
+                            <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
+                                Hi {{ appointment.guest_name|default:"there" }}, this is a reminder that your appointment at <span style="color: #000000; font-weight: 600;">{{ business.name }}</span> is in <span style="color: #6366f1; font-weight: 600;">{{ timeframe }}</span>.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 50px 0; border-top: 2px solid #000000; border-bottom: 1px solid #e5e7eb;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="33%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Service</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ appointment.service.name }}</div>
+                                    </td>
+                                    <td width="33%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Date</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ appointment.appointment_date|date:"l, d F" }}</div>
+                                    </td>
+                                    <td width="34%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Time</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ appointment.appointment_start_time|time:"H:i" }}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {% if appointment.staff %}
+                    <tr>
+                        <td style="padding: 30px 0; border-bottom: 1px solid #e5e7eb;">
+                            <table width="100%">
+                                <tr>
+                                    <td style="font-size: 16px; color: #64748b;">
+                                        Your service will be with <strong>{{ appointment.staff.name }}</strong>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <tr>
+                        <td style="padding-top: 60px;">
+                            <div style="background-color: #000000; padding: 60px; border-radius: 4px; text-align: left;">
+                                <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px;">Review your booking</div>
+                                <p style="color: #94a3b8; font-size: 18px; margin: 0 0 40px 0; line-height: 1.5;">
+                                    Need to check details or make changes? Access your booking dashboard below.
+                                </p>
+                                <a href="{{ site_url }}" style="display: inline-block; background-color: #ffffff; color: #000000; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                    View My Bookings &rarr;
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding-top: 80px;">
+                            <table width="100%">
+                                <tr>
+                                    <td style="font-size: 13px; color: #94a3b8; line-height: 1.5;">
+                                        Sent by <strong>{{ business.name }}</strong><br/>
+                                        via GetMeBooked
+                                    </td>
+                                    <td align="right" style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                                        &copy; 2025
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

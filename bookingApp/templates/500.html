@@ -1,0 +1,11 @@
+{% extends 'bookingApp/base.html' %}
+{% block content %}
+<div class="container text-center" style="padding: 100px 20px;">
+    <h1 class="display-1 fw-800 text-danger">500</h1>
+    <h2 class="fw-700">Oops! Something went wrong</h2>
+    <p class="text-muted mb-4">Our servers are having a bit of a moment. We've been notified and are looking into it.</p>
+    <a href="{% url 'home' %}" class="btn-copy-premium-v2" style="text-decoration: none;">
+        Return to Safety
+    </a>
+</div>
+{% endblock %}

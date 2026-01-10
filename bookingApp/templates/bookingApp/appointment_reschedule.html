@@ -1,0 +1,283 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}Reschedule Appointment #{{ appointment.id }}{% endblock %}
+
+{% block content %}
+{% if form.errors %}
+<div class="alert alert-danger">
+    <ul>
+        {% for field in form %}
+            {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+<div class="saas-container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8">
+            
+            <div class="text-center mb-5">
+                <div class="d-inline-flex align-items-center justify-content-center bg-indigo-soft text-indigo rounded-circle mb-3" style="width: 64px; height: 64px;">
+                    <i class="fa-solid fa-calendar-check fa-xl"></i>
+                </div>
+                <h1 class="h3 fw-800 text-slate-900">Reschedule Appointment</h1>
+                <p class="text-muted mx-auto" style="max-width: 400px;">
+                    Moving your session with <span class="fw-700 text-slate-800">{{ appointment.booking_form.business.name }}</span>
+                </p>
+            </div>
+
+            <div class="card-saas border-0 shadow-lg mb-4">
+                <div class="p-4 bg-slate-50 border-bottom d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-box-white shadow-sm">
+                            <i class="fa-solid fa-clock-rotate-left text-muted"></i>
+                        </div>
+                        <div>
+                            <div class="label-caps mb-0">Original Slot</div>
+                            <div class="fw-700 text-slate-700">
+                                {{ appointment.appointment_date|date:"M d" }} @ {{ appointment.appointment_start_time|time:"H:i" }}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge bg-indigo-soft text-indigo rounded-pill px-3 py-2 fw-700">Appt #{{ appointment.id }}</span>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" class="saas-form">
+                        {% csrf_token %}
+                        
+                        <input type="hidden" id="businessId" value="{{ appointment.booking_form.business.id }}">
+                        <input type="hidden" id="serviceId" value="{{ appointment.service.id }}">
+                        <input type="hidden" id="currentStaffId" value="{{ appointment.staff.id|default:'' }}">
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger border-0 rounded-4 p-3 mb-4 d-flex align-items-center gap-3">
+                            <i class="fa-solid fa-circle-exclamation fa-lg"></i>
+                            <div class="small fw-600">Please select a valid date and available time.</div>
+                        </div>
+                        {% endif %}
+
+                        {% if is_too_late %}
+                        <div class="alert-late-reschedule mb-4">
+                            <div class="d-flex gap-3">
+                                <div class="icon-warning-pulse">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-800 mb-1 text-red-900">Late Reschedule Policy</h6>
+                                    <p class="extra-small text-red-800 mb-3 lh-sm">
+                                        This change is within 24 hours of your slot. Your current deposit will be forfeited and a new deposit will be required.
+                                    </p>
+                                    <div class="form-check custom-late-check">
+                                        <input class="form-check-input" type="checkbox" name="confirm_deposit_loss" id="confirmLoss" required>
+                                        <label class="form-check-label fw-800 small text-red-900" for="confirmLoss">
+                                            I agree to forfeit my deposit
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label class="label-caps mb-2"><i class="fa-solid fa-calendar-plus me-1 text-indigo"></i> Select New Date</label>
+                                {{ form.appointment_date }}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="label-caps mb-2"><i class="fa-solid fa-bolt me-1 text-indigo"></i> Available Times</label>
+                                <div class="position-relative">
+                                    {{ form.appointment_start_time }}
+                                    <div id="time-loader" class="d-none position-absolute end-0 top-50 translate-middle-y me-3">
+                                        <div class="spinner-border spinner-border-sm text-indigo" role="status"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="label-caps mb-2">Reason for change (Optional)</label>
+                                {{ form.notes }}
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-2">
+                            <button type="submit" class="btn btn-saas-primary w-100 py-3 rounded-4 mb-3">
+                                <span class="fw-800">Confirm Reschedule</span>
+                                <i class="fa-solid fa-arrow-right ms-2"></i>
+                            </button>
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-link-slate w-100 py-2">
+                                <i class="fa-solid fa-xmark me-2"></i>Keep Original Schedule
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center p-3 rounded-4 bg-slate-50 border border-dashed">
+                <p class="extra-small text-muted mb-0 lh-base">
+                    <i class="fa-solid fa-circle-info me-1 text-indigo"></i> 
+                    Your request will be sent to the business for approval. <br>
+                    Status will update to <strong>Pending</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --indigo-600: #4f46e5;
+        --indigo-700: #4338ca;
+        --indigo-soft: #eef2ff;
+        --slate-50: #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-900: #0f172a;
+        --red-50: #fff1f2;
+        --red-600: #e11d48;
+        --red-900: #881337;
+    }
+
+    body { background-color: #fcfdfe; font-family: 'Inter', system-ui, sans-serif; }
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    .label-caps { font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; }
+    .extra-small { font-size: 0.75rem; }
+
+    /* Card Styling */
+    .card-saas { background: white; border-radius: 24px; overflow: hidden; }
+    .icon-box-white { width: 40px; height: 40px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .bg-slate-50 { background-color: var(--slate-50); }
+
+    /* Forms */
+    .saas-form input, .saas-form select, .saas-form textarea {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 16px;
+        border: 2px solid var(--slate-100);
+        font-weight: 600;
+        color: var(--slate-900);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: var(--slate-50);
+    }
+    .saas-form input:focus, .saas-form select:focus {
+        outline: none;
+        border-color: var(--indigo-600);
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+    }
+
+    /* Late Reschedule Alert */
+    .alert-late-reschedule {
+        background-color: var(--red-50);
+        border: 1px solid #ffe4e6;
+        border-radius: 20px;
+        padding: 20px;
+    }
+    .icon-warning-pulse {
+        width: 42px; height: 42px;
+        background: #fff;
+        color: var(--red-600);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.4);
+        animation: pulse-red 2s infinite;
+    }
+    @keyframes pulse-red {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(225, 29, 72, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+    }
+
+    /* Buttons */
+    .btn-saas-primary {
+        background: var(--indigo-600);
+        color: white;
+        border: none;
+        transition: all 0.3s;
+        box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+    }
+    .btn-saas-primary:hover {
+        background: var(--indigo-700);
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.4);
+        color: white;
+    }
+    .btn-link-slate {
+        color: #64748b;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .btn-link-slate:hover { color: var(--slate-900); }
+
+    .text-indigo { color: var(--indigo-600); }
+    .bg-indigo-soft { background-color: var(--indigo-soft); }
+    
+    .custom-late-check .form-check-input {
+        width: 1.25rem; height: 1.25rem; border-color: #fda4af; cursor: pointer;
+    }
+    .custom-late-check .form-check-input:checked {
+        background-color: var(--red-600); border-color: var(--red-600);
+    }
+</style>
+
+<script>
+    // Note: The logic script remains the same as previously provided 
+    // to ensure functionality is maintained.
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('id_appointment_date');
+        const timeSelect = document.getElementById('id_appointment_start_time');
+        const loader = document.getElementById('time-loader');
+        const businessId = document.getElementById('businessId').value;
+        const serviceId = document.getElementById('serviceId').value;
+        const staffId = document.getElementById('currentStaffId').value;
+
+        function fetchSlots() {
+            const selectedDate = dateInput.value;
+            if (!selectedDate) return;
+
+            loader.classList.remove('d-none');
+            timeSelect.disabled = true;
+            timeSelect.innerHTML = '<option value="">Searching...</option>';
+
+            const url = `/api/get-available-slots/?business_id=${businessId}&service_id=${serviceId}&staff_id=${staffId}&date=${selectedDate}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    timeSelect.innerHTML = '';
+                    if (data.slots && data.slots.length > 0) {
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = "";
+                        defaultOption.text = "Select an available time";
+                        timeSelect.appendChild(defaultOption);
+
+                        data.slots.forEach(time => {
+                            const option = document.createElement('option');
+                            const timeVal = typeof time === 'object' ? (time.value || time) : time;
+                            option.value = timeVal;
+                            option.text = timeVal;
+                            timeSelect.appendChild(option);
+                        });
+                    } else {
+                        timeSelect.innerHTML = '<option value="">No times available for this date</option>';
+                    }
+                })
+                .catch(() => {
+                    timeSelect.innerHTML = '<option value="">Error fetching slots</option>';
+                })
+                .finally(() => {
+                    loader.classList.add('d-none');
+                    timeSelect.disabled = false;
+                });
+        }
+        dateInput.addEventListener('change', fetchSlots);
+    });
+</script>
+{% endblock %}

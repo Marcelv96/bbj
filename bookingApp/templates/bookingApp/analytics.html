@@ -1,0 +1,323 @@
+{% extends 'bookingApp/base.html' %}
+{% load custom_filters %}
+{% block title %}{{ scope_name }} | Intelligence{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    :root {
+        --brand-indigo: #6366f1;
+        --brand-indigo-soft: #eef2ff;
+        --surface-ground: #f8fafc;
+        --surface-card: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--surface-ground);
+        color: var(--text-main);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .spa-width { max-width: 1400px; margin: 0 auto; padding: 0 1rem; width: 100%; }
+
+    .glass-panel {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        border-radius: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .glass-panel:hover {
+        border-color: var(--brand-indigo);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+    }
+
+    .h-mega-sm {
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+    }
+
+    .mini-label {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+    }
+
+    .btn-toggle {
+        padding: 0.5rem 1rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .btn-toggle.active {
+        background: var(--brand-indigo);
+        color: white;
+    }
+
+    .input-modern {
+        background: white;
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        outline: none;
+    }
+
+    /* Custom Scrollbar */
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+</style>
+
+<div class="min-h-screen py-8 md:py-12">
+    <header class="mb-10">
+        <div class="spa-width">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="px-2 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-wider rounded-md">Intelligence Engine</span>
+                        <span class="text-slate-300">•</span>
+                        <span class="mini-label">{{ scope_name }}</span>
+                    </div>
+                    <h1 class="h-mega-sm text-slate-900 tracking-tight">Performance Analytics</h1>
+                </div>
+
+                <form method="get" class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-3">
+                    {% if staff_list_dropdown %}
+                    <select name="staff_id" class="input-modern w-full sm:w-48" onchange="this.form.submit()">
+                        <option value="">Whole Business</option>
+                        {% for s in staff_list_dropdown %}
+                        <option value="{{ s.id }}" {% if current_filters.staff_id == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% endif %}
+
+                    <div class="bg-white p-1 rounded-lg border border-slate-200 flex w-full sm:w-auto">
+                        <button type="submit" name="timeframe" value="week" class="btn-toggle flex-1 {% if current_filters.timeframe == 'week' %}active{% endif %}">7D</button>
+                        <button type="submit" name="timeframe" value="month" class="btn-toggle flex-1 {% if current_filters.timeframe == 'month' %}active{% endif %}">30D</button>
+                        <button type="submit" name="timeframe" value="year" class="btn-toggle flex-1 {% if current_filters.timeframe == 'year' %}active{% endif %}">YTD</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="spa-width">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+            <div class="glass-panel p-6">
+                <p class="mini-label mb-2">Revenue</p>
+                <h3 class="text-2xl font-black text-slate-900">R{{ total_revenue|floatformat:0 }}</h3>
+                <div class="mt-2 flex items-center gap-1 text-[10px] font-bold text-emerald-500 uppercase">
+                    <i class="fa-solid fa-arrow-up"></i> Collected
+                </div>
+            </div>
+            <div class="glass-panel p-6 border-l-4 border-l-indigo-500">
+                <p class="mini-label mb-2">Bookings</p>
+                <h3 class="text-2xl font-black text-slate-900">{{ total_bookings }}</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase mt-2">Total Volume</p>
+            </div>
+            <div class="glass-panel p-6">
+                <p class="mini-label mb-2">Success Rate</p>
+                <h3 class="text-2xl font-black {% if completion_rate > 80 %}text-emerald-600{% else %}text-amber-600{% endif %}">
+                    {{ completion_rate|floatformat:0 }}%
+                </h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase mt-2">Completion</p>
+            </div>
+            <div class="glass-panel p-6">
+                <p class="mini-label mb-2">No-Show Rev</p>
+                <h3 class="text-2xl font-black text-indigo-400">R{{ no_show_profit|floatformat:0 }}</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase mt-2">Protected</p>
+            </div>
+            <div class="glass-panel p-6 hidden lg:block">
+                <p class="mini-label mb-2">Rating</p>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-2xl font-black text-slate-900">{{ avg_rating|floatformat:1 }}</h3>
+                    <i class="fa-solid fa-star text-amber-400 text-xs"></i>
+                </div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase mt-2">Customer Sat</p>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8 mb-8">
+            <div class="lg:col-span-2 glass-panel p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h4 class="text-sm font-black uppercase tracking-tight text-slate-900">Revenue Trajectory</h4>
+                        <p class="text-xs font-medium text-slate-400">Net earnings over selected timeframe</p>
+                    </div>
+                </div>
+                <div class="h-[350px]">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-panel p-8">
+                <h4 class="text-sm font-black uppercase tracking-tight text-slate-900 mb-8">Peak Activity</h4>
+                <div class="h-[350px]">
+                    <canvas id="busyTimesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 mb-12">
+            <div class="glass-panel overflow-hidden flex flex-col">
+                <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+                    <h4 class="text-xs font-black uppercase tracking-widest text-slate-900">Service Performance</h4>
+                    <span class="text-[10px] font-bold text-indigo-600">By Revenue</span>
+                </div>
+                <div class="p-8 space-y-6 flex-1 custom-scroll overflow-y-auto max-h-[400px]">
+                    {% for service in top_services %}
+                    <div class="flex items-center justify-between group">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xl font-black text-slate-200">0{{ forloop.counter }}</span>
+                            <div>
+                                <h5 class="text-sm font-bold text-slate-900">{{ service.service__name }}</h5>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">{{ service.count }} Bookings</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-black text-slate-900">R{{ service.revenue|floatformat:0 }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="py-12 text-center text-slate-300 font-bold uppercase text-[10px]">No data available</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="glass-panel overflow-hidden">
+                <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+                    <h4 class="text-xs font-black uppercase tracking-widest text-slate-900">Staff Contribution</h4>
+                    <i class="fa-solid fa-crown text-amber-400"></i>
+                </div>
+                {% if is_owner and not current_filters.staff_id %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50/50">
+                            <tr>
+                                <th class="px-8 py-4 mini-label">Professional</th>
+                                <th class="px-8 py-4 mini-label text-center">Sessions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            {% for staff in staff_performance %}
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="px-8 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">
+                                            {{ staff.name|slice:":1" }}
+                                        </div>
+                                        <span class="text-sm font-bold text-slate-900">{{ staff.name }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-4 text-center text-sm font-bold text-slate-500">{{ staff.booking_count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="px-8 py-12 text-center text-slate-300 font-bold uppercase text-[10px]">No staff activity found</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-12 text-center">
+                    <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200">
+                        <i class="fa-solid fa-chart-line text-slate-300"></i>
+                    </div>
+                    <p class="text-xs font-bold text-slate-400 uppercase leading-relaxed">Select "Whole Business" view<br>to see the staff leaderboard</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#94a3b8';
+
+    // Revenue Chart (Modern Gradient)
+    const revCtx = document.getElementById('revenueChart');
+    if(revCtx) {
+        new Chart(revCtx, {
+            type: 'line',
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    data: {{ chart_values|safe }},
+                    borderColor: '#6366f1',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#6366f1',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    tension: 0.3,
+                    fill: true,
+                    backgroundColor: (context) => {
+                        const bg = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
+                        bg.addColorStop(0, 'rgba(99, 102, 241, 0.1)');
+                        bg.addColorStop(1, 'rgba(99, 102, 241, 0)');
+                        return bg;
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { weight: 700, size: 10 } } },
+                    y: {
+                        grid: { color: '#f1f5f9' },
+                        border: { display: false },
+                        ticks: { callback: v => 'R' + v, font: { weight: 700, size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // Busy Times Chart (Rounded Bars)
+    const busyCtx = document.getElementById('busyTimesChart');
+    if(busyCtx) {
+        new Chart(busyCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ busy_labels|safe }},
+                datasets: [{
+                    data: {{ busy_values|safe }},
+                    backgroundColor: '#eef2ff',
+                    hoverBackgroundColor: '#6366f1',
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { weight: 700, size: 10 } } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f1f5f9' },
+                        border: { display: false },
+                        ticks: { stepSize: 1, font: { weight: 700, size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,145 +1,305 @@
 {% extends 'bookingApp/base.html' %}
-{% block title %}Appointment Detail | BookingApp{% endblock %}
+{% load custom_filters %}
+{% block title %}Appointment #{{ appointment.id }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{% if is_owner %}{% url 'owner_dashboard' appointment.booking_form.business.id %}{% else %}{% url 'my_appointments' %}{% endif %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-            &larr; Back
-        </a>
-        <span id="status-badge" class="badge rounded-pill p-2 px-3 text-uppercase badge-status-{{ appointment.status }}">
-            {{ appointment.get_status_display }}
-        </span>
-    </div>
+<script src="https://cdn.tailwindcss.com"></script>
 
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
-                <div class="card-body p-4">
-                    <h2 class="fw-bold mb-1">{{ appointment.service.name }}</h2>
-                    <p class="text-muted">Business: <strong>{{ appointment.booking_form.business.name }}</strong></p>
+<style>
+    :root {
+        --brand-indigo: #6366f1;
+        --brand-indigo-soft: #eef2ff;
+        --surface-ground: #f8fafc;
+        --surface-card: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+    }
 
-                    <div class="row g-3 py-3 border-top border-bottom my-4">
-                        <div class="col-6 col-md-3 text-center">
-                            <small class="text-muted d-block small">DATE</small>
-                            <span class="fw-bold">{{ appointment.appointment_date }}</span>
-                        </div>
-                        <div class="col-6 col-md-3 text-center">
-                            <small class="text-muted d-block small">TIME</small>
-                            <span class="fw-bold">{{ appointment.appointment_start_time }}</span>
-                        </div>
-                        <div class="col-6 col-md-3 text-center">
-                            <small class="text-muted d-block small">STAFF</small>
-                            <span class="fw-bold">{{ appointment.staff.name|default:"Any" }}</span>
-                        </div>
-                        <div class="col-6 col-md-3 text-center">
-                            <small class="text-muted d-block small">DURATION</small>
-                            <span class="fw-bold">{{ appointment.length_minutes }}m</span>
-                        </div>
-                    </div>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--surface-ground);
+        color: var(--text-main);
+        -webkit-font-smoothing: antialiased;
+    }
 
-                    {% if is_owner %}
-                        <form id="owner-status-form" method="post" class="p-3 bg-light rounded-3">
-                            {% csrf_token %}
-                            <label class="form-label small fw-bold">UPDATE STATUS</label>
-                            <div class="d-flex gap-2">
-                                {{ status_form.status }}
-                                <button type="submit" class="btn btn-primary rounded-pill px-4">Save</button>
-                            </div>
-                        </form>
-                    {% elif is_customer %}
-                        <div id="customer-actions" class="d-flex gap-2">
-                            <button onclick="toggleEdit()" class="btn btn-outline-primary rounded-pill px-4">Edit/Reschedule</button>
-                            <button onclick="confirmCancel()" class="btn btn-outline-danger rounded-pill px-4">Cancel Booking</button>
-                        </div>
+    .glass-panel {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        border-radius: 1rem;
+    }
 
-                        <form id="reschedule-form" method="post" class="mt-3 d-none p-4 border rounded-4 shadow-sm bg-white">
-                            {% csrf_token %}
-                            <input type="hidden" name="reschedule_submit" value="1">
-                            <h5 class="fw-bold mb-3">Reschedule Request</h5>
-                            <div class="mb-3">{{ reschedule_form.appointment_date }}</div>
-                            <div class="mb-3">{{ reschedule_form.appointment_start_time }}</div>
-                            <div class="mb-3">{{ reschedule_form.notes }}</div>
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-success rounded-pill px-4">Request Update</button>
-                                <button type="button" onclick="toggleEdit()" class="btn btn-light rounded-pill px-4">Back</button>
-                            </div>
-                        </form>
+    .btn-modern {
+        padding: 0.75rem 1.5rem;
+        font-weight: 700;
+        font-size: 0.875rem;
+        border-radius: 0.75rem;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-modern:active { transform: scale(0.98); }
+
+    /* Timeline Styling */
+    .timeline-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 9999px;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px var(--border-color);
+        background: white;
+        z-index: 10;
+        position: relative;
+    }
+
+    .timeline-dot.active {
+        background: var(--brand-indigo);
+        box-shadow: 0 0 0 2px var(--brand-indigo-soft);
+    }
+
+    .timeline-line {
+        position: absolute;
+        left: 5px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--border-color);
+    }
+
+    @media print {
+        .no-print { display: none !important; }
+        .glass-panel { border: none; box-shadow: none; }
+    }
+</style>
+
+<div class="min-h-screen py-8 md:py-12">
+    <div class="max-w-5xl mx-auto px-4">
+
+        <div class="flex items-center justify-between mb-8 no-print">
+            <a href="javascript:history.back()" class="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold text-xs uppercase tracking-widest transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Back to Registry
+            </a>
+        </div>
+
+        <div class="mb-10">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-[10px] font-black uppercase tracking-wider">Appointment #{{ appointment.id|stringformat:"05d" }}</span>
+                {% if appointment.deposit_paid %}
+                <span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-wider">Payment Verified</span>
+                {% endif %}
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-none mb-4">
+                {{ appointment.get_status_display }}
+            </h1>
+        </div>
+
+        {% if pay_url and not appointment.deposit_paid %}
+        <div class="bg-indigo-600 rounded-2xl p-3 md:p-8 mb-10 text-white shadow-xl shadow-indigo-100 flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="flex items-center gap-5 relative z-10">
+                <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl backdrop-blur-sm">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg leading-tight">Deposit Required</h3>
+                    <p class="text-indigo-100 text-sm mt-1">Payment of <strong>R{{ appointment.booking_form.business.deposit_amount }}</strong> is pending.</p>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-auto flex flex-col gap-2 relative z-10">
+                <label class="text-[10px] uppercase font-bold text-indigo-200 tracking-wider">Payment Link</label>
+                <div class="flex items-center gap-2 bg-indigo-800/50 p-1.5 rounded-xl border border-indigo-500/30 backdrop-blur-sm">
+                    <input type="text" value="{{ pay_url }}" id="depositLinkInput" readonly class="bg-transparent border-none text-xs text-indigo-50 w-full md:w-64 focus:ring-0 px-3 truncate font-mono">
+                    
+                    <button onclick="copyDepositLink()" class="p-2.5 bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white transition-all shadow-lg shadow-indigo-900/20" title="Copy Link">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+
+                    {% if payment_whatsapp_url %}
+                    <a href="{{ payment_whatsapp_url }}" target="_blank" class="p-2.5 bg-emerald-500 hover:bg-emerald-400 rounded-lg text-white transition-all shadow-lg shadow-emerald-900/20" title="Send via WhatsApp">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                    </a>
                     {% endif %}
                 </div>
             </div>
         </div>
+        {% endif %}
 
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 p-3">
-                <h6 class="fw-bold mb-3">Timeline</h6>
-                <div id="timeline-text" class="small text-muted">
-                    Last update: <strong>{{ appointment.get_status_display }}</strong>
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-3">
+                <div class="glass-panel p-4 md:p-5">
+                    <div class="mb-10">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Requested Service</label>
+                        <h2 class="text-3xl font-black text-slate-900 mt-2">{{ appointment.service.name }}</h2>
+                        <div class="flex items-center gap-2 mt-2 text-indigo-600">
+                            <i class="fa-solid fa-user-tie text-xs"></i>
+                            <span class="text-sm font-bold">Assigned to {{ appointment.staff.name|default:"Unassigned" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Date</label>
+                            <p class="text-lg font-bold text-slate-900 mt-1">{{ appointment.appointment_date|date:"l, d F Y" }}</p>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Time Slot</label>
+                            <p class="text-lg font-bold text-slate-900 mt-1">{{ appointment.appointment_start_time|time:"H:i" }}</p>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Valuation</label>
+                            <p class="text-lg font-black text-indigo-600 mt-1">R {{ appointment.service.price }}</p>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Client</label>
+                            <p class="text-lg font-bold text-slate-900 mt-1">
+                                {{ appointment.guest_name }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 pt-8 border-t border-slate-100 no-print">
+                        <div class="flex flex-wrap gap-3">
+                            {% if is_owner %}
+                                {% if appointment.status == 'pending' or appointment.status == 'reschedule_requested' %}
+                                    <button onclick="handleStatus('confirmed')" class="btn-modern flex-1 bg-indigo-600 text-white hover:bg-indigo-700">
+                                        <i class="fa-solid fa-check-circle"></i> Confirm Booking
+                                    </button>
+                                {% elif appointment.status == 'confirmed' %}
+                                    <button onclick="handleStatus('completed')" class="btn-modern flex-1 bg-slate-900 text-white hover:bg-black">
+                                        <i class="fa-solid fa-circle-check"></i> Mark Completed
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+
+                            
+
+                            {% if appointment.status != 'completed' and appointment.status != 'cancelled' %}
+                                <button onclick="handleStatus('cancelled')" class="btn-modern bg-white border border-red-100 text-red-500 hover:bg-red-50">
+                                    Cancel Booking
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="glass-panel p-8">
+                    <h3 class="text-xs font-black text-slate-900 uppercase tracking-widest mb-8">Process Tracker</h3>
+                    <div class="relative space-y-10 pl-6">
+                        <div class="timeline-line"></div>
+
+                        <div class="flex items-center gap-4 relative">
+                            <div class="timeline-dot active"></div>
+                            <div>
+                                <p class="text-xs font-black uppercase text-slate-900">Booking Placed</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">{{ appointment.created_at|date:"d M, H:i" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 relative">
+                            <div class="timeline-dot {% if appointment.deposit_paid %}active{% endif %}"></div>
+                            <div>
+                                <p class="text-xs font-black uppercase {% if appointment.deposit_paid %}text-slate-900{% else %}text-slate-300{% endif %}">Payment</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">{% if appointment.deposit_paid %}Completed{% else %}Pending{% endif %}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 relative">
+                            <div class="timeline-dot {% if appointment.status == 'confirmed' or appointment.status == 'completed' %}active{% endif %}"></div>
+                            <div>
+                                <p class="text-xs font-black uppercase {% if appointment.status == 'confirmed' or appointment.status == 'completed' %}text-slate-900{% else %}text-slate-300{% endif %}">Staff Approved</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 relative">
+                            <div class="timeline-dot {% if appointment.status == 'completed' %}active{% endif %}"></div>
+                            <div>
+                                <p class="text-xs font-black uppercase {% if appointment.status == 'completed' %}text-slate-900{% else %}text-slate-300{% endif %}">Finalized</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 bg-slate-50 border-dashed">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-900 font-black shadow-sm">
+                            <i class="fa-solid fa-address-book text-xs"></i>
+                        </div>
+                        <h4 class="text-xs font-black uppercase tracking-widest">Contact Details</h4>
+                    </div>
+                    <p class="text-xs font-bold text-slate-500 mb-1">Email Address</p>
+                    <p class="text-sm font-semibold text-slate-900 truncate mb-4">{{ appointment.customer.email|default:appointment.guest_email }}</p>
+                    
+                    {% if appointment.whatsapp_link %}
+                    <a href="{{ appointment.whatsapp_link }}" target="_blank" class="flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-xs hover:bg-emerald-600 transition-colors">
+                        <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
 <script>
-function toggleEdit() {
-    document.getElementById('reschedule-form').classList.toggle('d-none');
-    document.getElementById('customer-actions').classList.toggle('d-none');
-}
-
-function confirmCancel() {
-    if(confirm("Cancel this appointment?")) {
-        window.location.href = "{% url 'appointment_cancel' appointment.pk %}";
-    }
-}
-
-function postData(formId) {
-    const form = document.getElementById(formId);
-    if (!form) return;
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-
-        fetch(window.location.href, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === 'success') {
-                if(formId === 'reschedule-form') {
-                    location.reload(); // Reload for date change
-                } else {
-                    document.getElementById('status-badge').innerText = data.new_status_display;
-                    document.getElementById('status-badge').className = `badge rounded-pill p-2 px-3 text-uppercase badge-status-${data.new_status_raw}`;
-                    alert('Status Updated!');
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Update failed. Please refresh and try again.');
+    // --- New Copy Link Function ---
+    function copyDepositLink() {
+        const input = document.getElementById("depositLinkInput");
+        input.select();
+        input.setSelectionRange(0, 99999); // For mobile devices
+        navigator.clipboard.writeText(input.value).then(() => {
+            alert("Payment link copied to clipboard!");
         });
-    });
-}
+    }
 
-postData('owner-status-form');
-postData('reschedule-form');
+    // --- Existing Logic ---
+    
+    function handleStatus(targetStatus) {
+        const action = (targetStatus === 'cancelled' && "{{ is_customer }}" === "True") ? 'cancel' : 'update_status';
+        if(confirm(`Transition booking to ${targetStatus.toUpperCase()}?`)) {
+            const formData = new FormData();
+            formData.append('action', action);
+            formData.append('status', targetStatus);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            fetch(window.location.href, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            }).then(r => r.json()).then(data => {
+                if (data.status === 'success') window.location.reload();
+            });
+        }
+    }
+
+    
 </script>
 
 <style>
-    .badge-status-pending { background-color: #ffc107; color: #000; }
-    .badge-status-confirmed { background-color: #198754; color: #fff; }
-    .badge-status-completed { background-color: #0d6efd; color: #fff; }
-    .badge-status-cancelled { background-color: #dc3545; color: #fff; }
-    .badge-status-reschedule_requested { background-color: #0dcaf0; color: #000; }
+    /* Styling Django Form Widgets */
+    input[type="date"], input[type="time"] {
+        width: 100%;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        color: #1e293b;
+        outline: none;
+        transition: all 0.2s;
+    }
+    input[type="date"]:focus, input[type="time"]:focus {
+        border-color: #6366f1;
+        background: #fff;
+        ring: 2px;
+        ring-color: #eef2ff;
+    }
 </style>
 {% endblock %}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 60px 24px;">
+        <tr>
+            <td align="center">
+                <table width="100%" style="max-width: 800px;" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="padding-bottom: 60px; border-bottom: 1px solid #e5e7eb;">
+                            <table width="100%">
+                                <tr>
+                                    <td style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #000000; text-transform: uppercase;">
+                                        GetMeBooked
+                                    </td>
+                                    <td align="right">
+                                        {% if is_too_late %}
+                                            <div style="width: 12px; height: 12px; background-color: #dc2626; border-radius: 50%; display: inline-block;"></div>
+                                            <span style="font-size: 12px; font-weight: 700; color: #dc2626; text-transform: uppercase; margin-left: 4px;">Late Reschedule - Deposit Forfeited</span>
+                                        {% else %}
+                                            <div style="width: 12px; height: 12px; background-color: #10b981; border-radius: 50%; display: inline-block;"></div>
+                                            <span style="font-size: 12px; font-weight: 700; color: #10b981; text-transform: uppercase; margin-left: 4px;">Schedule Updated</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 40px 0 60px 0;">
+                            <h1 style="font-size: 84px; font-weight: 900; line-height: 0.85; margin: 0; color: #000000; letter-spacing: -4px;">
+                                New Time<br/>Requested.
+                            </h1>
+                            <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
+                                Hi {{ appointment.staff.name }}, <strong>{{ client_name }}</strong> has requested to move their appointment.
+                            </p><br>
+
+                            {% if is_too_late %}
+                            <div style="background-color: #fef2f2; padding: 20px; border-left: 4px solid #dc2626; border-radius: 4px; text-align: left; margin-bottom: 24px;">
+                                <div style="color: #991b1b; font-size: 18px; font-weight: 700; margin-bottom: 4px;">Policy Action Taken</div>
+                                <p style="color: #b91c1c; margin: 0; font-size: 14px; line-height: 1.5;">This request was made within the 24-hour window. The client has acknowledged and agreed to <strong>forfeit their original deposit</strong>.</p>
+                            </div>
+                            {% endif %}
+
+                            <div style="background-color: #000000; padding: 30px; border-radius: 4px; text-align: left;">
+                                <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 8px; letter-spacing: -1px;">Booking Details</div>
+
+                                <p style="color: #94a3b8; margin: 0 0 8px 0; font-size: 16px;">
+                                    <strong style="color: #ffffff;">Service:</strong> {{ appointment.service.name }}
+                                </p>
+                                <p style="color: #94a3b8; margin: 0 0 8px 0; font-size: 16px;">
+                                    <strong style="color: #ffffff;">Staff:</strong> {{ appointment.staff.name }}
+                                </p>
+                                <p style="color: #94a3b8; margin: 0 0 24px 0; font-size: 14px; font-style: italic;">
+                                    * This request is currently set to <strong>Pending</strong> until you take action.
+                                </p>
+
+                                <table cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <a href="https://www.getmebooked.co.za/" style="display: inline-block; background-color: #6495ED; color: #000000; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                                Review in Dashboard
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 50px 0; border-top: 2px solid #000000; border-bottom: 1px solid #e5e7eb;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="33%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Customer</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ client_name }}</div>
+                                        <div style="font-size: 13px; color: #64748b;">{{ appointment.attendees }} attendee(s)</div>
+                                    </td>
+                                    <td width="33%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Requested Date</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ appointment.appointment_date|date:"D, M d" }}</div>
+                                    </td>
+                                    <td width="34%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Requested Time</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">
+                                            @ {{ appointment.appointment_start_time|time:"H:i" }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding-top: 40px;">
+                            <table width="100%">
+                                <tr>
+                                    <td>
+                                        <span style="font-size: 14px; color: #64748b;">
+                                            Automated notification for {{ appointment.booking_form.business.name }}.
+                                        </span>
+                                    </td>
+                                    <td align="right" style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                                        GetMeBooked &copy; 2026
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

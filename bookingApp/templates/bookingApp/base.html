@@ -1,160 +1,648 @@
+{% load static %}
+{% load compress %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}BookingApp | Manage Your Business{% endblock %}</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  
-  <style>
-    :root {
-      --primary-color: #2563eb;
-      --bg-light: #f8fafc;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>GetMeBooked | Salon & Barber Booking App South Africa</title>
+    <meta name="description" content="The easiest booking app for South African salons, barbers, and nail studios. Reduce no-shows with PayFast deposits.">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="author" content="GetMeBooked Technologies">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-light);
-      color: #1e293b;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="GetMeBooked | Salon & Barber Booking App South Africa">
+    <meta property="og:description" content="Eliminate no-shows, automate your admin, and grow your salon business with GetMeBooked.">
+    <meta property="og:image" content="https://getmebooked.co.za/static/og-image-v2026.jpg">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="GetMeBooked">
 
-    .navbar {
-      background: #ffffff !important;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 0.8rem 0;
-    }
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GetMeBooked | Salon & Barber Booking App South Africa">
+    <meta name="twitter:description" content="Reduce no-shows, automate your bookings, and grow your business. GetMeBooked is trusted by salons across SA.">
+    <meta name="twitter:image" content="https://getmebooked.co.za/static/og-image-v2026.jpg">
 
-    .navbar-brand {
-      font-weight: 700;
-      color: var(--primary-color) !important;
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "GetMeBooked",
+      "url": "{{ request.build_absolute_uri }}",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "author": {
+        "@type": "Organization",
+        "name": "GetMeBooked Technologies",
+        "url": "https://getmebooked.co.za"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "149.00",
+        "priceCurrency": "ZAR",
+        "availability": "https://schema.org/InStock"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "215"
+      },
+      "screenshot": "https://getmebooked.co.za/static/og-image-v2026.jpg",
+      "featureList": "PayFast Deposits, Email Integration, Staff Roster, Revenue Analytics"
     }
+    </script>
 
-    .nav-link {
-      font-weight: 500;
-      color: #64748b !important;
-    }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/media/landing/f.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
 
-    .nav-link:hover {
-      color: var(--primary-color) !important;
-    }
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    .content-container {
-      flex: 1;
-      max-width: 1100px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                primary: '#6366f1',   /* Updated to match Analytics Indigo */
+                dark: '#0f172a',      /* Slate 900 */
+                darklighter: '#1e293b', /* Slate 800 */
+                border: '#1e293b',    /* Dark Borders */
+                slate50: '#f8fafc',   /* Surface Ground */
+                slate100: '#f1f5f9',
+                slate200: '#e2e8f0',  /* Light Borders */
+                text: '#64748b',      /* Muted Text */
+                textmain: '#1e293b',  /* Main Text */
+              }
+            },
+            fontFamily: {
+                brand: ['Plus Jakarta Sans', 'sans-serif'],
+                body: ['Inter', 'sans-serif']
+            },
+            transitionProperty: { 'layout': 'width, margin-left, padding, opacity, transform' }
+          }
+        }
+      }
+    </script>
 
-    .user-badge {
-      background: #eff6ff;
-      color: var(--primary-color);
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.85rem;
-    }
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+    <script>
+    window.OneSignal = window.OneSignal || [];
+    OneSignal.push(function() {
+        OneSignal.init({
+            appId: "755c884c-75a6-4624-b4fe-5089ee21abac",
+            notifyButton: {
+                enable: true,
+                position: 'bottom-right',
+                size: 'medium',
+                prenotify: true,
+                showCredit: false
+            },
+            allowLocalhostAsSecureOrigin: true
+        });
 
-    .btn-logout {
-      background: none;
-      border: none;
-      color: #ef4444;
-      font-weight: 600;
-      cursor: pointer;
-    }
+        // Save player ID to Django
+        OneSignal.on('subscriptionChange', function(isSubscribed) {
+            if (isSubscribed) {
+                OneSignal.getUserId(function(playerId) {
+                    fetch("/save-player-id/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: JSON.stringify({player_id: playerId})
+                    });
+                });
+            }
+        });
+    });
+    </script>
 
-    .dropdown-menu {
-      border: none;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-    }
-  </style>
+    <style type="text/tailwindcss">
+        @layer components {
+            :root {
+                --brand-indigo: #6366f1;
+                --brand-indigo-soft: #eef2ff;
+                --surface-ground: #f8fafc;
+                --surface-card: #ffffff;
+                --text-main: #1e293b;
+                --text-muted: #64748b;
+                --border-color: #e2e8f0;
+
+                --sidebar-width: 250px;
+                --sidebar-collapsed-width: 100px;
+                --header-height: 64px;
+            }
+
+            body {
+                @apply bg-brand-slate50 text-brand-textmain font-body antialiased selection:bg-brand-primary selection:text-white;
+                -webkit-font-smoothing: antialiased;
+                overflow-x: hidden;
+            }
+
+            /* --- DESKTOP SIDEBAR (UPDATED AESTHETIC) --- */
+            .app-sidebar {
+                @apply fixed left-0 top-0 h-screen bg-brand-dark border-r border-slate-800 z-[100] flex flex-col transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)];
+                width: var(--sidebar-width);
+            }
+
+            .app-main {
+                @apply flex-grow min-h-screen transition-all duration-300 relative z-0;
+                margin-left: var(--sidebar-width);
+                width: calc(100% - var(--sidebar-width));
+            }
+
+            /* --- COLLAPSED STATE LOGIC --- */
+            body.is-collapsed .app-sidebar { width: var(--sidebar-collapsed-width); }
+            body.is-collapsed .app-main {
+                margin-left: var(--sidebar-collapsed-width);
+                width: calc(100% - var(--sidebar-collapsed-width));
+            }
+
+            /* Hiding text in collapsed mode */
+            body.is-collapsed .logo-text,
+            body.is-collapsed .sidebar-text,
+            body.is-collapsed .sidebar-section-title,
+            body.is-collapsed .user-details,
+            body.is-collapsed .badge-count {
+                @apply hidden;
+            }
+
+            /* Centering icons in collapsed mode */
+            body.is-collapsed .nav-link {
+                @apply px-0 justify-center;
+            }
+            body.is-collapsed .nav-link i {
+                @apply mr-0 text-xl;
+            }
+            body.is-collapsed .logo-container {
+                @apply justify-center px-0;
+            }
+
+            /* --- SIDEBAR LINKS (UPDATED) --- */
+            .nav-link {
+                @apply flex items-center w-[90%] mx-auto px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 relative transition-all duration-200 text-[14px] font-bold no-underline rounded-lg mb-1;
+            }
+
+            .nav-link.active {
+                @apply text-white bg-brand-primary font-bold shadow-lg shadow-indigo-500/20;
+            }
+
+            .nav-link i {
+                @apply w-5 text-center mr-3 transition-all duration-300 opacity-90;
+            }
+
+            /* The "Mini Label" Aesthetic from Analytics */
+            .sidebar-section-title {
+                @apply px-6 mt-6 mb-3 text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 font-body;
+            }
+
+            /* --- PROFESSIONAL MOBILE NAV (UPDATED) --- */
+            .mobile-nav {
+                @apply fixed bottom-0 left-0 right-0 h-[65px] bg-white border-t border-brand-slate200 z-[1050] flex items-center justify-around pb-[env(safe-area-inset-bottom)];
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+            }
+
+            .mobile-tab {
+                @apply flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-brand-primary active:text-brand-primary transition-colors gap-1.5;
+            }
+
+            .mobile-tab.active {
+                @apply text-brand-primary;
+            }
+
+            /* --- MOBILE OFFCANVAS LISTS (UPDATED) --- */
+            .offcanvas-bottom {
+                @apply rounded-t-2xl !border-0 bg-white;
+                height: 65vh !important;
+                max-height: 85vh;
+            }
+
+            /* Glass Panel List Item Style */
+            .menu-item {
+                @apply flex items-center justify-between p-4 border-b border-slate-100 text-slate-700 hover:bg-slate-50 transition-colors no-underline font-medium;
+            }
+            .menu-item:last-child { border-bottom: none; }
+
+            .menu-icon {
+                @apply w-10 h-10 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center mr-4 text-sm border border-slate-100;
+            }
+
+            @media (max-width: 1023px) {
+                .app-sidebar { @apply -translate-x-full; }
+                .app-main { margin-left: 0 !important; width: 100% !important; }
+            }
+        }
+
+        /* --- UTILS --- */
+        #layout-tweak-btn {
+            position: absolute; right: -12px; top: 32px; width: 24px; height: 24px;
+            background: #0f172a; border: 1px solid #1e293b; color: #64748b;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 10px; cursor: pointer; z-index: 110; transition: all 0.2s;
+        }
+        #layout-tweak-btn:hover { color: white; border-color: #6366f1; background: #6366f1; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .app-sidebar ::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Loader */
+        #page-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 3px;
+            background: #e2e8f0; z-index: 99999; display: none;
+        }
+        #page-loader .bar {
+            height: 100%; background: #6366f1; width: 30%; position: absolute;
+            animation: loaderMove 1s infinite ease-in-out;
+        }
+        @keyframes loaderMove { 0% { left: -30%; } 100% { left: 100%; } }
+    </style>
 </head>
-<body>
 
-<nav class="navbar navbar-expand-lg sticky-top">
-  <div class="container">
-    <a class="navbar-brand" href="{% url 'home' %}">Bookings by Jason</a>
-    
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
+<body class="bg-brand-slate50 text-brand-textmain">
+
+    <div id="page-loader"><div class="bar"></div></div>
+
+<aside class="app-sidebar hidden lg:flex">
+    <button onclick="toggleSidebar()" id="layout-tweak-btn" aria-label="Toggle Layout">
+        <i class="fa-solid fa-chevron-left transition-transform duration-300" id="tweak-icon"></i>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item">
-          <a class="nav-link px-3" href="{% url 'home' %}">Explore</a>
-        </li>
-
-        {% if user.is_authenticated %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle px-3" href="#" id="manageDropdown" role="button" data-bs-toggle="dropdown">
-              Manage
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end p-2">
-              <li><h6 class="dropdown-header">Business Dashboards</h6></li>
-              {% for bus in user.businesses.all %}
-                <li><h6 class="dropdown-header fw-bold text-dark">{{ bus.name }}</h6></li>
-                <li><a class="dropdown-item" href="{% url 'owner_dashboard' bus.id %}">Main Dashboard</a></li>
-                <li><a class="dropdown-item" href="{% url 'service_create' bus.id %}">+ Add Service</a></li>
-                <li><a class="dropdown-item" href="{% url 'staff_create' bus.id %}">+ Add Staff</a></li>
-                <li><hr class="dropdown-divider"></li>
-                {% endfor %}
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-primary fw-bold" href="{% url 'register_business' %}">+ Add New Business</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="{% url 'my_appointments' %}">My Personal Bookings</a></li>
-            </ul>
-          </li>
-
-          <li class="nav-item ms-3">
-            <span class="user-badge">Hi, {{ user.username }}</span>
-          </li>
-          
-          <li class="nav-item ms-2">
-            <form action="{% url 'logout' %}" method="post" class="d-inline">
-              {% csrf_token %}
-              <button type="submit" class="btn-logout px-3">Logout</button>
-            </form>
-          </li>
-        {% else %}
-          <li class="nav-item"><a class="nav-link px-3" href="{% url 'login' %}">Login</a></li>
-          <li class="nav-item ms-2"><a class="btn btn-primary px-4 rounded-pill" href="{% url 'register' %}">Sign Up</a></li>
-        {% endif %}
-      </ul>
+    <div class="h-24 flex items-center px-6 logo-container transition-all">
+        <a href="{% url 'home' %}" class="no-underline flex items-center gap-3">
+            <div class="w-9 h-9 bg-brand-primary rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-indigo-500/30">
+                <i class="fa fa-calendar"></i>
+            </div>
+            <span class="logo-text font-brand font-bold text-xl text-white tracking-tight">
+                Get<span class="text-brand-primary">Me</span>Booked
+            </span>
+        </a>
     </div>
-  </div>
+
+    <nav class="flex-grow overflow-y-auto py-2 custom-scroll">
+        {% if user.is_authenticated %}
+            {% if user.business or user.staff_profile.role == 'ADMIN' %}
+                <div class="sidebar-section-title">Management</div>
+                {% with b_id=user.business.id|default:user.staff_profile.business.id b_name=user.business.name|default:user.staff_profile.business.name %}
+                <a href="{% url 'owner_dashboard' b_id %}" class="nav-link {% if 'owner_dashboard' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-store"></i>
+                    <span class="sidebar-text truncate">{{ b_name }}</span>
+                </a>
+                <a href="{% url 'master_appointments' b_id %}" class="nav-link {% if 'master_appointments' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <span class="sidebar-text">All Bookings</span>
+                    <span id="nav-badge-business-desktop" class="badge-count ml-auto bg-brand-primary text-white text-[9px] font-black px-1.5 rounded-full hidden">0</span>
+                </a>
+                {% endwith %}
+            {% else %}
+                <a href="{% url 'business_onboarding' %}" class="nav-link {% if 'business_onboarding' in request.path %}active{% endif %}">
+                    <i class="fa fa-scissors"></i>
+                    <span class="sidebar-text">Register Business</span>
+                </a>
+                <a href="{% url 'join_staff' %}" class="nav-link {% if 'join_staff' in request.path %}active{% endif %}">
+                    <i class="fa fa-user-plus"></i>
+                    <span class="sidebar-text">Join As Staff</span>
+                </a>
+            {% endif %}
+
+            {% if user.staff_profile %}
+                <div class="sidebar-section-title">Workspace</div>
+                <a href="{% url 'staff_dashboard' %}" class="nav-link {% if 'staff_dashboard' in request.path %}active{% endif %}">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    <span class="sidebar-text">Schedule</span>
+                    <span id="nav-badge-staff-desktop" class="badge-count ml-auto bg-brand-primary text-white text-[9px] font-black px-1.5 rounded-full hidden">0</span>
+                </a>
+                <a href="{% url 'analytics_dashboard' %}" class="nav-link {% if 'analytics_dashboard' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span class="sidebar-text">Analytics</span>
+                </a>
+            {% endif %}
+        {% endif %}
+
+        <div class="sidebar-section-title">System</div>
+
+        <a href="{% url 'user_guide' %}" class="nav-link">
+            <i class="fa fa-question-circle" aria-hidden="true"></i>
+            <span class="sidebar-text">Help Center</span>
+        </a>
+
+        <a href="mailto:getmebookedinfo@gmail.com" class="nav-link">
+            <i class="fa fa-envelope" aria-hidden="true"></i>
+            <span class="sidebar-text">Support</span>
+        </a>
+    </nav>
+
+    <div class="p-4 border-t border-slate-800 bg-black/20">
+        {% if user.is_authenticated %}
+            <div class="flex items-center gap-3 overflow-hidden rounded-xl p-2 hover:bg-white/5 transition-colors cursor-pointer group" onclick="window.location.href='{% url 'profile' %}'">
+                <div class="shrink-0 relative">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" class="w-9 h-9 rounded-full bg-slate-800 object-cover ring-2 ring-slate-800 group-hover:ring-brand-primary transition-all">
+                    {% else %}
+                        <div class="w-9 h-9 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold border border-slate-700 ring-2 ring-slate-800 group-hover:ring-brand-primary transition-all">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+                    <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-brand-dark rounded-full"></div>
+                </div>
+                <div class="user-details user-details-container overflow-hidden">
+                    <div class="text-sm font-bold text-white truncate">{{ user.username }}</div>
+                    <div class="text-[10px] font-bold text-slate-500 truncate uppercase tracking-wider">Settings</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <form action="{% url 'logout' %}" method="post" class="bg-black/20">
+        {% csrf_token %}
+        <button type="submit" class="nav-link w-full text-left !mb-0 !rounded-none !py-4 hover:!bg-red-500/10 hover:!text-red-400">
+            <i class="fa fa-power-off text-red-500" aria-hidden="true"></i>
+            <span class="sidebar-text">Logout</span>
+        </button>
+    </form>
+    {% endif %}
+</aside>
+
+<nav class="lg:hidden mobile-nav">
+    <a href="{% if request.user.business %}{% url 'master_appointments' request.user.business.id %}{% elif request.user.staff_profile %}{% url 'master_appointments' request.user.staff_profile.business.id %}{% else %}{% url 'home' %}{% endif %}"
+       class="mobile-tab {% if 'master_appointments' in request.path %}active{% endif %}">
+        <i class="fa-solid fa-clipboard-list text-xl"></i>
+        <span class="text-[10px] font-bold">Bookings</span>
+    </a>
+
+    {% if user.is_authenticated %}
+            <button data-bs-toggle="offcanvas" data-bs-target="#workspaceMenu" class="mobile-tab relative">
+                <i class="fa-solid fa-briefcase text-xl"></i>
+                <span class="text-[10px] font-bold">Work</span>
+                <span id="nav-badge-staff-mobile" class="absolute top-1 right-1/4 bg-brand-primary text-white text-[9px] min-w-[16px] h-[16px] flex items-center justify-center rounded-full border border-white font-bold hidden">0</span>
+            </button>
+    {% endif %}
+
+    <button data-bs-toggle="offcanvas" data-bs-target="#profileMenu" class="mobile-tab">
+        {% if user.is_authenticated and user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" class="w-6 h-6 rounded-full object-cover border border-slate-200">
+        {% else %}
+            <i class="fa-solid fa-user text-xl"></i>
+        {% endif %}
+        <span class="text-[10px] font-bold">Account</span>
+    </button>
 </nav>
 
-<div class="container">
-  <div class="content-container">
-    {% if messages %}
-    <div class="container mt-3">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm border-0" role="alert" style="border-radius: 12px;">
-                {# Use the |safe filter here to render the HTML bold tags and buttons #}
-                {% if 'safe' in message.tags %}
-                    {{ message|safe }}
-                {% else %}
-                    {{ message }}
-                {% endif %}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
+<div class="offcanvas offcanvas-bottom shadow-2xl" tabindex="-1" id="workspaceMenu">
+    <div class="offcanvas-header pb-0 justify-center">
+        <div class="w-12 h-1.5 bg-slate-200 rounded-full mt-2"></div>
     </div>
-{% endif %}
+    <div class="offcanvas-body p-0 pt-4">
+        <div class="px-6 pb-4 border-b border-slate-50">
+            <h5 class="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace</h5>
+        </div>
 
-    {% block content %}{% endblock %}
-  </div>
+        <div class="flex flex-col">
+            {% if user.business or user.staff_profile %}
+                <a href="{% url 'owner_dashboard' user.staff_profile.business.id %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white shadow-md shadow-slate-200">
+                            <i class="fa-solid fa-store text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-900">{{ user.staff_profile.business.name }}</div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Owner Dashboard</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
+                </a>
+                <a href="{% url 'analytics_dashboard' %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary">
+                            <i class="fa-solid fa-chart-pie text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-900">Analytics</div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Reports & Insights</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
+                </a>
+                <a href="{% url 'staff_dashboard' %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary">
+                            <i class="fa-regular fa-calendar-check text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-900">My Schedule</div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Upcoming Bookings</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
+                </a>
+            {% else %}
+            <a href="{% url 'business_onboarding' %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 border border-slate-100">
+                            <i class="fa fa-scissors text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-900">Register Business</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-slate-900 transition-colors"></i>
+                </a>
+            <a href="{% url 'join_staff' %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 border border-slate-100">
+                            <i class="fa fa-user-plus text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-900">Join As Staff</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-slate-900 transition-colors"></i>
+                </a>
+            {% endif %}
+
+        </div>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div class="offcanvas offcanvas-bottom shadow-2xl" tabindex="-1" id="profileMenu">
+    <div class="offcanvas-header pb-0 justify-center">
+        <div class="w-12 h-1.5 bg-slate-200 rounded-full mt-2"></div>
+    </div>
+    <div class="offcanvas-body p-0 pt-6">
+        {% if user.is_authenticated %}
+            <div class="px-6 pb-6 flex items-center gap-5 border-b border-slate-50">
+                <div class="w-12 h-12 flex items-center justify-center bg-slate-900 text-white rounded-xl font-bold text-lg shadow-lg shadow-slate-200">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <div class="flex-1">
+                    <div class="font-black text-slate-900 text-lg leading-tight">{{ user.username }}</div>
+                    <a href="{% url 'profile' %}" class="text-[10px] font-bold uppercase tracking-wider text-brand-primary hover:text-indigo-800 no-underline">Account Settings</a>
+                </div>
+            </div>
+
+            <div class="flex flex-col">
+                <a href="{% url 'user_guide' %}" class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 group border-b border-slate-50">
+                    <i class="fa-solid fa-book-open text-slate-400 group-hover:text-slate-900"></i>
+                    <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">User Guide</span>
+                </a>
+
+                <a href="mailto:support@getmebooked.co.za" class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 group border-b border-slate-50">
+                    <i class="fa-solid fa-headset text-slate-400 group-hover:text-slate-900"></i>
+                    <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">Contact Support</span>
+                </a>
+
+                <div id="download-android-btn">
+                    <a href="{% static 'downloads/getmebooked.apk' %}" download="GetMeBooked.apk" class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 group border-b border-slate-50">
+                        <i class="fa-brands fa-android text-slate-400 group-hover:text-emerald-600"></i>
+                        <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">Download Android APK</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-6 bg-slate-50/50">
+                <form action="{% url 'logout' %}" method="post" class="m-0">
+                    {% csrf_token %}
+                    <button class="w-full py-3 bg-white border border-slate-200 text-red-600 font-black text-xs uppercase tracking-widest hover:bg-red-50 hover:border-red-100 transition-all rounded-xl shadow-sm">
+                        Sign Out
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="p-8 text-center">
+                <a href="{% url 'login' %}" class="inline-block w-full py-4 bg-brand-primary text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-lg shadow-indigo-200">
+                    Log In / Sign Up
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+  function showMobileWebOnly() {
+    const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true || /median/i.test(navigator.userAgent);
+    return isMobile && !isPWA;
+  }
+
+  if (!showMobileWebOnly()) {
+    const btn = document.getElementById('download-android-btn');
+    if (btn) btn.style.display = 'none';
+  }
+</script>
+
+    <main class="app-main pt-4 lg:pt-0 pb-20 lg:pb-0">
+        <div class="w-full">
+            {% if messages %}
+            <div class="max-w-6xl mx-auto p-4 pb-0">
+                {% for message in messages %}
+                    <div class="flex items-center justify-between p-4 mb-4 border rounded-xl shadow-sm bg-white animate-in fade-in slide-in-from-top-2 {% if message.tags == 'success' %}border-l-4 border-l-emerald-500{% else %}border-l-4 border-l-red-500{% endif %}">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check text-emerald-500{% else %}fa-circle-exclamation text-red-500{% endif %}"></i>
+                            <span class="text-sm font-bold text-slate-700">{{ message|safe }}</span>
+                        </div>
+                        <button type="button" class="btn-close opacity-50 hover:opacity-100" onclick="this.parentElement.remove()"></button>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="max-w-[1400px] mx-auto min-h-screen">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+<script>
+    // --- LAYOUT ENGINE ---
+    function toggleSidebar() {
+        const isCollapsed = document.body.classList.toggle('is-collapsed');
+        const icon = document.getElementById('tweak-icon');
+        if(icon) icon.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+        localStorage.setItem('sidebar-layout', isCollapsed ? 'collapsed' : 'expanded');
+    }
+
+    // Restore State
+    if (localStorage.getItem('sidebar-layout') === 'collapsed') {
+        document.body.classList.add('is-collapsed');
+        const icon = document.getElementById('tweak-icon');
+        if(icon) icon.style.transform = 'rotate(180deg)';
+    }
+
+    // --- LOADER ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const loader = document.getElementById('page-loader');
+
+        // Show loader on navigation
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link && link.href && !link.target &&
+                link.hostname === location.hostname &&
+                !link.href.includes('#') &&
+                !link.hasAttribute('data-bs-toggle')) {
+                if (loader) loader.style.display = 'block';
+            }
+        });
+    });
+
+    // --- UNIFIED NOTIFICATIONS ENGINE ---
+    {% if user.is_authenticated %}
+    async function updateNotificationBadges() {
+        try {
+            const response = await fetch('/api/notifications/count/');
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+
+            // 1. Update Staff/Schedule Badges (Desktop & Mobile)
+            const staffCount = data.pending_staff_count || 0;
+            const staffIDs = ['nav-badge-staff-desktop', 'nav-badge-staff-mobile'];
+
+            staffIDs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (staffCount > 0) {
+                        el.textContent = staffCount;
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                }
+            });
+
+            // 2. Update Business/All Bookings Badge (Optional)
+            const bizCount = data.pending_business_count || 0;
+            const bizEl = document.getElementById('nav-badge-business-desktop');
+            if (bizEl) {
+                if (bizCount > 0) {
+                    bizEl.textContent = bizCount;
+                    bizEl.classList.remove('hidden');
+                } else {
+                    bizEl.classList.add('hidden');
+                }
+            }
+
+        } catch (error) {
+            console.error('Notification Polling Error:', error);
+        }
+    }
+
+    // Initial run and interval
+    document.addEventListener('DOMContentLoaded', () => {
+        updateNotificationBadges();
+        setInterval(updateNotificationBadges, 60000); // Poll every 60 seconds
+    });
+    {% endif %}
+</script>
 </body>
 </html>

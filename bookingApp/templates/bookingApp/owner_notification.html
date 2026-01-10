@@ -1,28 +1,120 @@
-<div style="font-family: sans-serif; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
-    <h2 style="color: #2563eb;">New Booking Request</h2>
-    <p>Hi {{ owner.username }}, you have a new appointment request for <strong>{{ appointment.booking_form.business.name }}</strong>.</p>
-    
-    <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
-        <p><strong>Customer:</strong> {{ appointment.customer.username }}</p>
-        <p><strong>Service:</strong> {{ appointment.service.name }}</p>
-        <p><strong>Date:</strong> {{ appointment.appointment_date }}</p>
-        <p><strong>Time:</strong> {{ appointment.appointment_start_time }}</p>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 60px 24px;">
+        <tr>
+            <td align="center">
+                <table width="100%" style="max-width: 800px;" cellpadding="0" cellspacing="0">
+                    
+                    <tr>
+                        <td style="padding-bottom: 60px; border-bottom: 1px solid #e5e7eb;">
+                            <table width="100%">
+                                <tr>
+                                    <td style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #000000; text-transform: uppercase;">
+                                        GetMeBooked
+                                    </td>
+                                    <td align="right">
+                                        <div style="width: 12px; height: 12px; background-color: #f59e0b; border-radius: 50%; display: inline-block;"></div>
+                                        <span style="font-size: 12px; font-weight: 700; color: #f59e0b; text-transform: uppercase; margin-left: 4px;">
+                                            {% if business.deposit_required %}Awaiting Payment{% else %}Pending Request{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-    <div style="margin-top: 25px;">
-        <a href="{{ site_url }}{% url 'appointment_email_decision' appointment.pk 'confirm' %}" 
-           style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">
-           Confirm Appointment
-        </a>
-        <a href="{{ site_url }}{% url 'appointment_email_decision' appointment.pk 'decline' %}" 
-           style="background-color: #f1f5f9; color: #475569; padding: 12px 24px; text-decoration: none; border-radius: 50px; display: inline-block; margin-left: 10px;">
-           Decline
-        </a>
-    </div>
-    {% if appointment.status == 'confirmed' %}
-    <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ appointment.service.name }}+-+{{ appointment.customer.username }}&dates={{ appointment.appointment_date|date:'Ymd' }}T{{ appointment.appointment_start_time|time:'His' }}Z/{{ appointment.appointment_date|date:'Ymd' }}T{{ appointment.end_time|time:'His' }}Z" 
-       target="_blank" class="btn btn-sm btn-outline-secondary">
-       + GCal
-    </a>
-{% endif %}
-</div>
+                    <tr>
+                        <td style="padding: 80px 0 60px 0;">
+                            <h1 style="font-size: 84px; font-weight: 900; line-height: 0.85; margin: 0; color: #000000; letter-spacing: -4px;">
+                                New<br/>Booking.
+                            </h1>
+                            <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
+                                Hi {{ owner.username }}, you have a new request for <span style="color: #000000; font-weight: 600;">{{ business.name }}</span>.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 50px 0; border-top: 2px solid #000000; border-bottom: 1px solid #e5e7eb;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="33%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Customer</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ customer_name }}</div>
+                                    </td>
+                                    <td width="33%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Service</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ appointment.service.name }}</div>
+                                    </td>
+                                    <td width="34%" valign="top">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Scheduled For</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">
+                                            {{ appointment.appointment_date|date:"l, F j" }}<br/>@ {{ appointment.appointment_start_time|time:"H:i" }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding-top: 60px;">
+                            <div style="background-color: #000000; padding: 60px; border-radius: 4px; text-align: left;">
+                                
+                                {% if not business.deposit_required %}
+                                    <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 32px; letter-spacing: -1px;">Make a decision</div>
+                                    
+                                    <table cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td>
+                                                <a href="{{ site_url }}{% url 'appointment_email_decision' appointment.pk 'confirm' %}" style="display: inline-block; background-color: #ffffff; color: #008000; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-right: 15px;">
+                                                    Approve Request
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ site_url }}{% url 'appointment_email_decision' appointment.pk 'decline' %}" style="display: inline-block; background-color: transparent; color: #ff4d4d; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #3f3f46;">
+                                                    Decline
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                {% else %}
+                                    <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px;">Awaiting Deposit</div>
+                                    <p style="color: #94a3b8; font-size: 18px; line-height: 1.6; margin: 0; max-width: 500px;">
+                                        This booking requires a deposit of <span style="color: #ffffff; font-weight: 600;">R{{ business.deposit_amount }}</span>. 
+                                        Once the customer pays, the appointment will be <span style="color: #ffffff; font-weight: 600;">automatically confirmed</span> and added to your calendar.
+                                    </p>
+                                {% endif %}
+
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding-top: 80px;">
+                            <table width="100%">
+                                <tr>
+                                    <td>
+                                        <a href="{{ site_url }}{% url 'owner_dashboard' business.id %}" style="font-size: 14px; color: #000000; text-decoration: none; font-weight: 700; border-bottom: 2px solid #000000; padding-bottom: 2px;">
+                                            Open Dashboard &rarr;
+                                        </a>
+                                    </td>
+                                    <td align="right" style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                                        GetMeBooked &copy; 2026
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

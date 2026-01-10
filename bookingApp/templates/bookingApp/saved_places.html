@@ -1,0 +1,154 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}My Saved Places{% endblock %}
+
+{% block content %}
+<div class="main-wrapper py-2">
+    <header class="page-header text-center mb-4">
+        <div class="container">
+            <span class="badge-type-mini">Personal Collection</span>
+            <h1 class="hero-title">My <span class="text-gradient">Saved Places</span></h1>
+            <p class="hero-subtitle mx-auto">
+                You have {{ saved_items.count }} business{{ saved_items.count|pluralize:"es" }} in your collection.
+            </p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row g-3 g-md-4">
+            {% for item in saved_items %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="premium-card">
+                        <div class="card-visual"
+                             style="{% if item.business.cover_image %}background-image: url('{{ item.business.cover_image_webp.url }}');{% endif %}">
+                            <div class="indigo-overlay"></div>
+
+                            <span class="category-tag">{{ item.business.get_industry_display|default:"Service" }}</span>
+
+                            <form action="{% url 'toggle_save' item.business.id %}" method="POST" class="wishlist-form">
+                                {% csrf_token %}
+                                <button type="submit" class="wishlist-btn active">
+                                    <i class="fa-solid fa-heart"></i>
+                                </button>
+                            </form>
+
+
+                        </div>
+
+                        <div class="card-content">
+                            <div class="mb-2">
+                                <h3 class="business-name">
+                                    {{ item.business.name }}
+                                    <i class="fa-solid fa-circle-check verified-icon"></i>
+                                </h3>
+                                <div class="rating-row">
+                                    <i class="fa-solid fa-star text-warning"></i>
+                                    <span class="rating-text">
+                                        {% if item.business.review_count > 0 %}
+                                            {{ item.business.average_rating|floatformat:1 }}
+                                            <span class="review-count">({{ item.business.review_count }})</span>
+                                        {% else %}
+                                            <span class="review-count">New</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="business-loc-text">
+                                <i class="fa-solid fa-location-dot"></i>
+                                {{ item.business.address|default:"Location not set"|truncatechars:35 }}
+                            </div>
+
+                            <div class="card-action-row mt-3">
+                                <div></div> <a href="{% url 'business_detail' item.business.id %}" class="btn-action-main">
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="empty-state-card p-5">
+                        <div class="empty-icon-box mb-3">
+                            <i class="fa-regular fa-bookmark"></i>
+                        </div>
+                        <h4 class="fw-bold">No saved places yet</h4>
+                        <p class="text-muted small">Start exploring businesses and tap the heart icon to save them.</p>
+                        <a href="{% url 'home' %}" class="btn-action-main d-inline-block mt-3">Explore Businesses</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+        --brand-indigo: #6366f1;
+        --brand-indigo-dark: #4338ca;
+        --brand-indigo-soft: rgba(99, 102, 241, 0.15);
+        --soft-indigo: #f5f7ff;
+        --slate-900: #0f172a;
+        --slate-500: #64748b;
+        --border: #f1f5f9;
+        --font-main: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body { background-color: #fafafa; font-family: var(--font-main); color: var(--slate-900); }
+
+    /* Header Styles matching Home */
+    .hero-title { font-weight: 800; font-size: 1.75rem; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+    @media (min-width: 768px) { .hero-title { font-size: 2.5rem; } }
+
+    .text-gradient { background: linear-gradient(135deg, var(--brand-indigo), #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-subtitle { color: var(--slate-500); font-size: 0.95rem; max-width: 500px; }
+    .badge-type-mini { background: var(--soft-indigo); color: var(--brand-indigo); padding: 4px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: inline-block; }
+
+    /* Premium Card Component */
+    .premium-card { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; display: flex; flex-direction: column; }
+    .premium-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+
+    .card-visual {
+        height: 140px;
+        background-color: #eef2ff;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+
+    .indigo-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(to bottom, rgba(99, 102, 241, 0.2), rgba(67, 56, 202, 0.4));
+        z-index: 0;
+    }
+
+    .category-tag { position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.85); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; z-index: 1; }
+
+    .wishlist-form { position: absolute; top: 12px; right: 12px; z-index: 1; }
+    .wishlist-btn { width: 34px; height: 34px; border-radius: 50%; background: white; border: none; display: grid; place-items: center; color: var(--slate-500); box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; }
+    .wishlist-btn.active { color: #ef4444; }
+
+    .avatar-float { position: absolute; bottom: -20px; left: 15px; z-index: 2; }
+    .avatar-square { width: 60px; height: 60px; border-radius: 16px; border: 4px solid white; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+
+    .card-content { padding: 30px 16px 16px 16px; flex-grow: 1; display: flex; flex-direction: column; }
+    .business-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 2px; }
+    .verified-icon { color: var(--brand-indigo); font-size: 0.75rem; }
+    .rating-row { display: flex; align-items: center; margin-bottom: 8px; }
+    .rating-text { font-size: 0.8rem; font-weight: 700; margin-left: 4px; }
+    .review-count { color: var(--slate-500); font-weight: 400; }
+
+    .business-loc-text { font-size: 0.8rem; color: var(--slate-500); display: flex; align-items: center; gap: 5px; margin-top: auto; }
+
+    .card-action-row { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid #f8fafc; }
+    .btn-action-main { background: var(--brand-indigo); color: white; padding: 8px 18px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 0.85rem; transition: 0.2s; }
+    .btn-action-main:hover { background: var(--brand-indigo-dark); color: white; }
+
+    /* Empty State */
+    .empty-state-card { background: white; border: 2px dashed var(--border); border-radius: 32px; }
+    .empty-icon-box { width: 60px; height: 60px; background: var(--soft-indigo); color: var(--brand-indigo); border-radius: 18px; display: grid; place-items: center; margin: 0 auto; font-size: 1.5rem; }
+</style>
+{% endblock %}

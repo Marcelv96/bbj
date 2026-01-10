@@ -1,193 +1,994 @@
 {% extends 'bookingApp/base.html' %}
-{% block title %}Dashboard: {{ business.name }}{% endblock %}
+{% load custom_filters %}
+{% block title %}{{ business.name }} | Owner Dashboard{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 
-        <div>
-            <h1 class="fw-bold mb-0 text-primary">Management: {{ business.name }}</h1>
-            <p class="text-muted small">Manage your schedule, staff, and service offerings</p>
+<style>
+    /* --- 1. CORE VISUAL IDENTITY (MATCHING ANALYTICS) --- */
+    :root {
+        --brand-indigo: #6366f1;
+        --brand-indigo-dark: #4f46e5;
+        --brand-indigo-soft: #eef2ff;
+        --surface-ground: #f8fafc;
+        --surface-card: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--surface-ground);
+        color: var(--text-main);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- 2. LAYOUT & CONTAINERS --- */
+    .spa-width { max-width: 1400px; margin: 0 auto; padding: 0 1rem; width: 100%; }
+
+    .glass-panel {
+        background: var(--surface-card);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        border-radius: 1rem;
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .glass-panel:hover {
+        border-color: var(--brand-indigo);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+    }
+
+    .glass-panel-interactive {
+        cursor: pointer;
+    }
+    .glass-panel-interactive:hover {
+        transform: translateY(-2px);
+    }
+
+    /* --- 3. TYPOGRAPHY --- */
+    .h-mega-sm {
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        color: var(--text-main);
+    }
+
+    .mini-label {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    /* --- 4. NAVIGATION PILLS --- */
+    .nav-pill {
+        padding: 0.5rem 1.25rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        border-radius: 9999px; /* Pill shape */
+        transition: all 0.2s;
+        color: var(--text-muted);
+        background: transparent;
+        border: 1px solid transparent;
+        white-space: nowrap;
+    }
+
+    .nav-pill:hover {
+        color: var(--brand-indigo);
+        background: white;
+        border-color: var(--border-color);
+    }
+
+    .nav-pill.active {
+        background: var(--brand-indigo);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+    }
+
+    /* --- 5. FORM ELEMENTS --- */
+    .input-modern {
+        background: white;
+        border: 1px solid var(--border-color);
+        padding: 0.6rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        outline: none;
+        width: 100%;
+        color: var(--text-main);
+        transition: border-color 0.2s;
+    }
+    .input-modern:focus { border-color: var(--brand-indigo); }
+
+    .btn-primary {
+        background: var(--brand-indigo);
+        color: white;
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-primary:hover { background: var(--brand-indigo-dark); transform: translateY(-1px); }
+
+    .btn-light {
+        background: white;
+        color: var(--brand-indigo);
+        padding: 0.6rem 1.25rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-light:hover { background: var(--brand-indigo-dark); color: white; transform: translateY(-1px); }
+
+    .btn-secondary {
+        background: white;
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-secondary:hover { border-color: var(--brand-indigo); color: var(--brand-indigo); }
+
+    /* --- 6. FULLCALENDAR OVERRIDES --- */
+    .fc { font-family: 'Inter', sans-serif; --fc-border-color: #f1f5f9; --fc-button-bg-color: #6366f1; --fc-button-border-color: #6366f1; --fc-today-bg-color: #f8fafc; }
+    .fc .fc-toolbar-title { font-size: 1.25rem; font-weight: 800; color: #1e293b; letter-spacing: -0.02em; }
+    .fc .fc-button { border-radius: 0.5rem; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; padding: 0.4rem 0.8rem; }
+    .fc .fc-col-header-cell-cushion { padding-top: 10px; padding-bottom: 10px; color: #64748b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+    .fc-daygrid-event { border-radius: 4px; padding: 2px 4px; font-size: 0.75rem; font-weight: 600; color:#4f46e5; }
+
+    /* Custom Scrollbar */
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+    /* Animations */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeUp 0.3s ease-out forwards; }
+</style>
+
+<div class="min-h-screen py-8 md:py-12">
+
+<header class="mb-6 lg:mb-10 mt-2">
+    <div class="spa-width px-4 lg:px-0">
+        <div class="flex flex-col gap-5 lg:flex-row lg:justify-between lg:items-end">
+
+            <div class="flex flex-col gap-1.5">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[9px] lg:text-[10px] font-black uppercase tracking-wider rounded">
+                        Business Admin
+                    </span>
+                    <span class="text-slate-300">•</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full {% if business.is_active %}bg-emerald-500{% else %}bg-red-500{% endif %}"></span>
+                        <span class="text-[10px] font-bold uppercase tracking-tight text-slate-500">
+                            {% if business.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                    <h1 class="text-2xl lg:text-3xl font-black tracking-tight text-slate-900 leading-none">
+                        {{ business.name }}
+                    </h1>
+                    <button onclick="toggleHelpModal2()"
+                            class="flex-shrink-0 w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-brand-indigo hover:border-brand-indigo transition-all bg-white"
+                            title="Help">
+                        <i class="fa-solid fa-question text-[10px]"></i>
+                    </button>
+                </div>
+
+                {% if days_left <= 5 %}
+                <div class="mt-1 flex items-center gap-2 text-[11px] font-bold text-red-600 bg-red-50/50 px-2 py-1 rounded border border-red-100 w-fit">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Expires in {{ days_left }} days</span>
+                    {% if request.user == business.owner %}
+                        <a href="{{ pay_url }}" class="underline decoration-red-300 hover:text-red-700 ml-1">Renew</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="flex items-center gap-2 w-full lg:w-auto">
+                <a href="{% url 'master_appointments' business.id %}"
+                   class="btn-primary flex-1 lg:flex-none flex items-center justify-center gap-2 py-2 px-3 text-xs sm:text-sm font-bold">
+                    <i class="fa fa-calendar-check"></i>
+                    <span>Bookings</span>
+                </a>
+
+                <a href="{% url 'client-list' %}"
+                   class="btn-light flex-1 lg:flex-none flex items-center justify-center gap-2 py-2 px-3 text-xs sm:text-sm font-bold border border-slate-200">
+                    <i class="fa fa-users"></i>
+                    <span>Clients</span>
+                </a>
+
+                <a href="{% url 'business_detail' business.id %}" target="_blank"
+                   class="btn-secondary flex-1 lg:flex-none flex items-center justify-center gap-2 py-2 px-3 text-xs sm:text-sm font-bold border border-slate-200">
+                    <i class="fa fa-external-link"></i>
+                    <span>Public</span>
+                </a>
+            </div>
+
         </div>
-        <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill shadow-sm">{{ business.slug }}.example.com</span>
+    </div>
+</header>
+
+    <div class="sticky top-4 z-40 mb-8">
+        <div class="spa-width">
+            <div class="glass-panel p-2 flex overflow-x-auto custom-scroll gap-2 bg-white/90 backdrop-blur-md">
+                <button class="nav-pill active" onclick="switchDashTab(event, 'dash-team')">Team</button>
+                <button class="nav-pill hidden md:block" onclick="switchDashTab(event, 'dash-calendar')">Calendar</button>
+                <button class="nav-pill" onclick="switchDashTab(event, 'dash-links')">Portals & Links</button>
+                <button class="nav-pill" onclick="switchDashTab(event, 'dash-services')">Service Menu</button>
+                {% if user == business.owner %}
+                <button class="nav-pill" onclick="switchDashTab(event, 'dash-settings')">Settings</button>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-    <ul class="nav nav-tabs mb-4 border-bottom-0" id="dashboardTabs" role="tablist">
-        <li class="nav-item">
-            <button class="nav-link active fw-bold px-4" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button">
-                Incoming Appointments
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold px-4" id="services-tab" data-bs-toggle="tab" data-bs-target="#services" type="button">
-                Services
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold px-4" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff" type="button">
-                Staff Members
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold px-4" id="forms-tab" data-bs-toggle="tab" data-bs-target="#forms" type="button">
-                Booking Forms
-            </button>
-        </li>
-    </ul>
+    <main class="spa-width min-h-[500px]">
 
-    <div class="tab-content card border-0 shadow-sm p-4" id="dashboardTabsContent" style="border-radius: 16px;">
-        
-        <div class="tab-pane fade show active" id="appointments">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold mb-0">Appointments</h4>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Customer</th>
-                            <th>Service</th>
-                            <th>Staff</th>
-                            <th>Date & Time</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for appointment in appointments %}
-                        <tr>
-                            <td class="fw-bold text-dark">{{ appointment.customer.username }}</td>
-                            <td><span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">{{ appointment.service.name }}</span></td>
-                            <td class="text-muted small">{{ appointment.staff.name|default:"Any" }}</td>
-                            <td>{{ appointment.appointment_date|date:"D, M d" }} at {{ appointment.appointment_start_time|time:"H:i" }}</td>
-                            <td>
-                                <span class="badge rounded-pill badge-status-{{ appointment.status }} small">
-                                    {{ appointment.get_status_display }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    {% if appointment.status == 'pending' %}
-                                        <a href="{% url 'appointment_email_decision' appointment.pk 'confirm' %}" class="btn btn-sm btn-primary rounded-pill px-3">
-                                            Confirm
-                                        </a>
-                                        <a href="{% url 'appointment_email_decision' appointment.pk 'decline' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                                            Decline
-                                        </a>
+        <section id="dash-team" class="tab-pane animate-fade-up">
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1">
+                    <div class="glass-panel p-6 h-full border-l-4 border-l-indigo-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-900">Invite Staff</h3>
+                                <p class="text-[10px] uppercase font-bold text-slate-400">Expand your team</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 text-center mb-4">
+                            <p class="mini-label mb-2">Unique Join Code</p>
+                            <code id="joinCodeText" class="block text-3xl font-black text-indigo-600 tracking-[0.2em] mb-3">{{ business.join_code }}</code>
+                            <button class="btn-secondary w-full text-[10px]" onclick="copyJoinCode(this)">
+                                <i class="fa-regular fa-copy"></i> Copy Code
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Share this code with your staff. They can use it to create their own accounts linked to your business.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div class="glass-panel p-6 min-h-full">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg text-slate-900">Active Roster</h3>
+                            <span class="mini-label">{{ staff_members.count }} Members</span>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            {% for s in staff_members %}
+                            <div class="flex items-center gap-4 p-4 border border-slate-100 rounded-xl hover:border-indigo-100 transition-colors bg-slate-50/50">
+                                <div class="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                    {% if s.user.profile.avatar %}
+                                        <img src="{{ s.user.profile.avatar.url }}" class="w-full h-full object-cover">
                                     {% else %}
-                                        <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-light border rounded-pill px-3 text-muted">
-                                            Manage
-                                        </a>
-                                        
+                                        <span class="font-black text-slate-300 text-lg">{{ s.name|slice:":1" }}</span>
                                     {% endif %}
                                 </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="6" class="text-center py-5 text-muted">No appointments scheduled yet.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900">{{ s.name }}</h4>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">{{ s.email|default:"Staff" }}</p>
+                                </div>
+                                <div class="ml-auto">
+                                    <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-span-full py-12 text-center text-slate-300 font-bold uppercase text-xs">
+                                No staff added yet
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="tab-pane fade" id="services">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold mb-0">Offered Services</h4>
-                <a href="{% url 'service_create' business.id %}" class="btn btn-sm btn-success rounded-pill px-3">+ Add Service</a>
+        <section id="dash-calendar" class="tab-pane hidden animate-fade-up">
+            <div class="glass-panel p-6">
+                <div id="calendar" class="min-h-[700px]"></div>
             </div>
-            <div class="row g-3">
+        </section>
+
+        <section id="dash-links" class="tab-pane hidden animate-fade-up space-y-8">
+            {% for form in booking_forms %}
+            <div class="glass-panel p-8 border-l-4 border-l-indigo-600 relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 text-9xl text-slate-50 pointer-events-none">
+                    <i class="fa-solid fa-link opacity-50"></i>
+                </div>
+
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Active Portal</span>
+                            </div>
+                            <h3 class="text-2xl font-black text-slate-900">{{ form.name }}</h3>
+                        </div>
+                        <button onclick="openHelpModal()" class="text-xs font-bold text-indigo-500 hover:text-indigo-700 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-question"></i> How to use this?
+                        </button>
+                    </div>
+
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                                    <i class="fa-solid fa-code"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-900">Website Widget Code</h4>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                                Copy this snippet to add a pop-up booking form to your existing website. Users don't have to leave your website when booking.
+                            </p>
+                            <button onclick="copyEmbedSnippet('{{ request.scheme }}://{{ request.get_host }}/book/{{ form.embed_token }}/', 'embedBtn{{ forloop.index }}')"
+                                id="embedBtn{{ forloop.index }}" class="btn-primary w-full justify-center">
+                                Copy Embed Code
+                            </button>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                                    <i class="fa-solid fa-share-nodes"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-900">Direct Booking Links</h4>
+                            </div>
+
+                            <div class="flex gap-2 mb-4">
+                                <input type="text" value="{{ request.scheme }}://{{ request.get_host }}/book/{{ form.embed_token }}/" id="link{{ forloop.index }}" readonly class="input-modern bg-white text-xs font-mono text-slate-500">
+                                <button onclick="copyAction('link{{ forloop.index }}')" class="btn-secondary !px-3">
+                                    <i class="fa-solid fa-copy"></i>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <a href="https://wa.me/?text=Book%20here:%20{{ request.scheme }}://{{ request.get_host }}/book/{{ form.embed_token }}/" target="_blank" class="btn-secondary justify-center hover:!text-emerald-600 hover:!border-emerald-200">
+                                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                                </a>
+                                <button onclick="openInstagramApp('{{ request.scheme }}://{{ request.get_host }}/book/{{ form.embed_token }}/')" class="btn-secondary justify-center hover:!text-pink-600 hover:!border-pink-200">
+                                    <i class="fa-brands fa-instagram"></i> Instagram
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section id="dash-services" class="tab-pane hidden animate-fade-up">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="font-black text-xl text-slate-900">Service Menu</h3>
+                    <p class="text-xs text-slate-400 font-medium">Manage offerings and pricing</p>
+                </div>
+                <a href="{% url 'service_create' business.id %}" class="btn-primary">
+                    <i class="fa-solid fa-plus"></i> Add New
+                </a>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for s in services %}
-                <div class="col-md-6">
-                    <div class="border rounded-3 p-3 d-flex justify-content-between align-items-center">
+                    <a href="{% url 'service_edit' business.id s.id %}" class="glass-panel glass-panel-interactive p-4 flex flex-col justify-between group h-fit">
                         <div>
-                            <div class="fw-bold text-dark">{{ s.name }}</div>
-                            <div class="small text-muted">{{ s.default_length_minutes }} min • ${{ s.price }}</div>
+                            <div class="flex justify-between items-start mb-1">
+                                <h4 class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight">{{ s.name }}</h4>
+                                <span class="bg-slate-50 text-slate-600 px-2 py-0.5 rounded text-[10px] font-black border border-slate-100">R{{ s.price|floatformat:0 }}</span>
+                            </div>
+
+                            <div class="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                <i class="fa-regular fa-clock"></i> {{ s.default_length_minutes }} Mins
+                            </div>
+
+                            {% if s.description %}
+                                <p class="text-xs text-slate-400 line-clamp-1">{{ s.description }}</p>
+                            {% else %}
+                            <p class="text-xs text-slate-400 line-clamp-1">A professional session to perfect your look</p>
+                            {% endif %}
                         </div>
-                        <span class="badge bg-light text-dark border">Active</span>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="col-12 text-center py-4 text-muted">No services created.</div>
+
+                        <div class="mt-2 pt-2 border-t border-slate-50 flex items-center text-[10px] font-bold text-indigo-500 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">
+                            Edit <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </div>
+                    </a>
                 {% endfor %}
+            </div>
+        </section>
+
+        {% if user == business.owner %}
+        <section id="dash-settings" class="tab-pane hidden animate-fade-up">
+            <div class="mb-6">
+                <h3 class="font-black text-xl text-slate-900">Control Center</h3>
+                <p class="text-xs text-slate-400 font-medium">Configure business operations</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <button onclick="openSettingsModal('modal-profile', 'Business Identity')" class="glass-panel glass-panel-interactive p-6 text-left group">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Profile & Identity</h4>
+                    <p class="text-xs text-slate-400">Name, Logo, Social Links</p>
+                </button>
+
+                <button onclick="openSettingsModal('modal-hours', 'Operating Schedule')" class="glass-panel glass-panel-interactive p-6 text-left group">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Operating Hours</h4>
+                    <p class="text-xs text-slate-400">Weekly schedule & times</p>
+                </button>
+
+                <button onclick="openSettingsModal('modal-blocks', 'Blocked Dates')" class="glass-panel glass-panel-interactive p-6 text-left group">
+                    <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Blocked Dates</h4>
+                    <p class="text-xs text-slate-400">Holidays & time off</p>
+                </button>
+
+                <button onclick="openSettingsModal('modal-pay', 'Payment Gateway')" class="glass-panel glass-panel-interactive p-6 text-left group">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Payments & Deposits</h4>
+                    <p class="text-xs text-slate-400">PayFast integration details</p>
+                </button>
+
+                <button onclick="openSettingsModal('modal-refer', 'Referral Rewards')" class="glass-panel glass-panel-interactive p-6 text-left group">
+                    <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-gift"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Referral Program</h4>
+                    <p class="text-xs text-slate-400">Get free subscription time</p>
+                </button>
+
+                <button onclick="openSettingsModal('modal-sub', 'Subscription Plan')" class="glass-panel glass-panel-interactive p-6 text-left group border-slate-200">
+                    <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center mb-4 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Billing & Plan</h4>
+                    <p class="text-xs text-slate-400">
+                        {% if days_left > 0 %}<span class="text-emerald-600">{{ days_left }} Days active</span>{% else %}<span class="text-red-500">Expired</span>{% endif %}
+                    </p>
+                </button>
+            </div>
+        </section>
+        {% endif %}
+
+    </main>
+</div>
+
+<div id="settings-modal-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-xl max-h-[85vh] flex flex-col animate-fade-up shadow-2xl">
+
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <h3 id="modal-display-title" class="font-black uppercase text-xs tracking-widest text-slate-900">Settings</h3>
+            <button onclick="closeSettingsModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto custom-scroll">
+
+            <div id="modal-profile" class="modal-pane hidden space-y-5">
+                <form method="POST" enctype="multipart/form-data" class="space-y-5">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_profile">
+
+                    <div>
+                        <label class="mini-label">Brand Visuals</label>
+                        <div class="flex items-center gap-4 p-3 border border-slate-100 rounded-xl bg-slate-50">
+                            {% if business.cover_image %}
+                                <img src="{{ business.cover_image.url }}" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+                            {% endif %}
+                            <input type="file" name="cover_image" accept="image/*" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 transition-all">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="mini-label">Name</label>
+                            <input type="text" name="name" value="{{ business.name }}" class="input-modern" required>
+                        </div>
+                        <div>
+                            <label class="mini-label">Industry</label>
+                            <select name="industry" class="input-modern">
+                                {% for value, label in business.INDUSTRY_CHOICES %}
+                                    <option value="{{ value }}" {% if business.industry == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="mini-label">Description</label>
+                        <textarea name="description" rows="3" class="input-modern">{{ business.description|default:'' }}</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="mini-label">Phone</label>
+                            <input type="text" name="phone_number" value="{{ business.contact_number|default:'' }}" class="input-modern">
+                        </div>
+                        <div>
+                            <label class="mini-label">Address</label>
+                            <input type="text" name="address" value="{{ business.address|default:'' }}" class="input-modern">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full">Save Changes</button>
+                </form>
+            </div>
+
+            <div id="modal-hours" class="modal-pane hidden space-y-4">
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}<input type="hidden" name="action" value="update_hours">
+
+                    <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/50">
+                        <div class="flex justify-between mb-2"><span class="text-xs font-bold uppercase">Weekdays</span></div>
+                        <div class="flex gap-2">
+                            <input type="time" name="open_mon_fri" value="{{ operating_hours.mon_fri.open_time|time:'H:i' }}" class="input-modern">
+                            <input type="time" name="close_mon_fri" value="{{ operating_hours.mon_fri.close_time|time:'H:i' }}" class="input-modern">
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/50">
+                        <div class="flex justify-between mb-2"><span class="text-xs font-bold uppercase">Saturday</span></div>
+                        <div class="flex gap-2">
+                            <input type="time" name="open_sat" value="{{ operating_hours.sat.open_time|time:'H:i' }}" class="input-modern">
+                            <input type="time" name="close_sat" value="{{ operating_hours.sat.close_time|time:'H:i' }}" class="input-modern">
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/50">
+                        <div class="flex justify-between mb-2"><span class="text-xs font-bold uppercase text-slate-400">Sunday</span></div>
+                        <div class="flex gap-2">
+                            <input type="time" name="open_sun" value="{{ operating_hours.sun.open_time|time:'H:i' }}" class="input-modern">
+                            <input type="time" name="close_sun" value="{{ operating_hours.sun.close_time|time:'H:i' }}" class="input-modern">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full">Update Schedule</button>
+                </form>
+            </div>
+
+            <div id="modal-blocks" class="modal-pane hidden">
+                <form method="POST" class="flex gap-3 mb-6">
+                    {% csrf_token %}<input type="hidden" name="action" value="add_block">
+                    <input type="date" name="block_date" required class="input-modern">
+                    <button type="submit" class="btn-primary !bg-slate-900 !text-white whitespace-nowrap">Block Date</button>
+                </form>
+
+                <div class="space-y-2 max-h-[300px] overflow-y-auto custom-scroll">
+                    {% for block in business_blocks %}
+                    <div class="flex justify-between items-center bg-white p-3 border border-slate-100 rounded-lg shadow-sm">
+                        <span class="text-xs font-bold uppercase text-slate-700">{{ block.block_date|date:"d M Y" }}</span>
+                        <form method="POST" class="m-0">
+                            {% csrf_token %}<input type="hidden" name="action" value="delete_block">
+                            <input type="hidden" name="block_id" value="{{ block.id }}">
+                            <button type="submit" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-8 text-slate-300 text-xs font-bold uppercase border border-dashed border-slate-200 rounded-xl">No blocked dates</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="modal-pay" class="modal-pane hidden">
+    <form method="POST" class="space-y-5">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_payfast">
+
+        <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 mb-4">
+            <h4 class="text-xs font-black uppercase text-indigo-900 mb-2">PayFast Credentials</h4>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="mini-label">Merchant ID</label>
+                    <input type="text" name="payfast_merchant_id" value="{{ business.payfast_merchant_id|default:'' }}" class="input-modern">
+                </div>
+                <div>
+                    <label class="mini-label">Merchant Key</label>
+                    <input type="password" name="payfast_merchant_key" value="{{ business.payfast_merchant_key|default:'' }}" class="input-modern">
+                </div>
             </div>
         </div>
 
-        <div class="tab-pane fade" id="staff">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold mb-0">Staff Members</h4>
-                <a href="{% url 'staff_create' business.id %}" class="btn btn-sm btn-success rounded-pill px-3">+ Add Staff</a>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="mini-label">Deposit Type</label>
+                <select name="deposit_type" id="deposit_type_select" class="input-modern">
+                    <option value="fixed" {% if business.deposit_type == 'fixed' %}selected{% endif %}>Fixed Amount (R)</option>
+                    <option value="percentage" {% if business.deposit_type == 'percentage' %}selected{% endif %}>Percentage (%)</option>
+                </select>
             </div>
-            <div class="list-group list-group-flush">
-                {% for s in staff_members %}
-                <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-badge" viewBox="0 0 16 16">
-                                <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                                <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2H2a2 2 0 0 1-2-2V7zm3.5 1a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="fw-bold">{{ s.name }}</div>
-                            <div class="small text-muted">{{ s.email|default:"No email provided" }}</div>
-                        </div>
-                    </div>
+
+            <div>
+                <div id="fixed_amount_container">
+                    <label class="mini-label">Fixed Amount (R)</label>
+                    <input type="number" step="0.01" name="deposit_amount" value="{{ business.deposit_amount|default:'0.00' }}" class="input-modern">
                 </div>
-                {% empty %}
-                <div class="text-center py-4 text-muted">No staff members listed.</div>
-                {% endfor %}
+                <div id="percentage_container" style="display: none;">
+                    <label class="mini-label">Deposit Percentage (%)</label>
+                    <input type="number" name="deposit_percentage" value="{{ business.deposit_percentage|default:'50' }}" class="input-modern" min="1" max="100">
+                </div>
             </div>
         </div>
 
-        <div class="tab-pane fade" id="forms">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold mb-0">Booking Forms</h4>
-                <a href="{% url 'booking_form_create' business.id %}" class="btn btn-sm btn-success rounded-pill px-3">+ Create New</a>
-            </div>
-            <div class="row g-3">
-                {% for form in booking_forms %}
-                <div class="col-12">
-                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3 rounded-3 border">
-                        <div>
-                            <h6 class="mb-1 fw-bold text-dark">{{ form.name }}</h6>
-                            <p class="mb-0 small text-muted">Embed Token: <code>{{ form.embed_token|truncatechars:20 }}</code></p>
-                        </div>
-                        <a href="{% url 'booking_form_edit' business.id form.id %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Edit Form</a>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="col-12 text-center py-4 text-muted">No booking forms created.</div>
-                {% endfor %}
-            </div>
+        <div>
+            <label class="mini-label">Reschedule Window (Hours)</label>
+            <input type="number" name="reschedule_window_hours" value="{{ business.reschedule_window_hours|default:'24' }}" class="input-modern">
+            <p class="text-[10px] text-gray-500 mt-1">Hours before appointment where deposit is forfeited if rescheduled.</p>
         </div>
 
+        <div>
+            <label class="mini-label">Policy Text</label>
+            <textarea name="deposit_policy" rows="3" class="input-modern">{{ business.deposit_policy }}</textarea>
+        </div>
+
+        <button type="submit" class="btn-primary w-full">Save Payment Settings</button>
+    </form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const select = document.getElementById('deposit_type_select');
+    const fixedCont = document.getElementById('fixed_amount_container');
+    const percentCont = document.getElementById('percentage_container');
+
+    const fixedInput = fixedCont.querySelector('input');
+    const percentInput = percentCont.querySelector('input');
+
+    function toggleDepositFields() {
+        if (select.value === 'fixed') {
+            fixedCont.style.display = 'block';
+            percentCont.style.display = 'none';
+
+            fixedInput.disabled = false;
+            percentInput.disabled = true;
+        } else {
+            fixedCont.style.display = 'none';
+            percentCont.style.display = 'block';
+
+            fixedInput.disabled = true;
+            percentInput.disabled = false;
+        }
+    }
+
+    // Run on change
+    select.addEventListener('change', toggleDepositFields);
+
+    // Run on page load to set correct initial state
+    toggleDepositFields();
+});
+</script>
+
+            <div id="modal-sub" class="modal-pane hidden">
+                <div class="flex justify-between items-center mb-6 bg-slate-900 text-white p-6 rounded-xl">
+                    <div>
+                        <p class="text-[10px] font-bold uppercase opacity-60">Time Remaining</p>
+                        <p class="text-4xl font-black uppercase">{{ days_left }} Days</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-bold uppercase opacity-60">Status</p>
+                        <p class="font-black text-sm uppercase {% if days_left > 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
+                            {% if days_left > 0 %}Active{% else %}Expired{% endif %}
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ pay_url }}" class="btn-primary w-full justify-center !py-4">
+                    Renew Subscription (R149 / 30 Days)
+                </a>
+            </div>
+
+            <div id="modal-refer" class="modal-pane hidden">
+                <div class="text-center p-8 border border-dashed border-slate-200 rounded-xl bg-slate-50">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-gift text-xl"></i>
+                    </div>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Your Referral Code</p>
+                    <code class="block text-3xl font-black text-slate-900 mb-6 tracking-widest">{{ business.referral_code }}</code>
+                    <button onclick="copyReferralCode('{{ business.referral_code }}', this)" class="btn-secondary">
+                        Copy Code to Clipboard
+                    </button>
+                    <p class="text-[10px] text-slate-400 mt-6">Share this code with other business owners.<br>When they subscribe, you both get +30 days free.</p>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
-<style>
-    body { background-color: #f8fafc; }
-    /* Status Badge Colors */
-    .badge-status-pending { background-color: #fef3c7; color: #92400e; }
-    .badge-status-confirmed { background-color: #dcfce7; color: #166534; }
-    .badge-status-declined { background-color: #fee2e2; color: #991b1b; }
-    .badge-status-completed { background-color: #dbeafe; color: #1e40af; }
-    .badge-status-reschedule_requested { background-color: #f3e8ff; color: #6b21a8; }
+<div id="calendar-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-2xl animate-fade-up shadow-2xl">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+            <div>
+                <span class="mini-label">Agenda</span>
+                <h3 id="modal-date-title" class="text-lg font-black uppercase text-slate-900">Date Details</h3>
+            </div>
+            <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div id="modal-body" class="p-6 space-y-3 max-h-[60vh] overflow-y-auto custom-scroll bg-slate-50/50"></div>
+    </div>
+</div>
 
-    /* Custom Nav Styling */
-    .nav-tabs .nav-link {
-        color: #64748b;
-        border: none;
-        border-bottom: 3px solid transparent;
-        transition: all 0.2s ease;
+<div id="helpModal2" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="toggleHelpModal2()"></div>
+    <div class="relative glass-panel w-full max-w-4xl max-h-[85vh] animate-fade-up flex flex-col overflow-hidden">
+        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+            <div>
+                <span class="text-indigo-600 text-[10px] font-black uppercase tracking-wider mb-1 block">Quick Start Guide</span>
+                <h2 class="text-2xl font-black text-slate-900">Dashboard Overview</h2>
+            </div>
+            <button onclick="toggleHelpModal2()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div class="overflow-y-auto flex-1 bg-slate-50 p-8 custom-scroll">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-link text-indigo-500"></i> Portals
+                    </h3>
+                    <p class="text-xs text-slate-500">Links for Instagram bios and code to embed booking buttons on your own website.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-tags text-emerald-500"></i> Services
+                    </h3>
+                    <p class="text-xs text-slate-500">Create your menu. Prices and durations here automatically sync to your public page.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-amber-500"></i> Team
+                    </h3>
+                    <p class="text-xs text-slate-500">Use the Join Code to let staff create accounts linked to this dashboard.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-gears text-slate-500"></i> Settings
+                    </h3>
+                    <p class="text-xs text-slate-500">Manage hours, block holidays, set up payments, and customize your profile.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="helpModal" class="fixed inset-0 hidden items-center justify-center z-[200] p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="glass-panel p-8 max-w-md w-full animate-fade-up">
+        <h3 class="font-black text-xl text-slate-900 mb-4">How it works</h3>
+        <p class="text-slate-500 text-sm leading-relaxed mb-6">
+            The website form creates a seamless popup ("modal") on your existing website. This keeps users on your page while they book.
+        </p>
+        <button onclick="closeHelpModal()" class="btn-primary w-full">Understood</button>
+    </div>
+</div>
+
+<div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-full shadow-2xl opacity-0 transition-all duration-300 pointer-events-none transform translate-y-4">
+    Action Successful
+</div>
+
+<script>
+    // --- 1. DATA PREP ---
+    const allAppointments = [];
+    function pushAppointment(id, name, service, date, time, status, detailUrl) {
+        allAppointments.push({ id, name, service, date, time, status, detailUrl });
     }
-    .nav-tabs .nav-link.active {
-        color: #2563eb;
-        background: transparent;
-        border-bottom: 3px solid #2563eb;
+
+    {% for appt in today_appointments %}
+    pushAppointment("{{ appt.pk }}", "{% if appt.customer %}{{ appt.customer.get_full_name|default:appt.customer.username|escapejs }}{% else %}{{ appt.guest_name|escapejs }} (Guest){% endif %}", "{{ appt.service.name|escapejs }}", "{{ appt.appointment_date|date:'Y-m-d' }}", "{{ appt.appointment_start_time|time:'H:i' }}", "{{ appt.status }}", "{% url 'appointment_detail' appt.pk %}");
+    {% endfor %}
+    {% for appt in upcoming_appointments %}
+    pushAppointment("{{ appt.pk }}", "{% if appt.customer %}{{ appt.customer.get_full_name|default:appt.customer.username|escapejs }}{% else %}{{ appt.guest_name|escapejs }} (Guest){% endif %}", "{{ appt.service.name|escapejs }}", "{{ appt.appointment_date|date:'Y-m-d' }}", "{{ appt.appointment_start_time|time:'H:i' }}", "{{ appt.status }}", "{% url 'appointment_detail' appt.pk %}");
+    {% endfor %}
+    {% for appt in past_appointments %}
+    pushAppointment("{{ appt.pk }}", "{% if appt.customer %}{{ appt.customer.get_full_name|default:appt.customer.username|escapejs }}{% else %}{{ appt.guest_name|escapejs }} (Guest){% endif %}", "{{ appt.service.name|escapejs }}", "{{ appt.appointment_date|date:'Y-m-d' }}", "{{ appt.appointment_start_time|time:'H:i' }}", "{{ appt.status }}", "{% url 'appointment_detail' appt.pk %}");
+    {% endfor %}
+
+    // --- 2. TABS LOGIC ---
+    let calendar; // Scope calendar variable
+
+    function switchDashTab(evt, tabId) {
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+        document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+
+        document.getElementById(tabId).classList.remove('hidden');
+        evt.currentTarget.classList.add('active');
+
+        // Resize calendar if showing
+        if(tabId === 'dash-calendar' && calendar) {
+            setTimeout(() => calendar.updateSize(), 50);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    .nav-tabs .nav-link:hover:not(.active) {
-        border-bottom: 3px solid #e2e8f0;
+
+    // --- 3. CALENDAR INIT ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        if (calendarEl) {
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
+                dayMaxEvents: 3,
+                events: allAppointments.map(a => ({
+                    title: a.name,
+                    start: `${a.date}T${a.time}`,
+                    backgroundColor: a.status === 'confirmed' ? '#6366f1' : '#cbd5e1',
+                    borderColor: 'transparent',
+                    textColor: a.status === 'confirmed' ? '#fff' : '#475569',
+                    extendedProps: { detailUrl: a.detailUrl, service: a.service, status: a.status }
+                })),
+                eventClick: (info) => openDateModal(info.event.startStr.split('T')[0]),
+                dateClick: (info) => openDateModal(info.dateStr),
+                height: 'auto'
+            });
+            calendar.render();
+        }
+
+        // Auto-select first tab
+        const firstBtn = document.querySelector('.nav-pill');
+        if(firstBtn) firstBtn.click();
+    });
+
+    // --- 4. MODALS & UTILS ---
+    function openDateModal(dateStr) {
+        const modal = document.getElementById('calendar-modal');
+        const body = document.getElementById('modal-body');
+        const selectedDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+
+        const dateObj = new Date(selectedDate + 'T00:00:00');
+        document.getElementById('modal-date-title').innerText = dateObj.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+
+        const dayAppts = allAppointments.filter(a => a.date === selectedDate).sort((a,b) => a.time.localeCompare(b.time));
+
+        if (dayAppts.length > 0) {
+            body.innerHTML = dayAppts.map(a => `
+                <div class="bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between hover:border-indigo-200 transition-colors">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-sm font-black text-slate-900">${a.time}</span>
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${a.status==='confirmed' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}">${a.status}</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-700">${a.name}</h4>
+                        <p class="text-xs text-slate-400">${a.service}</p>
+                    </div>
+                    <a href="${a.detailUrl}" class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-colors">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </a>
+                </div>
+            `).join('');
+        } else {
+            body.innerHTML = `<div class="py-12 text-center text-slate-300 font-bold uppercase text-xs">No bookings for this date</div>`;
+        }
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
-</style>
+
+    function closeModal() {
+        document.getElementById('calendar-modal').classList.add('hidden');
+        document.getElementById('calendar-modal').classList.remove('flex');
+    }
+
+    function openSettingsModal(paneId, title) {
+        const overlay = document.getElementById('settings-modal-overlay');
+        document.querySelectorAll('.modal-pane').forEach(p => p.classList.add('hidden'));
+        document.getElementById(paneId).classList.remove('hidden');
+        document.getElementById('modal-display-title').innerText = title;
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSettingsModal() {
+        const overlay = document.getElementById('settings-modal-overlay');
+        overlay.classList.add('hidden');
+        overlay.classList.remove('flex');
+        document.body.style.overflow = '';
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translate(-50%, 0)';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translate(-50%, 1rem)';
+        }, 3000);
+    }
+
+    function copyAction(id) {
+        const input = document.getElementById(id);
+        input.select();
+        navigator.clipboard.writeText(input.value).then(() => showToast("Link Copied"));
+    }
+
+    function copyJoinCode(btn) {
+        const code = document.getElementById('joinCodeText').innerText;
+        navigator.clipboard.writeText(code).then(() => showToast("Staff Join Code Copied"));
+    }
+
+    function copyReferralCode(code, btn) {
+        navigator.clipboard.writeText(code).then(() => showToast("Referral Code Copied"));
+    }
+
+    function openInstagramApp(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast("Link Copied - Open Instagram");
+            setTimeout(() => window.location.href = "instagram://camera", 1000);
+        });
+    }
+
+    function openHelpModal() { document.getElementById('helpModal').classList.remove('hidden'); document.getElementById('helpModal').classList.add('flex'); }
+    function closeHelpModal() { document.getElementById('helpModal').classList.add('hidden'); document.getElementById('helpModal').classList.remove('flex'); }
+
+    function toggleHelpModal2() {
+        const m = document.getElementById('helpModal2');
+        if(m.classList.contains('hidden')) {
+            m.classList.remove('hidden'); m.classList.add('flex'); document.body.style.overflow = 'hidden';
+        } else {
+            m.classList.add('hidden'); m.classList.remove('flex'); document.body.style.overflow = '';
+        }
+    }
+
+    // Embed Script Generation
+    function copyEmbedSnippet(bookingUrl, buttonId) {
+        const separator = bookingUrl.includes('?') ? '&' : '?';
+        const embedUrl = `${bookingUrl}${separator}embed=true`;
+        const snippet = `
+<button onclick="openGMB()" style="background:#000;color:#fff;padding:12px 24px;border:0;cursor:pointer;font-family:sans-serif;font-weight:700;text-transform:uppercase;font-size:12px;border-radius:6px;">Book Now</button>
+<script>(function(){if(window.openGMB)return;const s=document.createElement('style');s.textContent='.gmb-o{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center}.gmb-w{width:100%;max-width:500px;height:85vh;background:#fff;position:relative}.gmb-f{width:100%;height:100%;border:0}.gmb-c{position:absolute;top:10px;right:10px;background:#000;color:#fff;border:0;width:30px;height:30px;cursor:pointer;z-index:10000}';document.head.appendChild(s);window.openGMB=function(){if(document.getElementById('gmb-o'))return;const d=document.createElement('div');d.id='gmb-o';d.className='gmb-o';d.innerHTML='<div class="gmb-w"><iframe class="gmb-f" src="${embedUrl}"></iframe><button class="gmb-c" onclick="closeGMB()">×</button></div>';document.body.appendChild(d);document.body.style.overflow='hidden'};window.closeGMB=function(){const el=document.getElementById('gmb-o');if(el)el.remove();document.body.style.overflow=''}})()<\/script>`;
+
+        navigator.clipboard.writeText(snippet).then(() => {
+            const btn = document.getElementById(buttonId);
+            const original = btn.innerHTML;
+            btn.innerHTML = '✓ Copied';
+            setTimeout(() => btn.innerHTML = original, 2000);
+        });
+    }
+</script>
 {% endblock %}

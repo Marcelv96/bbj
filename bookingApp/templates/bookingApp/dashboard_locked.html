@@ -1,0 +1,64 @@
+{% extends 'bookingApp/base.html' %}
+{% block content %}
+
+<div class="min-h-screen bg-slate-50 flex items-center justify-center">
+    <div class="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50 border border-slate-100 text-center">
+
+        <div class="w-20 h-20 bg-rose-50 rounded-3xl flex items-center justify-center mx-auto mb-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+        </div>
+
+        <h1 class="text-2xl font-black text-slate-900 mb-3">Dashboard Locked</h1>
+        <p class="text-slate-500 text-sm leading-relaxed mb-8">
+            The profile for <span class="font-bold text-slate-700">{{ business.name }}</span> is currently inactive.
+            {% if request.user == business.owner %}
+                Please complete the platform activation to access your dashboard.
+            {% else %}
+                Please contact the business owner to renew the subscription.
+            {% endif %}
+        </p>
+
+        {% if request.user == business.owner %}
+        <div class="bg-slate-50 rounded-2xl p-4 mb-8 flex justify-between items-center text-left">
+            <div>
+                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Monthly Fee</p>
+                <p class="text-lg font-black text-slate-800">R149.00</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Term</p>
+                <p class="text-sm font-bold text-slate-600">30 Days Access</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="space-y-3">
+            {% if request.user == business.owner %}
+                <a href="{{ pay_url }}"
+                   class="block w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                    Activate Now
+                </a>
+            {% else %}
+                <div class="p-4 bg-amber-50 text-amber-700 rounded-2xl text-xs font-medium border border-amber-100 mb-4">
+                    Account access restricted until renewal.
+                </div>
+            {% endif %}
+
+            <a href="{% url 'home' %}" class="block w-full text-slate-400 hover:text-slate-600 text-sm font-medium py-2">
+                Back to Home
+            </a>
+        </div>
+
+        {% if request.user == business.owner %}
+        <p class="mt-8 text-[10px] text-slate-400 flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Securely processed via PayFast
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

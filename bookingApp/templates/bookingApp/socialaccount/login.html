@@ -1,0 +1,165 @@
+{% extends 'bookingApp/base.html' %}
+{% load socialaccount %}
+
+{% block title %}Login | Bookings by Jason{% endblock %}
+
+{% block content %}
+<div class="auth-center-viewport d-flex align-items-center justify-content-center">
+    <div class="auth-module">
+        
+        <div class="text-center mb-5">
+            
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Securely sign in to manage your bookings</p>
+        </div>
+
+        <div class="social-auth-zone mb-4">
+            <a href="{% provider_login_url 'google' %}" class="btn-google-saas">
+                <i class="fa-brands fa-google me-2"></i> Continue with Google
+            </a>
+        </div>
+
+        <div class="divider-container my-4">
+            <div class="divider-line"></div>
+            <span class="divider-text">or use email</span>
+        </div>
+
+        <div class="auth-glass-card">
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="auth-field-group mb-4">
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <label for="{{ field.id_for_label }}" class="saas-label">
+                            {{ field.label }}
+                        </label>
+                        {% if field.name == "password" %}
+                            <a href="#" class="saas-link-sm">Forgot password?</a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="saas-input-wrapper">
+                        {{ field }}
+                    </div>
+                    
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <div class="saas-error-msg">
+                                <i class="fa-solid fa-circle-exclamation me-1"></i>{{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="form-check mb-4 saas-checkbox">
+                    <input class="form-check-input" type="checkbox" id="remember">
+                    <label class="form-check-label text-muted" for="remember">Remember this device</label>
+                </div>
+
+                <button type="submit" class="btn-saas-primary w-100 mb-4">
+                    Sign In <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                </button>
+            </form>
+
+            <div class="text-center">
+                <p class="text-muted small mb-1">Don't have an account?</p>
+                <a href="{% url 'register' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}"
+                   class="saas-link-bold">
+                    Create a free account
+                </a>
+            </div>
+        </div>
+
+        <div class="auth-footer-links mt-5">
+            <a href="#">Privacy Policy</a>
+            <span class="dot-spacer">•</span>
+            <a href="#">Terms of Service</a>
+            <span class="dot-spacer">•</span>
+            <a href="#">Support</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* COMPONENT STACKING */
+    .auth-center-viewport {
+        min-height: 85vh;
+        padding: 2rem 1.5rem;
+        position: relative;
+        z-index: 5; /* Above canvas */
+    }
+
+    .auth-module {
+        width: 100%;
+        max-width: 420px;
+    }
+
+    /* BRANDING ICON */
+    .auth-brand-icon {
+        width: 60px; height: 60px;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.6rem;
+        color: #2563eb;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+    }
+
+    /* TYPOGRAPHY */
+    .auth-title { font-weight: 800; color: #0f172a; letter-spacing: -0.02em; }
+    .auth-subtitle { color: #64748b; font-size: 0.95rem; }
+    .saas-label { font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    /* GOOGLE BUTTON (FA ICON VERSION) */
+    .btn-google-saas {
+        display: flex; align-items: center; justify-content: center;
+        width: 100%; padding: 0.8rem;
+        background: #fff; border: 1px solid #e2e8f0;
+        border-radius: 12px; color: #1e293b; font-weight: 600;
+        text-decoration: none; transition: all 0.2s;
+    }
+    .btn-google-saas:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
+    .btn-google-saas i { color: #ea4335; /* Google Red for the icon */ font-size: 1.1rem; }
+
+    /* DIVIDER */
+    .divider-container { position: relative; text-align: center; }
+    .divider-line { height: 1px; background: rgba(0,0,0,0.06); width: 100%; }
+    .divider-text { 
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: #f8fafc; padding: 0 12px; font-size: 0.8rem; color: #94a3b8;
+    }
+
+    /* INPUTS */
+    input[type="text"], input[type="password"], input[type="email"] {
+        width: 100%; padding: 0.8rem 1rem; border-radius: 10px;
+        border: 1px solid #e2e8f0; background: #fff; transition: all 0.2s;
+    }
+    input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08); }
+
+    /* PRIMARY ACTION */
+    .btn-saas-primary {
+        background: #2563eb; color: #fff; border: none; padding: 0.9rem;
+        border-radius: 12px; font-weight: 700; transition: all 0.3s;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+    }
+    .btn-saas-primary:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 12px 25px rgba(37, 99, 235, 0.3); }
+
+    /* LINKS & ERRORS */
+    .saas-link-sm { font-size: 0.8rem; color: #2563eb; font-weight: 600; text-decoration: none; }
+    .saas-link-bold { color: #2563eb; font-weight: 700; text-decoration: none; }
+    .saas-error-msg { color: #ef4444; font-size: 0.8rem; margin-top: 0.5rem; font-weight: 500; }
+
+    /* FOOTER */
+    .auth-footer-links { text-align: center; font-size: 0.8rem; color: #94a3b8; }
+    .auth-footer-links a { color: inherit; text-decoration: none; }
+    .auth-footer-links a:hover { color: #2563eb; }
+    .dot-spacer { margin: 0 8px; }
+
+    /* Focused Experience Override */
+    .navbar-desktop, .mobile-nav { display: none !important; }
+    body { padding-bottom: 0 !important; }
+</style>
+{% endblock %}

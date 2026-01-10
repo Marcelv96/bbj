@@ -1,0 +1,25 @@
+{% extends 'bookingApp/base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; padding: 20px; text-align: center; font-family: sans-serif;">
+    <div style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; padding: 40px;">
+        <div style="color: #10b981; font-size: 48px; margin-bottom: 20px;">
+            ✓
+        </div>
+        <h1 style="color: #1e293b; margin-bottom: 10px;">Reschedule Requested</h1>
+        <p style="color: #64748b; line-height: 1.6;">
+            Your request to change your appointment has been received. 
+            The business owner has been notified and will review your new requested time.
+        </p>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 14px; color: #94a3b8;">
+                You will receive a confirmation email once the new time is approved.
+            </p>
+            <a href="/" style="display: inline-block; margin-top: 20px; color: #64748b; text-decoration: none; font-weight: 600;">
+                ← Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% for appt in appointments %}
+<tr class="hover:bg-slate-50/80 transition-all group">
+    <td class="px-6 py-5">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-slate-900 text-white flex items-center justify-center font-black text-md border border-black">
+                {{ appt.customer.first_name|default:appt.guest_name|slice:":1"|upper }}
+            </div>
+            <div>
+                <p class="font-black text-slate-900 uppercase text-sm tracking-tight">{{ appt.customer.get_full_name|default:appt.guest_name }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ appt.customer.email|default:appt.guest_email }}</p>
+            </div>
+        </div>
+    </td>
+    <td class="px-6 py-5">
+        <p class="font-bold text-slate-800 text-sm uppercase">{{ appt.service.name }}</p>
+        <p class="text-[10px] text-indigo-500 font-black uppercase tracking-widest mt-1">
+            <i class="fa-solid fa-user-tie mr-1"></i> {{ appt.staff.name }}
+        </p>
+    </td>
+    <td class="px-6 py-5">
+        <p class="text-sm font-black text-slate-900 uppercase">{{ appt.appointment_date|date:"D, M d, Y" }}</p>
+        <p class="text-[10px] font-bold text-slate-500 mt-1">
+            <i class="fa-regular fa-clock mr-1 text-indigo-400"></i>{{ appt.appointment_start_time|time:"H:i" }}
+        </p>
+    </td>
+    <td class="px-6 py-5">
+        <span class="px-3 py-1 text-[11px] font-black uppercase tracking-widest border
+            {% if appt.status == 'confirmed' %} border-emerald-200 bg-emerald-50 text-emerald-700
+            {% elif appt.status == 'pending' %} border-amber-200 bg-amber-50 text-amber-700
+            {% elif appt.status == 'cancelled' %} border-rose-200 bg-rose-50 text-rose-700
+            {% else %} border-slate-200 bg-slate-50 text-slate-600 {% endif %}">
+            {{ appt.get_status_display }}
+        </span>
+    </td>
+    <td class="px-6 py-5 text-right">
+        <a href="{% url 'appointment_detail' appt.pk %}" class="inline-flex items-center justify-center w-8 h-8 rounded border border-slate-200 text-slate-400 hover:border-black hover:text-black transition-all shadow-sm hover:shadow-md">
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="5" class="px-6 py-20 text-center">
+        <div class="flex flex-col items-center">
+            <div class="w-16 h-16 bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center text-slate-300 mb-4">
+                <i class="fa-solid fa-magnifying-glass text-xl"></i>
+            </div>
+            <h3 class="text-sm font-black uppercase tracking-widest text-slate-900">No matching records</h3>
+            <p class="text-[10px] font-bold text-slate-400 uppercase mt-2">Try adjusting your filters</p>
+        </div>
+    </td>
+</tr>
+{% endfor %}

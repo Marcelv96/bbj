@@ -1,70 +1,363 @@
 {% extends 'bookingApp/base.html' %}
-{% block title %}Explore Businesses | BookingApp{% endblock %}
+{% load custom_filters %}
+
+{% block title %}Explore Specialists | GetMeBooked{% endblock %}
 
 {% block content %}
-<div class="row mb-5 align-items-center">
-    <div class="col-md-8">
-        <h1 class="display-5 fw-bold text-dark">Discover & Book</h1>
-        <p class="lead text-secondary">Find the best local services and book your next appointment in seconds.</p>
-    </div>
-    <div class="col-md-4 text-md-end">
-        <a href="{% url 'register_business' %}" class="btn btn-outline-primary rounded-pill px-4">List Your Business</a>
-    </div>
-</div>
-
-<div class="row g-4">
-    {% for business in businesses %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 border-0 shadow-sm hover-shadow transition-all" style="border-radius: 16px;">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="bg-primary bg-opacity-10 p-3 rounded-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18m6-18v18M3 9h18M3 15h18"/></svg>
-                        </div>
-                        {% if business.owner == user %}
-                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Owner</span>
-                        {% endif %}
-                    </div>
-                    
-                    <h4 class="card-title fw-bold mb-2">{{ business.name }}</h4>
-                    <p class="card-text text-secondary mb-4" style="font-size: 0.95rem; line-height: 1.6;">
-                        {{ business.description|default:"A premier service provider focused on quality and customer satisfaction."|truncatechars:100 }}
-                    </p>
-                    
-                    <div class="mt-auto pt-3 border-top">
-                        <div class="d-grid gap-2">
-                            <a href="{% url 'business_detail' business.id %}" class="btn btn-primary rounded-pill">View Services</a>
-                            
-                            {% if business.owner == user %}
-                                <a href="{% url 'owner_dashboard' business.id %}" class="btn btn-light rounded-pill text-primary fw-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                                    Manage Dashboard
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% empty %}
-        <div class="col-12 text-center py-5">
-            <div class="p-5 bg-light rounded-4">
-                <h3 class="text-secondary">No businesses found</h3>
-                <p>Be the first to list your service on our platform!</p>
-                <a href="{% url 'register_business' %}" class="btn btn-primary px-4">Register Now</a>
-            </div>
-        </div>
-    {% endfor %}
-</div>
-
 <style>
-    .hover-shadow {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
-    }
-    .fw-600 { font-weight: 600; }
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+  * {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  @keyframes loaderMove {
+    0% { left: -30%; }
+    100% { left: 100%; }
+  }
+
+  @keyframes bounceArrow {
+    0%, 100% { transform: translateX(0) translateY(-50%); }
+    50% { transform: translateX(8px) translateY(-50%); }
+  }
+
+  .loader-bar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #e2e8f0;
+    z-index: 9999;
+  }
+
+  .loader-progress-line {
+    height: 100%;
+    background: #6366f1;
+    width: 30%;
+    position: absolute;
+    animation: loaderMove 1.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .d-none { display: none; }
+
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .scroll-smooth { scroll-behavior: smooth; }
+
+  /* Ensures square cards across different screen sizes */
+  .square-card {
+    aspect-ratio: 1 / 1;
+  }
 </style>
+
+<div id="page-loader" class="d-none">
+  <div class="loader-bar-container">
+    <div class="loader-progress-line"></div>
+  </div>
+</div>
+
+<div class="bg-slate-50 min-h-screen">
+
+  <div class="md:hidden mt-0">
+    <div class="w-full px-2 py-4"> <div class="mb-6 flex flex-col justify-center text-center">
+          <div class="mb-2 mt-0 inline-flex items-center justify-center gap-1">
+            <i class="fas fa-crown text-yellow-400 text-sm"></i>
+            <span class="text-xs font-bold text-gray-700">Growing Verified Network</span>
+          </div>
+          <h1 class="mt-2 text-4xl font-black tracking-tight text-gray-900">
+            Get<span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Me</span>Booked
+          </h1>
+          <p class="mt-1 text-gray-600 text-sm font-medium">Find & book verified professionals near you.</p>
+      </div>
+
+      <form action="{% url 'home' %}" method="GET" id="mobileSearchForm" class="m-0 mb-4 px-1">
+        <div class="flex items-center gap-1 rounded-xl bg-white border border-slate-200 px-3 py-1 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+          <i class="fas fa-magnifying-glass text-gray-400 text-sm"></i>
+          <input type="text" name="q" value="{{ search_query|default:'' }}"
+                 placeholder="Hair, Nails, Cleaning..."
+                 class="flex-1 border-0 bg-transparent py-3 px-2 text-sm font-medium outline-none text-gray-900"
+                 id="m-search-input">
+          <button class="bg-indigo-600 text-white border-0 w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer" type="submit">
+            <i class="fas fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </form>
+
+      <div class="flex overflow-x-auto gap-2 scrollbar-hide pb-2 px-1">
+        <a href="?q=Hair" class="{% if search_query == 'Hair' %}bg-indigo-600 text-white border-indigo-600{% else %}bg-white text-gray-900 border-slate-200{% endif %} whitespace-nowrap rounded-full border px-4 py-2 text-xs font-bold shadow-sm">
+          <i class="fas fa-scissors mr-1.5"></i> Hair
+        </a>
+        <a href="?q=Nails" class="{% if search_query == 'Nails' %}bg-indigo-600 text-white border-indigo-600{% else %}bg-white text-gray-900 border-slate-200{% endif %} whitespace-nowrap rounded-full border px-4 py-2 text-xs font-bold shadow-sm">
+          <i class="fas fa-hand mr-1.5"></i> Nails
+        </a>
+        <a href="?q=Barber" class="{% if search_query == 'Barber' %}bg-indigo-600 text-white border-indigo-600{% else %}bg-white text-gray-900 border-slate-200{% endif %} whitespace-nowrap rounded-full border px-4 py-2 text-xs font-bold shadow-sm">
+          <i class="fas fa-razor mr-1.5"></i> Barber
+        </a>
+        <a href="?q=Skin" class="{% if search_query == 'Skin' %}bg-indigo-600 text-white border-indigo-600{% else %}bg-white text-gray-900 border-slate-200{% endif %} whitespace-nowrap rounded-full border px-4 py-2 text-xs font-bold shadow-sm">
+          <i class="fas fa-sparkles mr-1.5"></i> Skin
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <header class="hidden md:block relative min-h-screen w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-12 mb-16 overflow-hidden flex items-center justify-center">
+    <div class="absolute inset-0 z-0">
+      <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop" alt="Luxury Salon" class="w-full h-full object-cover object-center" loading="lazy">
+      <div class="absolute inset-0" style="background: radial-gradient(circle at center, rgba(15, 23, 42, 0.65) 0%, rgba(15, 23, 42, 0.95) 100%); backdrop-filter: brightness(0.8);"></div>
+    </div>
+
+    <div class="w-full max-w-7xl mx-auto px-6 py-20 relative z-10 text-center">
+      <div class="mb-6">
+        <div class="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white font-bold shadow-lg">
+          <i class="fas fa-crown text-yellow-400 text-sm"></i>
+          <span class="text-sm">Growing Verified Network</span>
+        </div>
+        <h1 class="text-7xl font-black text-white leading-tight" style="text-shadow: 0 4px 15px rgba(0,0,0,0.5); letter-spacing: -0.03em;">
+          Get<span class="bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">Me</span>Booked
+        </h1>
+        <h2 class="mt-4 mb-8 text-2xl text-white font-light" style="text-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+          Find & book verified professionals near you — <span class="font-bold">instantly.</span>
+        </h2>
+
+        <form action="{% url 'home' %}" method="GET" class="hidden md:flex items-center gap-2 w-full max-w-6xl mx-auto" id="searchForm">
+
+  <!-- Service or Business input with clear button -->
+  <div class="relative flex-[1.5] flex items-center bg-white rounded-lg border border-slate-300 px-4 shadow-sm focus-within:ring-1 focus-within:ring-slate-400 h-[60px]">
+    <i class="fas fa-magnifying-glass text-gray-500 text-lg"></i>
+    <input
+      type="text"
+      name="q"
+      id="inputQ"
+      value="{{ search_query|default:'' }}"
+      placeholder="Search services or business"
+      class="w-full border-0 bg-transparent py-3 px-3 text-[15px] font-medium outline-none text-gray-900 placeholder:text-gray-400 h-full"
+      autocomplete="off"
+    />
+    <!-- Clear button -->
+    <button
+      type="button"
+      id="clearBtnQ"
+      aria-label="Clear service or business input"
+      title="Clear service or business input"
+      class="absolute right-4 text-gray-400 hover:text-gray-600 transition opacity-0 pointer-events-none"
+      style="top: 50%; transform: translateY(-50%); font-size: 20px; line-height: 1;"
+    >
+      &times;
+    </button>
+  </div>
+
+  <!-- Location input with clear button -->
+  <div class="relative flex-1 flex items-center bg-white rounded-lg border border-slate-300 px-4 shadow-sm focus-within:ring-1 focus-within:ring-slate-400 h-[60px]">
+    <i class="fas fa-location-dot text-gray-500 text-lg"></i>
+    <input
+      type="text"
+      name="location"
+      id="inputLocation"
+      value="{{ request.GET.location|default:'' }}"
+      placeholder="Where?"
+      class="w-full border-0 bg-transparent py-3 px-3 text-[15px] font-medium outline-none text-gray-900 placeholder:text-gray-400 h-full"
+      autocomplete="off"
+    />
+    <!-- Clear button -->
+    <button
+      type="button"
+      id="clearBtnLocation"
+      aria-label="Clear location input"
+      title="Clear location input"
+      class="absolute right-4 text-gray-400 hover:text-gray-600 transition opacity-0 pointer-events-none"
+      style="top: 50%; transform: translateY(-50%); font-size: 20px; line-height: 1;"
+    >
+      &times;
+    </button>
+  </div>
+
+  <!-- Submit button -->
+  <button
+    type="submit"
+    class="bg-gray-900 text-white border-0 px-10 h-[60px] rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-indigo-600 transition-colors shrink-0 cursor-pointer"
+  >
+    Search
+  </button>
+</form>
+
+<script>
+  const clearBtnQ = document.getElementById('clearBtnQ');
+  const clearBtnLocation = document.getElementById('clearBtnLocation');
+  const inputQ = document.getElementById('inputQ');
+  const inputLocation = document.getElementById('inputLocation');
+  const form = document.getElementById('searchForm');
+
+  // Show or hide clear buttons based on inputs' content
+  function toggleClearButtons() {
+    if (inputQ.value) {
+      clearBtnQ.classList.remove('opacity-0', 'pointer-events-none');
+    } else {
+      clearBtnQ.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    if (inputLocation.value) {
+      clearBtnLocation.classList.remove('opacity-0', 'pointer-events-none');
+    } else {
+      clearBtnLocation.classList.add('opacity-0', 'pointer-events-none');
+    }
+  }
+
+  // Clear specific input and submit form to reset search
+  clearBtnQ.addEventListener('click', () => {
+    inputQ.value = '';
+    toggleClearButtons();
+    inputQ.focus();
+    form.submit();
+  });
+
+  clearBtnLocation.addEventListener('click', () => {
+    inputLocation.value = '';
+    toggleClearButtons();
+    inputLocation.focus();
+    form.submit();
+  });
+
+  // Listen for input changes to toggle clear button visibility live
+  [inputQ, inputLocation].forEach(input => {
+    input.addEventListener('input', toggleClearButtons);
+  });
+
+  // Initialize clear button visibility on load
+  toggleClearButtons();
+</script>
+
+      </div>
+
+      <div class="grid grid-cols-3 gap-6 mt-12">
+        <div class="rounded-3xl p-8 bg-white/10 backdrop-blur-xl border border-white/20 text-white">
+          <i class="fas fa-bolt text-3xl mb-4 text-indigo-400"></i>
+          <h6 class="font-black text-xl mb-2">Instant Booking</h6>
+          <p class="text-sm opacity-85">Real-time availability means no waiting for callbacks.</p>
+        </div>
+        <div class="rounded-3xl p-8 bg-white/10 backdrop-blur-xl border border-white/20 text-white">
+          <i class="fas fa-shield-halved text-3xl mb-4 text-indigo-400"></i>
+          <h6 class="font-black text-xl mb-2">Vetted Excellence</h6>
+          <p class="text-sm opacity-85">Verified professionals only for your safety and peace of mind.</p>
+        </div>
+        <div class="rounded-3xl p-8 bg-white/10 backdrop-blur-xl border border-white/20 text-white">
+          <i class="fas fa-calendar-check text-3xl mb-4 text-indigo-400"></i>
+          <h6 class="font-black text-xl mb-2">Seamless Sync</h6>
+          <p class="text-sm opacity-85">Smart scheduling that works perfectly around your life.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full max-w-7xl mx-auto px-2 md:px-6 py-8" id="results-area">
+    <div class="flex items-end justify-between flex-wrap mb-10 gap-4 px-1">
+      <div>
+        <span class="inline-block mb-2 bg-indigo-50 text-indigo-600 font-bold text-xs uppercase px-4 py-1.5 rounded-full border border-indigo-200">Catalog</span>
+        <h2 class="text-3xl font-black tracking-tight text-gray-900">
+          {% if search_query %}Results for <span class="text-indigo-600">"{{ search_query }}"</span>{% else %}Discover Specialists{% endif %}
+        </h2>
+      </div>
+    </div>
+
+    <div class="relative">
+      {% if businesses %}
+        <div class="flex overflow-x-auto md:grid md:grid-cols-4 scroll-smooth gap-4 md:gap-5 pb-8 scrollbar-hide snap-x snap-mandatory" id="main-carousel">
+          {% for business in businesses %}
+            <div class="flex-shrink-0 w-[94%] md:w-full aspect-square bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col transition-all hover:-translate-y-2 hover:shadow-xl snap-center ml-2 md:ml-0">
+
+  <div class="relative h-1/3 bg-cover bg-center bg-gray-200 shrink-0" style="background-image: url('{{ business.cover_image_webp.url|default:'' }}');">
+    <span class="absolute top-3 left-3 bg-white text-gray-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase shadow-md">{{ business.get_industry_display }}</span>
+
+    <form action="{% url 'toggle_save' business.id %}" method="POST" class="absolute top-3 right-3">
+      {% csrf_token %}
+      <button type="submit" class="{% if business.id in saved_business_ids %}bg-red-500{% else %}bg-white/20{% endif %} border border-white/40 backdrop-blur-md text-white w-8 h-8 rounded-full flex items-center justify-center">
+        <i class="fa{% if business.id in saved_business_ids %}-solid{% else %}-regular{% endif %} fa-heart text-xs"></i>
+      </button>
+    </form>
+  </div>
+
+  <div class="p-4 flex-1 flex flex-col min-h-0">
+
+    <div class="flex-1 overflow-hidden">
+      <div class="flex justify-between items-start mb-0.5">
+        <h3 class="text-sm font-black text-gray-900 line-clamp-1 uppercase tracking-tight">{{ business.name }}</h3>
+        <div class="text-yellow-600 text-[10px] font-black flex items-center shrink-0 ml-2">
+          <i class="fas fa-star mr-1"></i>
+          {% if business.total_reviews > 0 %}{{ business.calculated_rating|floatformat:1 }}{% else %}New{% endif %}
+        </div>
+      </div>
+
+      <p class="text-[10px] text-gray-400 font-bold line-clamp-1 mb-2 uppercase tracking-tight">
+        {{ business.address|default:"No Address Provided" }}
+      </p>
+
+      <div class="flex flex-wrap gap-1">
+        {% for service in business.services.all|slice:":2" %}
+          <span class="bg-slate-50 text-slate-500 text-[9px] font-black px-2 py-0.5 rounded border border-slate-100 uppercase">
+            {{ service.name }}
+          </span>
+        {% endfor %}
+        {% if business.services.all.count > 2 %}
+          <span class="text-[9px] text-gray-400 font-bold self-center ml-1">+{{ business.services.all.count|add:"-2" }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="pt-3 border-t border-slate-100 flex justify-between items-center shrink-0">
+
+      <div class="text-[10px] font-black text-gray-900 uppercase tracking-tighter">
+        {% if business.today_hours %}
+          {% with h=business.today_hours.0 %}
+             {{ h.opening_time|time:"H:i" }}{{ h.open_time|time:"H:i" }} - {{ h.closing_time|time:"H:i" }}{{ h.close_time|time:"H:i" }}
+          {% endwith %}
+        {% else %}
+          <span class="text-red-500">Closed</span>
+        {% endif %}
+      </div>
+
+      <a href="{% url 'business_detail' business.id %}" class="bg-gray-900 text-white px-4 py-2 rounded-xl font-bold text-[10px] hover:bg-indigo-600 transition-colors">
+        Book <i class="fas fa-calendar-plus ml-1"></i>
+      </a>
+
+    </div>
+  </div>
+</div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="py-20 text-center bg-white rounded-3xl border border-slate-200 px-4 mx-2">
+           <h3 class="text-2xl font-black mb-2">No Specialists Found</h3>
+           <p class="text-gray-500 mb-6">Try searching for broader categories.</p>
+           <a href="{% url 'home' %}" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold">Clear Search</a>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer class="w-full max-w-7xl mx-auto px-4 py-20">
+    <div class="relative rounded-[2rem] p-12 text-center text-white overflow-hidden bg-slate-900 border border-white/5">
+      <div class="relative z-10">
+        <h2 class="font-black text-3xl mb-4">Want to list your business?</h2>
+        <p class="mb-8 text-white/70">Join our network and reach more clients today.</p>
+        <a href="{% url 'business_onboarding' %}" class="bg-white text-gray-900 rounded-full px-10 py-4 font-bold hover:shadow-xl transition-all">Get Started Now</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const loader = document.getElementById('page-loader');
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', () => loader.classList.remove('d-none'));
+    });
+
+    // Auto-scroll logic for search results
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('q')) {
+      document.getElementById('results-area').scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+</script>
 {% endblock %}

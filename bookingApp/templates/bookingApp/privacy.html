@@ -1,0 +1,126 @@
+{% extends 'bookingApp/base.html' %}
+{% block title %}Privacy Policy | GetMeBooked{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-white min-vh-100">
+    <div class="row border-bottom py-5 px-2 px-lg-2">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-baseline">
+                <div>
+                    <h1 class="display-3 fw-900 text-dark mb-2 tracking-tighter">Privacy Policy</h1>
+                    <p class="fs-5 text-muted mb-0">Our commitment to data minimalism for getmebooked.co.za</p>
+                </div>
+                <div class="text-md-end mt-3 mt-md-0">
+                    <span class="text-uppercase fw-800 small ls-1 text-muted">Effective Revision</span>
+                    <p class="h6 fw-900 text-dark mb-0">31 December 2025</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="legal-body px-2 px-lg-2">
+
+        <div class="row py-5 border-bottom">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">01. Data Collection</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-4 text-dark lh-base mb-4">We operate on a strictly "minimal-essential" data policy. We only collect information required to facilitate scheduling and verify identity.</p>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <p class="fs-5 text-secondary"><strong class="text-dark">User Account Data:</strong> We store your Email, Username, and Phone Number to manage authentication, appointment notifications, and booking history.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="fs-5 text-secondary"><strong class="text-dark">Merchant Credentials:</strong> For Business Owners, we store PayFast Merchant IDs and security keys. These are <strong>encrypted</strong> and used solely to route client deposits to your business.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row py-5 border-bottom">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">02. Business Address</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-4 text-dark lh-base mb-4">We do not track or store the physical location of users.</p>
+                <p class="fs-5 text-secondary mb-0">The only address information stored on our platform is the **Physical Business Address** provided by the Business Owner. This address is used exclusively to display an interactive map via iframe on the business's public booking page to help clients find the premises.</p>
+            </div>
+        </div>
+
+        <div class="row py-5 border-bottom">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">03. Financial Processing</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-4 text-dark lh-base mb-4">We do not store credit card details or bank account numbers.</p>
+                <p class="fs-5 text-secondary mb-0">All transactions—including platform subscriptions and booking deposits—are processed through **PayFast**, a secure third-party provider. We only store transaction status and subscription expiration dates to manage access to the management portal.</p>
+            </div>
+        </div>
+
+        <div class="row py-5 border-bottom">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">04. Usage Disclosure</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-4 text-dark lh-base mb-4">Your data is never for sale.</p>
+                <p class="fs-5 text-secondary">Information is used exclusively to notify Business Owners of your <code>Appointment</code> requests and to automate the confirmation of paid deposits. We do not use tracking pixels, third-party marketing cookies, or behavioral analytics.</p>
+            </div>
+        </div>
+
+        <div class="row py-5">
+            <div class="col-xl-3">
+                <h5 class="text-primary fw-900 text-uppercase ls-1 mb-4">05. Your Rights</h5>
+            </div>
+            <div class="col-xl-9">
+                <p class="fs-5 text-secondary">You have the right to delete your account at any time. Deleting your account will immediately purge your <code>Profile</code>, encrypted <code>Merchant Keys</code>, and <code>Appointment</code> history from our active database. Public reviews will be anonymized upon request.</p>
+            </div>
+        </div>
+
+        <div class="row py-5">
+            <div class="col-12">
+                <div class="bg-dark text-white p-5 rounded-4 d-flex flex-column flex-lg-row justify-content-between align-items-center gap-4">
+                    <div>
+                        <h2 class="fw-900 mb-1">Privacy First</h2>
+                        <p class="text-white-50 mb-0">By using GetMeBooked, you acknowledge this Privacy Policy.</p>
+                    </div>
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5 py-3 fw-800 rounded-3">Return Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #1a1a1a;
+        letter-spacing: -0.01em;
+    }
+
+    .fw-900 { font-weight: 900; }
+    .fw-800 { font-weight: 800; }
+    .ls-1 { letter-spacing: 0.1em; }
+    .tracking-tighter { letter-spacing: -0.04em; }
+
+    .text-primary { color: #6366f1 !important; }
+    .btn-primary { background-color: #6366f1; border: none; }
+    .btn-primary:hover { background-color: #4f46e5; }
+
+    .legal-body .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    @media (min-width: 1600px) {
+        .legal-body, .container-fluid > .row {
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    p { line-height: 1.6; }
+</style>
+{% endblock %}

@@ -2,8 +2,51 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import Profile, Business, Service, Staff, BookingForm, Appointment
+from .models import Profile, Business, Service, Staff, BookingForm, Appointment, ClientProfile
+from django.contrib import admin
+from .models import SavedBusiness, Review
+# admin.py
+from django.contrib import admin
+from .models import DemoLead
 
+admin.site.register(ClientProfile)
+
+@admin.register(DemoLead)
+class DemoLeadAdmin(admin.ModelAdmin):
+    list_display = ('email', 'service', 'staff', 'created_at')
+    search_fields = ('email', 'name')
+    list_filter = ('created_at',)
+
+
+@admin.register(SavedBusiness)
+class SavedBusinessAdmin(admin.ModelAdmin):
+    list_display = ('user', 'business', 'created_at')
+    list_filter = ('created_at', 'business')
+    search_fields = ('user__username', 'business__name')
+    readonly_fields = ('created_at',)
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('business', 'user', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at', 'business')
+    search_fields = ('user__username', 'business__name', 'comment')
+    # This allows you to edit the rating and comment directly in the list view
+    list_editable = ('rating',)
+    readonly_fields = ('created_at', 'updated_at')
+
+    # Organizes the detail view in the admin
+    fieldsets = (
+        (None, {
+            'fields': ('business', 'user')
+        }),
+        ('Content', {
+            'fields': ('rating', 'comment')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
 
 # Inline admin descriptor for Profile model linked to User
 class ProfileInline(admin.StackedInline):
@@ -22,15 +65,23 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
+# admin.py
+from django.contrib import admin
+from .models import Profile
+
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_business_owner')
-    search_fields = ('user__username', 'user__email')
+    # ERROR CAUSE: 'is_business_owner' is missing from the Profile model
+    # list_display = ['user', 'is_business_owner', 'phone_number']
+
+    # FIXED: Use existing fields from your Profile model
+    list_display = ['user', 'phone_number', 'email_notifications']
+    search_fields = ['user__username', 'phone_number']
 
 
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'slug', 'created_at')
+    list_display = ('name', 'owner', 'slug', 'created_at', 'payfast_merchant_id', 'payfast_merchant_key')
     list_filter = ('created_at',)
     search_fields = ('name', 'owner__username')
     prepopulated_fields = {'slug': ('name',)}
@@ -68,6 +119,6 @@ class AppointmentAdmin(admin.ModelAdmin):
     list_filter = ('status', 'appointment_date', 'booking_form')
     search_fields = ('customer__username', 'booking_form__business__name', 'service__name')
     date_hierarchy = 'appointment_date'
-    
+
     # Optional: Make it easy to change status directly from the list view
     list_editable = ('status',)

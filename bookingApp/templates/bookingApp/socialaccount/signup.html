@@ -1,0 +1,18 @@
+{% extends 'bookingApp/base.html' %}
+{% load socialaccount %}
+
+{% block title %}Confirm Social Login{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <h2 class="mb-4">Sign in with {{ provider.name }}</h2>
+    <p>You are about to sign in using a third-party account from {{ provider.name }}.</p>
+
+    <form method="post" action="{% url 'socialaccount_signup' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary my-3">Continue</button>
+        <br>
+        <a href="{% url 'account_login' %}" class="btn btn-link">Cancel</a>
+    </form>
+</div>
+{% endblock %}

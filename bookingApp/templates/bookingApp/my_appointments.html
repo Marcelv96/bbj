@@ -1,79 +1,174 @@
 {% extends 'bookingApp/base.html' %}
-{% block title %}My Bookings | BookingApp{% endblock %}
+{% block title %}My Schedule | BookingsByJason{% endblock %}
 
 {% block content %}
-<div class="row mb-4 align-items-center">
-    <div class="col-md-6">
-        <h1 class="fw-bold text-dark">My Bookings</h1>
-        <p class="text-secondary">Manage your upcoming and past appointments.</p>
-    </div>
-    <div class="col-md-6 text-md-end">
-        <a href="{% url 'home' %}" class="btn btn-primary rounded-pill px-4">
-            Book New Appointment
-        </a>
-    </div>
-</div>
+<div class="saas-view py-2">
+    <header class="container-pro text-center mb-5">
+        <div class="brand-meta">
+            <span class="badge-type mb-2">Customer Portal</span>
+            <h1 class="hero-h1">My <span class="text-indigo">Appointments</span></h1>
+            <p class="text-muted small mt-2">Manage and track your {{ total_count }} verified sessions.</p>
+        </div>
+    </header>
 
-<div class="row g-4">
-    {% for appointment in appointments %}
-        <div class="col-12">
-            <div class="card border-0 shadow-sm hover-shadow transition-all" style="border-radius: 12px;">
-                <div class="card-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-2 text-center border-end d-none d-md-block">
-                            <div class="text-primary fw-bold small text-uppercase">{{ appointment.appointment_date|date:"M" }}</div>
-                            <div class="display-6 fw-bold text-dark">{{ appointment.appointment_date|date:"d" }}</div>
-                            <div class="text-muted small">{{ appointment.appointment_date|date:"Y" }}</div>
+    <nav class="tab-navbar container-pro mb-5" style="max-width: 400px; margin: 0 auto;">
+        <button onclick="filterAppointments('all', this)" class="tab-link active" style="border: none; cursor: pointer;">
+            <i class="fa-solid fa-layer-group"></i> <span>All</span>
+        </button>
+        <button onclick="filterAppointments('upcoming', this)" class="tab-link" style="border: none; cursor: pointer;">
+            <i class="fa-solid fa-calendar-day"></i> <span>Upcoming</span>
+        </button>
+        <button onclick="filterAppointments('past', this)" class="tab-link" style="border: none; cursor: pointer;">
+            <i class="fa-solid fa-history"></i> <span>Past</span>
+        </button>
+    </nav>
+
+    <main class="container-pro">
+        <div class="wide-feed mx-auto" id="appointment-list" style="max-width: 1100px;">
+            {% for appointment in appointments %}
+            <div class="timeline-row appointment-item"
+                 data-category="{% if appointment.status in 'cancelled,completed,declined' %}past{% else %}upcoming{% endif %}">
+
+                <div class="timeline-side">
+                    <div class="date-capsule">
+                        <span class="d-day">{{ appointment.appointment_date|date:"d" }}</span>
+                        <span class="d-mon">{{ appointment.appointment_date|date:"M" }}</span>
+                    </div>
+                    <div class="time-label">{{ appointment.appointment_start_time|time:"H:i" }}</div>
+                </div>
+
+                <a href="{% url 'appointment_detail' appointment.pk %}" class="appt-glass-card wide-card">
+                    <div class="appt-info">
+                        <div class="appt-meta mb-1">
+                            <span class="service-tag text-uppercase fw-800" style="letter-spacing: 0.5px; color: var(--indigo);">
+                                {{ appointment.booking_form.business.name }}
+                            </span>
+                            <span class="status-badge {% if appointment.status == 'confirmed' or appointment.status == 'completed' %}success{% elif appointment.status == 'cancelled' or appointment.status == 'declined' %}danger{% else %}warning{% endif %}">
+                                {{ appointment.get_status_display }}
+                            </span>
                         </div>
+                        <h3 class="mb-3" style="font-size: 1.1rem;">{{ appointment.service.name }}</h3>
 
-                        <div class="col-md-7 ps-md-4">
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 me-2">
-                                    {{ appointment.booking_form.business.name }}
-                                </span>
-                                <span class="badge rounded-pill badge-status-{{ appointment.status }}">
-                                    {{ appointment.get_status_display }}
-                                </span>
+                        <div class="bottom-meta-row">
+                            <div class="meta-item">
+                                <img src="https://ui-avatars.com/api/?name={{ appointment.staff.name|urlencode }}&background=6366f1&color=fff&bold=true" class="avatar-mini">
+                                <span>{{ appointment.staff.name|default:"Specialist" }}</span>
                             </div>
-                            <h4 class="fw-bold mb-1">{{ appointment.service.name }}</h4>
-                            <div class="d-flex flex-wrap gap-3 text-secondary small">
-                                <span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    {{ appointment.appointment_start_time }} ({{ appointment.length_minutes }} min)
-                                </span>
-                                <span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                    Staff: {{ appointment.staff.name|default:"Any Available" }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 text-md-end mt-3 mt-md-0">
-                            <div class="d-grid gap-2">
-                                <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-primary btn-sm rounded-pill">Manage Booking</a>
-                                <a href="{% url 'business_detail' appointment.booking_form.business.id %}" class="btn btn-outline-secondary btn-sm rounded-pill">View Business</a>
+                            <div class="meta-item">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span>{{ appointment.booking_form.business.address|default:"Verified Location"|truncatechars:25 }}</span>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div class="appt-actions">
+                        <div class="btn-circle view">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
-    {% empty %}
-        <div class="col-12 text-center py-5">
-            <div class="p-5 bg-white rounded-4 shadow-sm">
-                <h4 class="text-secondary">No appointments found</h4>
-                <a href="{% url 'home' %}" class="btn btn-primary px-4 rounded-pill">Browse Businesses</a>
+            {% empty %}
+            <div class="empty-state-card">
+                <i class="fa-solid fa-calendar-xmark mb-2" style="font-size: 2rem;"></i>
+                <h4 class="fw-800">No sessions scheduled</h4>
+                <p>Your timeline is currently clear.</p>
+                <a href="{% url 'home' %}" class="badge-type text-decoration-none mt-3 d-inline-block">Browse Services</a>
             </div>
+            {% endfor %}
+
+
         </div>
-    {% endfor %}
+    </main>
 </div>
 
+<script>
+function filterAppointments(category, el) {
+    // UI Update
+    document.querySelectorAll('.tab-link').forEach(tab => tab.classList.remove('active'));
+    el.classList.add('active');
+
+    const items = document.querySelectorAll('.appointment-item');
+    let visibleCount = 0;
+
+    items.forEach(item => {
+        if (category === 'all' || item.getAttribute('data-category') === category) {
+            item.style.display = 'flex';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    const noResults = document.getElementById('no-results');
+    noResults.classList.toggle('d-none', visibleCount > 0);
+}
+</script>
+
 <style>
-    .hover-shadow:hover { transform: scale(1.01); box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.08)!important; }
-    .transition-all { transition: all 0.2s ease-in-out; }
-    .badge-status-pending { background-color: #fef3c7; color: #92400e; }
-    .badge-status-confirmed { background-color: #d1fae5; color: #065f46; }
-    .badge-status-cancelled { background-color: #fee2e2; color: #991b1b; }
-    .badge-status-completed { background-color: #e0f2fe; color: #075985; }
+    :root {
+        --indigo: #6366f1;
+        --indigo-soft: #f5f7ff;
+        --bg: #fafafa;
+        --border: #f1f1f1;
+        --text: #111827;
+        --muted: #6b7280;
+        --shadow: 0 4px 20px rgba(0,0,0,0.04);
+        --green: #22c55e;
+        --orange: #f59e0b;
+        --red: #ef4444;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .container-pro { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0; }
+    .d-none { display: none !important; }
+
+    .hero-h1 { font-size: 2rem; font-weight: 900; letter-spacing: -0.8px; }
+    .text-indigo { color: var(--indigo); }
+    .badge-type { background: var(--indigo-soft); color: var(--indigo); padding: 5px 12px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; display: inline-block; }
+
+    .tab-navbar { display: flex; background: #f0f0f0; padding: 5px; border-radius: 18px; gap: 4px; }
+    .tab-link { flex: 1; border: none; padding: 10px 5px; border-radius: 14px; font-weight: 700; font-size: 0.7rem; color: var(--muted); background: transparent; transition: 0.2s; }
+    .tab-link i { display: block; font-size: 1rem; margin-bottom: 2px; }
+    .tab-link.active { background: #fff; color: var(--indigo); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+    .timeline-row { display: flex; gap: 24px; margin-bottom: 16px; align-items: stretch; }
+    .timeline-side { width: 60px; display: flex; flex-direction: column; align-items: flex-end; padding-top: 12px; flex-shrink: 0; }
+    .d-day { display: block; font-size: 1.4rem; font-weight: 900; color: var(--text); line-height: 1; }
+    .d-mon { display: block; font-size: 0.7rem; font-weight: 800; color: var(--indigo); text-transform: uppercase; }
+    .time-label { margin-top: 6px; font-size: 0.75rem; font-weight: 700; color: var(--muted); }
+
+    .appt-glass-card {
+        flex: 1; background: #fff; border-radius: 24px; border: 1px solid var(--border);
+        padding: 24px; display: flex; align-items: center; text-decoration: none; color: inherit;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow);
+    }
+    .appt-glass-card:hover { transform: translateX(8px); border-color: var(--indigo); }
+
+    .appt-info { flex: 1; }
+    .appt-meta { display: flex; gap: 10px; align-items: center; }
+    .status-badge { font-size: 0.6rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
+    .status-badge.warning { background: #fff7ed; color: var(--orange); }
+    .status-badge.success { background: #f0fdf4; color: var(--green); }
+    .status-badge.danger { background: #fef2f2; color: var(--red); }
+
+    .bottom-meta-row { display: flex; gap: 20px; }
+    .meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+    .avatar-mini { width: 22px; height: 22px; border-radius: 50%; }
+
+    .btn-circle.view {
+        width: 40px; height: 40px; border-radius: 50%; background: var(--indigo-soft);
+        color: var(--indigo); display: grid; place-items: center; transition: 0.3s;
+    }
+    .appt-glass-card:hover .btn-circle.view { background: var(--indigo); color: #fff; }
+
+    .empty-state-card { padding: 60px 40px; text-align: center; background: #fff; border-radius: 24px; border: 1px dashed var(--border); color: var(--muted); }
+
+    @media (max-width: 768px) {
+        .timeline-row { flex-direction: column; gap: 8px; }
+        .timeline-side { width: 100%; flex-direction: row; justify-content: space-between; padding: 0 10px; }
+        .date-capsule { display: flex; gap: 6px; align-items: center; }
+        .appt-glass-card:hover { transform: none; }
+        .bottom-meta-row { flex-direction: column; gap: 6px; }
+    }
 </style>
 {% endblock %}
