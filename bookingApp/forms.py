@@ -229,7 +229,7 @@ class BusinessOnboardingForm(forms.ModelForm):
     class Meta:
         model = Business
         fields = [
-            'name', 'industry', 'address', 'contact_number', 'description',
+            'name', 'industry', 'buffer_time', 'address', 'contact_number', 'description',
             'cover_image', 'instagram_url', 'facebook_url', 'twitter_url'
         ]
         widgets = {

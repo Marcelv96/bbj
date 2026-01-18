@@ -1,428 +1,384 @@
-{% extends 'bookingApp/base.html' %}
+{% extends "bookingApp/base.html" %}
 {% load custom_filters %}
-
-{% block title %}Staff Dashboard | {{ user.staff_profile.business.name }}{% endblock %}
-
 {% block content %}
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-    /* --- 1. CORE VISUAL IDENTITY (MATCHING OWNER/ANALYTICS) --- */
+    /* --- 1. PROFESSIONAL THEME VARIABLES (MATCHING OWNER DASHBOARD) --- */
     :root {
-        --brand-indigo: #6366f1;
-        --brand-indigo-dark: #4f46e5;
-        --brand-indigo-soft: #eef2ff;
-        --surface-ground: #f8fafc;
-        --surface-card: #ffffff;
-        --text-main: #1e293b;
-        --text-muted: #64748b;
-        --border-color: #e2e8f0;
+        --primary: #4f46e5; /* Indigo 600 */
+        --primary-dark: #4338ca; /* Indigo 700 */
+        --secondary: #64748b; /* Slate 500 */
+        --bg-body: #f8fafc; /* Slate 50 */
+        --bg-card: #ffffff;
+        --border-subtle: #e2e8f0; /* Slate 200 */
+        --text-main: #0f172a; /* Slate 900 */
     }
 
     body {
-        font-family: 'Inter', sans-serif;
-        background-color: var(--surface-ground);
+        background-color: var(--bg-body);
+        font-family: 'Plus Jakarta Sans', sans-serif; /* Kept font from staff dash or switch to Inter if preferred */
         color: var(--text-main);
         -webkit-font-smoothing: antialiased;
     }
 
-    /* --- 2. CONTAINERS & PANELS --- */
-    .spa-width { max-width: 1400px; margin: 0 auto; padding: 0 1rem; width: 100%; }
+    /* --- 2. LAYOUT UTILITIES --- */
+    .app-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
 
-    .glass-panel {
-        background: var(--surface-card);
-        border: 1px solid var(--border-color);
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-        border-radius: 1rem;
-        transition: all 0.2s ease;
+    @media (max-width: 640px) {
+        .app-container { padding: 0 0.75rem; }
+    }
+
+    /* Cards */
+    .feature-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease-in-out;
         overflow: hidden;
     }
 
-    .glass-panel:hover {
-        border-color: var(--brand-indigo);
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+    .feature-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
     }
 
-    .glass-panel-interactive { cursor: pointer; }
-    .glass-panel-interactive:hover { transform: translateY(-2px); }
-
-    /* --- 3. TYPOGRAPHY --- */
-    .h-mega-sm {
-        font-size: clamp(1.8rem, 5vw, 2.5rem);
-        font-weight: 900;
-        letter-spacing: -0.04em;
-        line-height: 1;
-        color: var(--text-main);
+    /* --- 3. NAVIGATION TABS --- */
+    .sticky-nav {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border-subtle);
     }
 
-    .mini-label {
-        font-size: 10px;
-        font-weight: 800;
+    .nav-tab {
+        position: relative;
+        padding: 1rem 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--secondary);
+        transition: color 0.2s;
+        white-space: nowrap;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .nav-tab:hover { color: var(--primary); }
+    .nav-tab.active { color: var(--primary); }
+
+    .nav-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: var(--primary);
+    }
+
+    /* --- 4. FORM ELEMENTS --- */
+    .input-std {
+        width: 100%;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        color: #334155;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+    .input-std:focus { border-color: var(--primary); ring: 2px solid #e0e7ff; }
+
+    .btn-main {
+        background-color: var(--primary);
+        color: white;
+        font-weight: 600;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+    .btn-main:hover { background-color: var(--primary-dark); }
+
+    .btn-outline {
+        background-color: white;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-weight: 600;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: #f8fafc; }
+
+    /* --- 5. UTILS --- */
+    .mini-heading {
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--text-muted);
-        display: block;
+        letter-spacing: 0.05em;
+        color: var(--secondary);
         margin-bottom: 0.5rem;
     }
 
-    /* --- 4. BUTTONS & NAV --- */
-    .nav-pill {
-        padding: 0.5rem 1.25rem;
-        font-weight: 700;
-        font-size: 0.75rem;
-        border-radius: 9999px;
-        transition: all 0.2s;
-        color: var(--text-muted);
-        background: transparent;
-        border: 1px solid transparent;
-        white-space: nowrap;
-    }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    .nav-pill:hover { color: var(--brand-indigo); background: white; border-color: var(--border-color); }
-
-    .nav-pill.active {
-        background: var(--brand-indigo);
-        color: white;
-        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
-    }
-
-    /* Secondary Pills for sub-tabs */
-    .filter-pill {
-        padding: 0.4rem 1rem;
-        font-weight: 700;
-        font-size: 0.75rem;
-        border-radius: 0.5rem;
-        transition: all 0.2s;
-        color: var(--text-muted);
-        background: white;
-        border: 1px solid var(--border-color);
-    }
-    .filter-pill:hover { border-color: var(--brand-indigo); color: var(--brand-indigo); }
-    .filter-pill.active { background: var(--text-main); color: white; border-color: var(--text-main); }
-
-    /* Buttons */
-    .btn-primary {
-        background: var(--brand-indigo);
-        color: white;
-        padding: 0.6rem 1.25rem;
-        border-radius: 0.75rem;
-        font-weight: 700;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    .btn-primary:hover { background: var(--brand-indigo-dark); transform: translateY(-1px); }
-
-    .btn-secondary {
-        background: white;
-        border: 1px solid var(--border-color);
-        color: var(--text-main);
-        padding: 0.6rem 1.25rem;
-        border-radius: 0.75rem;
-        font-weight: 700;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    .btn-secondary:hover { border-color: var(--brand-indigo); color: var(--brand-indigo); }
-
-    /* --- 5. INPUTS --- */
-    .input-modern {
-        background: white;
-        border: 1px solid var(--border-color);
-        padding: 0.6rem 1rem;
-        border-radius: 0.75rem;
-        font-size: 0.875rem;
-        font-weight: 600;
-        outline: none;
-        width: 100%;
-        color: var(--text-main);
-        transition: border-color 0.2s;
-    }
-    .input-modern:focus { border-color: var(--brand-indigo); }
-
-    /* Animations */
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-fade-up { animation: fadeUp 0.3s ease-out forwards; }
+    .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
-<div class="min-h-screen py-8 md:py-12">
+<div class="min-h-screen pb-10">
 
-    <header class="mb-8">
-        <div class="spa-width">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
-                <div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="px-2 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-wider rounded-md">Staff Portal</span>
-                        <span class="text-slate-300">•</span>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span class="mini-label !mb-0 text-slate-500">Active</span>
-                        </div>
+    <header class="bg-white pt-6 md:pt-8 pb-2">
+        <div class="app-container">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-lg shadow-slate-200">
+                        {{ user.username|slice:":1"|upper }}
                     </div>
-                    <h1 class="h-mega-sm tracking-tight text-slate-900">{{ user.get_full_name|default:user.username }}</h1>
-
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 leading-tight">{{ user.username }}'s Hub<span class="text-indigo-600">.</span></h1>
+                        <p class="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Staff Portal & Availability</p>
+                    </div>
                 </div>
+
+                <a href="{% url 'manual_booking' business.id %}" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden md:inline">Quick Booking</span>
+                    <span class="md:hidden">New</span>
+                </a>
             </div>
         </div>
     </header>
 
-    <div class="sticky top-4 z-40 mb-8">
-        <div class="spa-width">
-            <div class="glass-panel p-2 flex overflow-x-auto gap-2 bg-white/90 backdrop-blur-md">
-                <button class="nav-pill active" onclick="switchMainTab(event, 'tab-appointments')">My Schedule</button>
-                <button class="nav-pill" onclick="switchMainTab(event, 'tab-services')">Services</button>
-                <button class="nav-pill" onclick="switchMainTab(event, 'tab-hours')">Work Hours</button>
-                <button class="nav-pill" onclick="switchMainTab(event, 'tab-blocks')">Time Off</button>
-
+    <nav class="sticky-nav mt-3">
+        <div class="app-container">
+            <div class="flex gap-4 md:gap-6 overflow-x-auto hide-scrollbar">
+                <button class="nav-tab active" onclick="switchTab(event, 'tab-services')">Services</button>
+                <button class="nav-tab" onclick="switchTab(event, 'tab-hours')">Hours</button>
+                <button class="nav-tab" onclick="switchTab(event, 'tab-off')">Time Off</button>
             </div>
         </div>
-    </div>
+    </nav>
 
-    <main class="spa-width min-h-[500px]">
+    <main class="py-6 md:py-8">
+        <div class="app-container">
 
-        <section id="tab-appointments" class="tab-pane block animate-fade-up">
+            <section id="tab-services" class="tab-content animate-fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="font-bold text-slate-900">Authorized Services</h3>
+                        <p class="text-sm text-slate-500">Select the services you are qualified to perform.</p>
+                    </div>
+                </div>
 
-            <div class="flex gap-2 mb-6">
-                <button class="filter-pill active" onclick="switchSubTab(event, 'sub-today')">Today</button>
-                <button class="filter-pill" onclick="switchSubTab(event, 'sub-upcoming')">Upcoming</button>
-                <button class="filter-pill" onclick="switchSubTab(event, 'sub-history')">History</button>
-                <a href="{% url 'manual_booking' business.id %}" class="inline-flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-all shadow-sm shadow-indigo-100">
-                        <i class="fa-solid fa-plus text-xs"></i>
-                        <span>Booking</span>
-                    </a>
-            </div>
+                <div class="bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="update_services" value="true">
 
-            <div id="sub-today" class="sub-pane block space-y-3">
-                {% for appt in todays_appointments %}
-                <div class="glass-panel p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 border-l-indigo-500 hover:border-indigo-500">
-                    <div class="flex items-center gap-5">
-                        <div class="bg-indigo-50 text-indigo-600 rounded-lg px-4 py-3 min-w-[80px] text-center border border-indigo-100">
-                            <span class="block text-sm font-black">{{ appt.appointment_start_time|time:"H:i" }}</span>
-                            <span class="block text-[9px] font-bold uppercase tracking-wider opacity-70">Start</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {% for checkbox in service_form.services %}
+                            <label class="feature-card p-4 cursor-pointer flex items-center justify-between group hover:bg-slate-50 transition-colors">
+                                <span class="text-sm font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">{{ checkbox.choice_label }}</span>
+                                <div class="scale-110 accent-indigo-600">{{ checkbox.tag }}</div>
+                            </label>
+                            {% endfor %}
                         </div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-lg">
-                                {{ appt.guest_name }}
-                            </h4>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">{{ appt.service.name }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="{% url 'appointment_detail' appt.pk %}" class="btn-secondary !rounded-full !w-10 !h-10 !p-0 flex items-center justify-center">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
-                </div>
-                {% empty %}
-                <div class="glass-panel p-12 text-center">
-                    <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fa-regular fa-calendar text-slate-300"></i>
-                    </div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">No appointments today</p>
-                </div>
-                {% endfor %}
-            </div>
 
-            <div id="sub-upcoming" class="sub-pane hidden space-y-3">
-                {% for appt in upcoming %}
-                <div class="glass-panel p-4 flex items-center justify-between gap-4">
-                    <div class="flex items-center gap-5">
-                        <div class="bg-slate-50 text-slate-900 rounded-lg px-4 py-2 min-w-[80px] text-center border border-slate-100">
-                            <span class="block text-sm font-black">{{ appt.appointment_start_time|time:"H:i" }}</span>
-                            <span class="block text-[9px] font-bold uppercase text-indigo-500">{{ appt.appointment_date|date:"d M" }}</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">{% if appt.customer %}{{ appt.customer.get_full_name }}{% else %}{{ appt.guest_name }}{% endif %}</h4>
-                            <p class="text-xs text-slate-400">{{ appt.service.name }}</p>
-                        </div>
-                    </div>
-                    <a href="{% url 'appointment_detail' appt.pk %}" class="btn-secondary !rounded-full !w-8 !h-8 !p-0 flex items-center justify-center">
-                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                    </a>
-                </div>
-                {% empty %}
-                <div class="glass-panel p-12 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">No upcoming bookings</div>
-                {% endfor %}
-            </div>
-
-            <div id="sub-history" class="sub-pane hidden space-y-2">
-                {% for appt in past %}
-                <div class="glass-panel p-3 flex items-center justify-between opacity-80 hover:opacity-100">
-                    <div class="flex items-center gap-4">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase w-12">{{ appt.appointment_date|date:"d M" }}</span>
-                        <h4 class="font-bold text-slate-700 text-sm">{% if appt.customer %}{{ appt.customer.get_full_name }}{% else %}{{ appt.guest_name }}{% endif %}</h4>
-                    </div>
-                    <span class="text-[9px] font-black text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded">{{ appt.status }}</span>
-                </div>
-                {% empty %}
-                <div class="glass-panel p-12 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">No history found</div>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section id="tab-services" class="tab-pane hidden animate-fade-up">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="font-black text-xl text-slate-900">My Skills</h3>
-                    <p class="text-xs text-slate-400 font-medium">Select services you are qualified to perform</p>
-                </div>
-            </div>
-
-            <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="update_services" value="true">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                    {% for checkbox in service_form.services %}
-                    <label class="glass-panel glass-panel-interactive p-4 flex items-center gap-4 cursor-pointer group">
-                        <div class="relative flex items-center justify-center w-5 h-5">
-                            {{ checkbox.tag }}
-                            </div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-700 group-hover:text-indigo-600 transition-colors">
-                            {{ checkbox.choice_label }}
-                        </span>
-                    </label>
-                    {% endfor %}
-                </div>
-
-                <button type="submit" class="btn-primary px-8">
-                    Update Service List
-                </button>
-            </form>
-        </section>
-
-        <section id="tab-hours" class="tab-pane hidden animate-fade-up">
-            <div class="glass-panel p-6 lg:p-8 max-w-3xl">
-                <div class="mb-6 border-b border-slate-100 pb-4">
-                    <h3 class="font-black text-lg text-slate-900">Weekly Schedule</h3>
-                    <p class="text-xs text-slate-400">Set your standard availability.</p>
-                </div>
-
-                <form method="POST" class="space-y-4">
-                    {% csrf_token %}
-                    {% for day_val, day_label in day_choices %}
-                    <div class="flex items-center justify-between gap-4 py-2">
-                        <label class="text-[10px] font-black uppercase text-slate-500 w-24">{{ day_label }}</label>
-                        <div class="flex items-center gap-3 flex-1 max-w-xs">
-                            <input type="time" name="{{ day_val }}_open" class="input-modern !py-2 text-xs"
-                                   value="{{ hours|get_item:day_val|get_attr:'open_time'|time:'H:i' }}">
-                            <span class="text-[9px] font-bold text-slate-300">TO</span>
-                            <input type="time" name="{{ day_val }}_close" class="input-modern !py-2 text-xs"
-                                   value="{{ hours|get_item:day_val|get_attr:'close_time'|time:'H:i' }}">
-                        </div>
-                    </div>
-                    {% endfor %}
-                    <div class="pt-6 mt-4 border-t border-slate-100">
-                        <button type="submit" name="update_hours" class="btn-primary w-full md:w-auto">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-        <section id="tab-blocks" class="tab-pane hidden animate-fade-up space-y-8">
-            <div class="glass-panel p-6 border-l-4 border-l-rose-400">
-                <h3 class="font-bold text-slate-900 mb-4">Request Time Off</h3>
-                <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    {% csrf_token %}
-                    <div class="space-y-1">
-                        <label class="mini-label">Date</label>
-                        <input type="date" name="block_date" class="input-modern" required>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="mini-label">Start Time</label>
-                        <input type="time" name="start_time" class="input-modern" required>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="mini-label">End Time</label>
-                        <input type="time" name="end_time" class="input-modern" required>
-                    </div>
-                    <button type="submit" name="add_block" class="btn-primary !bg-slate-900 w-full">
-                        <i class="fa-solid fa-plus text-xs"></i> Add Block
-                    </button>
-                </form>
-            </div>
-
-            <div>
-                <h3 class="mini-label mb-3">Active Time Blocks</h3>
-                <div class="space-y-3">
-                    {% for block in blocks %}
-                    <div class="glass-panel p-4 flex justify-between items-center border border-slate-100">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center">
-                                <i class="fa-regular fa-calendar-xmark"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-slate-900 text-sm">{{ block.block_date|date:"D, d M Y" }}</p>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ block.start_time|time:"H:i" }} — {{ block.end_time|time:"H:i" }}</p>
-                            </div>
-                        </div>
-                        <form method="POST" class="m-0">
-                            {% csrf_token %}
-                            <input type="hidden" name="block_id" value="{{ block.id }}">
-                            <button type="submit" name="delete_block" class="text-slate-300 hover:text-rose-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50">
-                                <i class="fa-solid fa-trash-can"></i>
+                        <div class="mt-8 pt-6 border-t border-slate-100 flex justify-end">
+                            <button type="submit" class="btn-main px-8">
+                                Save Changes
                             </button>
-                        </form>
-                    </div>
-                    {% empty %}
-                    <div class="glass-panel p-8 text-center text-[10px] font-bold uppercase text-slate-400 tracking-wider">
-                        No time off scheduled
-                    </div>
-                    {% endfor %}
+                        </div>
+                    </form>
                 </div>
-            </div>
-        </section>
+            </section>
 
+            <section id="tab-hours" class="tab-content hidden animate-fade-in">
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1">
+                        <div class="feature-card p-6 bg-indigo-50 border-indigo-100 h-full">
+                            <div class="w-10 h-10 rounded-lg bg-white text-indigo-600 flex items-center justify-center text-lg mb-4 shadow-sm">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-900 mb-2">Standard Schedule</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Set your standard weekly availability here. Clients will only be able to book you during these windows.
+                            </p>
+                            <div class="mt-6 p-4 bg-white rounded-lg border border-indigo-100">
+                                <p class="text-xs font-bold text-indigo-800 uppercase tracking-wide mb-1">Note</p>
+                                <p class="text-xs text-slate-500">Leaving a time blank or equal (e.g. 09:00 - 09:00) will mark you as unavailable for that day.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        <div class="feature-card p-0">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <table class="w-full text-left">
+                                    <thead class="bg-slate-50 border-b border-slate-100">
+                                        <tr>
+                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Day</th>
+                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Availability Window</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        {% for day_val, day_label in day_choices %}
+                                        <tr class="hover:bg-slate-50 transition-colors">
+                                            <td class="px-6 py-4">
+                                                <p class="text-sm font-bold text-slate-900">{{ day_label }}</p>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex justify-end items-center gap-3">
+                                                    <div class="relative">
+                                                        <input type="time" name="{{ day_val }}_open" class="input-std !py-1.5 !px-2 w-28 text-center" value="{{ hours|get_item:day_val|get_attr:'open_time'|time:'H:i' }}">
+                                                    </div>
+                                                    <span class="text-slate-300 font-light text-xl">/</span>
+                                                    <div class="relative">
+                                                        <input type="time" name="{{ day_val }}_close" class="input-std !py-1.5 !px-2 w-28 text-center" value="{{ hours|get_item:day_val|get_attr:'close_time'|time:'H:i' }}">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+                                    <button type="submit" name="update_hours" class="btn-main px-6">
+                                        Update Schedule
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-off" class="tab-content hidden animate-fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    <div class="lg:col-span-1">
+                        <div class="feature-card p-6 sticky top-24">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center">
+                                    <i class="fa-solid fa-mug-hot"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900">Schedule Break</h3>
+                            </div>
+
+                            <form method="POST" class="space-y-4">
+                                {% csrf_token %}
+                                <div>
+                                    <label class="mini-heading block">Date</label>
+                                    <input type="date" name="block_date" class="input-std" required>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="mini-heading block">Start Time</label>
+                                        <input type="time" name="start_time" class="input-std" required>
+                                    </div>
+                                    <div>
+                                        <label class="mini-heading block">End Time</label>
+                                        <input type="time" name="end_time" class="input-std" required>
+                                    </div>
+                                </div>
+
+                                <div class="pt-2">
+                                    <button type="submit" name="add_block" class="btn-main w-full justify-center">
+                                        Block Time
+                                    </button>
+                                    <p class="text-[10px] text-slate-400 mt-3 text-center">This will prevent clients from booking you during this period.</p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        <div class="feature-card min-h-full p-0">
+                            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                                <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Upcoming Blocks</h3>
+                                <span class="bg-slate-200 text-slate-600 text-xs font-bold px-2 py-1 rounded-full">{{ blocks|length }}</span>
+                            </div>
+
+                            <div class="divide-y divide-slate-100">
+                                {% for block in blocks %}
+                                <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-indigo-600 group-hover:shadow-sm border border-transparent group-hover:border-slate-200 flex items-center justify-center transition-all">
+                                            <i class="fa-solid fa-calendar-day"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-900 text-sm">{{ block.block_date|date:"l, d M Y" }}</h4>
+                                            <p class="text-xs font-medium text-slate-500 flex items-center gap-2 mt-0.5">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                                {{ block.start_time|time:"H:i" }} - {{ block.end_time|time:"H:i" }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <form method="POST" class="m-0">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="block_id" value="{{ block.id }}">
+                                        <button type="submit" name="delete_block" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Remove Block">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                {% empty %}
+                                <div class="p-12 text-center">
+                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                                        <i class="fa-regular fa-calendar-check text-2xl"></i>
+                                    </div>
+                                    <h3 class="text-slate-900 font-bold text-sm">No Time Off Scheduled</h3>
+                                    <p class="text-xs text-slate-500 mt-1">You are fully available according to your standard hours.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 </div>
 
 <script>
-    function switchMainTab(evt, tabId) {
-        // Hide all main panes
-        document.querySelectorAll('.tab-pane').forEach(p => {
-            p.classList.add('hidden');
-            p.classList.remove('block');
-        });
-        // Remove active from all main nav items
-        document.querySelectorAll('.nav-pill').forEach(btn => btn.classList.remove('active'));
-
-        // Show selected pane
+    function switchTab(evt, tabId) {
+        // Hide all contents
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        // Show target content
         document.getElementById(tabId).classList.remove('hidden');
-        document.getElementById(tabId).classList.add('block');
-        evt.currentTarget.classList.add('active');
 
-        // Ensure fade animation replays
-        const pane = document.getElementById(tabId);
-        pane.classList.remove('animate-fade-up');
-        void pane.offsetWidth; // Trigger reflow
-        pane.classList.add('animate-fade-up');
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function switchSubTab(evt, subId) {
-        // Hide all sub panes within appointments
-        document.querySelectorAll('.sub-pane').forEach(p => {
-            p.classList.add('hidden');
-            p.classList.remove('block');
-        });
-        // Remove active from all filter pills
-        document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
-
-        // Show selected sub pane
-        document.getElementById(subId).classList.remove('hidden');
-        document.getElementById(subId).classList.add('block');
+        // Reset nav buttons
+        document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
+        // Activate clicked button
         evt.currentTarget.classList.add('active');
     }
 </script>

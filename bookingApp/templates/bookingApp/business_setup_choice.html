@@ -1,0 +1,132 @@
+{% extends 'bookingApp/base.html' %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        background-color: #f8fafc; /* Very light subtle gray-blue */
+        font-family: 'Inter', sans-serif;
+    }
+
+    .choice-container {
+        max-width: 900px;
+        margin-top: 80px;
+    }
+
+    .choice-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 40px 32px;
+        height: 100%;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .choice-card:hover {
+        transform: translateY(-8px);
+        border-color: #6366f1; /* Indigo accent */
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+
+    .icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background-color: #f0f2ff;
+        color: #6366f1;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        transition: all 0.25s ease;
+    }
+
+    .choice-card:hover .icon-wrapper {
+        background-color: #6366f1;
+        color: #ffffff;
+    }
+
+    .choice-title {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+    }
+
+    .choice-text {
+        color: #64748b;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 24px;
+        flex-grow: 1;
+    }
+
+    .action-link {
+        font-weight: 600;
+        color: #6366f1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .page-header h1 {
+        color: #0f172a;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header p {
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="container choice-container">
+    <div class="page-header text-center mb-5">
+        <h1 class="display-6 mb-2">How would you like to begin?</h1>
+        <p>Set up your workspace in minutes.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <a href="{% url 'business_onboarding' %}" class="choice-card">
+                <div class="icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </div>
+                <h2 class="choice-title">Register my Business</h2>
+                <p class="choice-text">
+                    I am a business owner. I want to create a new profile, list services, and manage my staff.
+                </p>
+                <div class="action-link">
+                    Create new workspace <span>&rarr;</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-6">
+            <a href="{% url 'join_staff' %}" class="choice-card">
+                <div class="icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <h2 class="choice-title">Join an Existing Team</h2>
+                <p class="choice-text">
+                    My business is already on the platform. I want to join as staff or a manager using a Place ID.
+                </p>
+                <div class="action-link">
+                    Find my team <span>&rarr;</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <p class="text-muted small">Logged in as <strong>{{ user.email }}</strong>. <a href="{% url 'logout' %}" class="text-decoration-none">Not you? Logout</a></p>
+    </div>
+</div>
+{% endblock %}

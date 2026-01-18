@@ -7,6 +7,7 @@ from django.db.models import Avg
 from django.db import models
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+from decimal import Decimal
 
 
 class Profile(models.Model):
@@ -58,6 +59,11 @@ class Business(models.Model):
         ('barber', 'Barber'),
     ]
 
+    buffer_time = models.PositiveIntegerField(
+        default=0,
+        help_text="Minutes of buffer time between appointments (e.g., 15)."
+    )
+
     owner = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -101,6 +107,9 @@ class Business(models.Model):
     # --- UPDATED Payment & Deposit Settings ---
     payfast_merchant_id = models.CharField(max_length=50, blank=True, null=True, help_text="Your PayFast Merchant ID")
     payfast_merchant_key = models.CharField(max_length=50, blank=True, null=True, help_text="Your PayFast Merchant Key")
+
+    # Add this to Business model in models.py
+    referral_bonus_paid = models.BooleanField(default=False)
 
     DEPOSIT_TYPE_CHOICES = [
         ('fixed', 'Fixed Amount (R)'),
@@ -176,6 +185,15 @@ class Business(models.Model):
 
     # models.py inside the Business class
 
+    # models.py inside the Business class
+
+    def calculate_deposit(self, service_price):
+        """Calculates the deposit amount based on business settings."""
+        if self.deposit_type == 'percentage':
+            # (Percentage / 100) * Price
+            return (self.deposit_percentage / Decimal('100')) * Decimal(service_price)
+        return self.deposit_amount  # Fixed amount
+
     def is_deposit_required_for_client(self, email):
         """
         Checks if a deposit is required, unless the client is marked as exempt.
@@ -199,6 +217,11 @@ class Business(models.Model):
             filter_kwargs = {field_name: code}
             if not Business.objects.filter(**filter_kwargs).exists():
                 return code
+
+    @property
+    def is_expiring_soon(self):
+        """Returns True if the subscription expires in 2 days or less."""
+        return 0 <= self.days_remaining <= 2
 
     @property
     def deposit_required(self):
@@ -304,28 +327,42 @@ class Service(models.Model):
 
 
 # Booking form configuration per business
+from django.db import models
+from django.utils.crypto import get_random_string
+
 class BookingForm(models.Model):
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='booking_forms')
+    # Changed to OneToOneField to enforce one form per business
+    business = models.OneToOneField(
+        Business,
+        on_delete=models.CASCADE,
+        related_name='booking_form'
+    )
     name = models.CharField(max_length=255, default="Main Booking Form")
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # Keep the token for internal identification if needed
     embed_token = models.CharField(max_length=32, unique=True, editable=False)
 
     def save(self, *args, **kwargs):
         # Generate a unique embed token
         if not self.embed_token:
-            token = get_random_string(length=32)
-            while BookingForm.objects.filter(embed_token=token).exists():
-                token = get_random_string(length=32)
-            self.embed_token = token
+            self.embed_token = self.generate_unique_token()
         super().save(*args, **kwargs)
 
-    def get_embed_js_snippet(self):
-        return f'<script src="https://example.com/embed/{self.embed_token}/book.js"></script>'
+    def generate_unique_token(self):
+        """Helper to ensure token uniqueness."""
+        while True:
+            token = get_random_string(length=32)
+            if not BookingForm.objects.filter(embed_token=token).exists():
+                return token
+
+    def get_booking_url(self):
+        """Returns the clean slug-based URL."""
+        return f"/book/{self.business.slug}/"
 
     def __str__(self):
-        return f"{self.name} ({self.business.name})"
-
+        return f"{self.name} - {self.business.name}"
 
 import uuid
 import re
@@ -423,12 +460,18 @@ class Appointment(models.Model):
         start_dt = datetime.combine(self.appointment_date, self.appointment_start_time)
         return (start_dt + timedelta(minutes=self.length_minutes)).time()
 
-    def save(self, *args, **kwargs):
-        if not self.reschedule_token:
-            self.reschedule_token = str(uuid.uuid4())
+    # models.py inside the Appointment class
 
+    # Inside Appointment class in models.py
+    def save(self, *args, **kwargs):
         if self.service:
             self.length_minutes = self.service.default_length_minutes
+
+            # Ensure we capture the deposit amount at the MOMENT of booking
+            if not self.amount_to_pay or self.amount_to_pay == 0:
+                # Check if we have a business via the service
+                business = self.service.business
+                self.amount_to_pay = business.calculate_deposit(self.service.price)
         else:
             self.length_minutes = 30
 
@@ -565,7 +608,9 @@ from django.db import models
 from django.conf import settings
 from django.db.models import Sum, Count, Q
 from django.db.models.signals import post_save
+import urllib.parse
 from django.dispatch import receiver
+from django.urls import reverse
 
 class ClientProfile(models.Model):
     business = models.ForeignKey('Business', on_delete=models.CASCADE, related_name='clients')
@@ -599,13 +644,41 @@ class ClientProfile(models.Model):
         return self.get_appointments().count()
 
     @property
+    def total_deposit_paid(self):
+        # NEW: Total Deposits Collected
+        return self.get_appointments().filter(status='completed').aggregate(
+            total=Sum('amount_to_pay')
+        )['total'] or 0.00
+
+    @property
     def total_spent(self):
-        return self.get_appointments().aggregate(total=Sum('amount_to_pay'))['total'] or 0.00
+        # FIX: Filter for completed appointments only, and sum service__price (Full Value)
+        # instead of amount_to_pay (Deposit only).
+        return self.get_appointments().filter(status='completed').aggregate(
+            total=Sum('service__price')
+        )['total'] or 0.00
 
     @property
     def last_service(self):
         apt = self.get_appointments().order_by('-appointment_date', '-appointment_start_time').first()
         return apt.service.name if apt and apt.service else "N/A"
+
+    # inside class ClientProfile(models.Model):
+
+    @property
+    def last_visit_appointment(self):
+        """Returns the most recent appointment object for this client."""
+        return self.get_appointments().order_by('-appointment_date', '-appointment_start_time').first()
+
+    @property
+    def last_visit_display(self):
+        """Returns a formatted string like '12 Jan 2024 (Haircut)'"""
+        apt = self.last_visit_appointment
+        if apt:
+            date_str = apt.appointment_date.strftime('%d %b %Y')
+            service_name = apt.service.name if apt.service else "No Service"
+            return f"{date_str} ({service_name})"
+        return "No previous visits"
 
     @property
     def most_selected_service(self):
@@ -613,6 +686,59 @@ class ClientProfile(models.Model):
             count=Count('service')
         ).order_by('-count').first()
         return service_counts['service__name'] if service_counts else "N/A"
+
+    @property
+    def days_since_last_visit(self):
+        # This uses the 'last_appointment_date' we annotated in the view
+        if hasattr(self, 'last_appointment_date') and self.last_appointment_date:
+            delta = timezone.now().date() - self.last_appointment_date
+            return delta.days
+        return None
+
+    @property
+    def is_overdue(self):
+        days = self.days_since_last_visit
+        # FOR TESTING: Use >= 0 so Mark (2 days ago) shows up.
+        # Change to > 30 for production.
+        return days is not None and days >= 30
+
+    @property
+    def rebook_whatsapp_link(self):
+        if not self.phone:
+            return None
+
+        # 1. Find the first available booking form for this business
+        # models.py (Correct)
+        booking_form = getattr(self.business, 'booking_form', None)
+        if booking_form:
+            # Builds /bookingform/5/book/
+            booking_path = reverse('book_appointment', kwargs={'booking_form_id': booking_form.id})
+            booking_url = f"https://www.getmebooked.co.za{booking_path}"
+        else:
+            # Fallback if no form exists
+            booking_url = "https://www.getmebooked.co.za"
+
+        # 2. Clean phone number (27 format)
+        clean_number = ''.join(filter(str.isdigit, str(self.phone)))
+        if clean_number.startswith('0'):
+            clean_number = f"27{clean_number[1:]}"
+
+        # 3. Build the message
+        message = (
+            f"Hi {self.name}, it's been a while since your last visit to {self.business.name}! "
+            f"We'd love to see you again. You can book your next session here: {booking_url}"
+        )
+
+        params = urllib.parse.urlencode({'text': message})
+        return f"https://wa.me/{clean_number}?{params}"
+
+    @property
+    def rebook_email_link(self):
+        if not self.email: return None
+        subject = "We miss you!"
+        body = f"Hi {self.name},\n\nIt's been a while since your last visit. We'd love to welcome you back soon.\n\nBook here: https://getmebooked.co.za"
+        params = urllib.parse.urlencode({'subject': subject, 'body': body})
+        return f"mailto:{self.email}?{params}"
 
 # Signal to automatically build the client list
 @receiver(post_save, sender='bookingApp.Appointment') # Use string name if Appointment is defined later
@@ -632,3 +758,14 @@ def sync_client_profile(sender, instance, created, **kwargs):
                     'user': instance.customer
                 }
             )
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Business)
+def create_business_booking_form(sender, instance, created, **kwargs):
+    if created:
+        BookingForm.objects.get_or_create(
+            business=instance,
+            defaults={'name': f"Main Booking Form - {instance.name}"}
+        )

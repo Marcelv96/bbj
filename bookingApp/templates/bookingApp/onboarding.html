@@ -177,7 +177,19 @@
                 <div class="step-progress-fill" id="progress-bar"></div>
             </div>
         </div>
-
+ {% if messages %}
+            <div class="max-w-6xl mx-auto p-4 pb-0">
+                {% for message in messages %}
+                    <div class="flex items-center justify-between p-4 mb-4 border rounded-xl shadow-sm bg-white animate-in fade-in slide-in-from-top-2 {% if message.tags == 'success' %}border-l-4 border-l-emerald-500{% else %}border-l-4 border-l-red-500{% endif %}">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check text-emerald-500{% else %}fa-circle-exclamation text-red-500{% endif %}"></i>
+                            <span class="text-sm font-bold text-slate-700">{{ message|safe }}</span>
+                        </div>
+                        <button type="button" class="btn-close opacity-50 hover:opacity-100" onclick="this.parentElement.remove()"></button>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         <div class="main-content">
             <header>
                 <h1 class="h-mega">{% if is_editing %}Update Business{% else %}Let's set up your shop{% endif %}</h1>
@@ -189,9 +201,9 @@
 
                 <div class="step-view" id="step-1">
                     <span class="section-header">Step 1: Business Profile</span>
-                    
+
                     <div class="form-group">
-                        <label class="field-label">Business Name</label>
+                        <label class="field-label" required="true">Business Name</label>
                         {{ form.name }}
                     </div>
 
@@ -234,7 +246,7 @@
 
                 <div class="step-view d-none" id="step-2">
                     <span class="section-header">Step 2: Operating Hours</span>
-                    
+
                     <div class="space-y-3 mb-6">
                         <div class="p-4 border border-slate-100 bg-slate-50 rounded-xl">
                             <label class="field-label">Monday - Friday</label>
@@ -267,7 +279,7 @@
 
                 <div class="step-view d-none" id="step-3">
                     <span class="section-header">Step 3: Services & Pricing</span>
-                    
+
                     <div id="service-container">
                         {{ service_formset.management_form }}
                         {% for sv_form in service_formset %}
@@ -279,7 +291,7 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="field-label">Price ($)</label>
+                                    <label class="field-label">Price (R)</label>
                                     {{ sv_form.price }}
                                 </div>
                                 <div>
@@ -306,19 +318,13 @@
 
                 <div class="step-view d-none" id="step-4">
                     <span class="section-header">Step 4: Socials & Launch</span>
-                    
-                    <div class="form-group">
-                        <label class="field-label">Booking Page URL Name</label>
-                        <div class="relative">
-                            {{ form.booking_form_name }}
-                            <span class="absolute right-3 top-3 text-xs text-slate-400">.yourdomain.com</span>
-                        </div>
-                    </div>
+
+
                     <div class="form-group">
                         <label class="field-label">Business Description</label>
                         {{ form.description }}
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
                         <div class="form-group">
                             <label class="field-label text-[10px]">Instagram</label>

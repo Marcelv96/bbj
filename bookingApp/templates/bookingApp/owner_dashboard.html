@@ -1,320 +1,310 @@
 {% extends 'bookingApp/base.html' %}
 {% load custom_filters %}
+{% load static %}
 {% block title %}{{ business.name }} | Owner Dashboard{% endblock %}
 
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
 <style>
-    /* --- 1. CORE VISUAL IDENTITY (MATCHING ANALYTICS) --- */
+    /* --- 1. PROFESSIONAL THEME VARIABLES --- */
     :root {
-        --brand-indigo: #6366f1;
-        --brand-indigo-dark: #4f46e5;
-        --brand-indigo-soft: #eef2ff;
-        --surface-ground: #f8fafc;
-        --surface-card: #ffffff;
-        --text-main: #1e293b;
-        --text-muted: #64748b;
-        --border-color: #e2e8f0;
+        --primary: #4f46e5; /* Indigo 600 */
+        --primary-dark: #4338ca; /* Indigo 700 */
+        --secondary: #64748b; /* Slate 500 */
+        --bg-body: #f8fafc; /* Slate 50 */
+        --bg-card: #ffffff;
+        --border-subtle: #e2e8f0; /* Slate 200 */
+        --text-main: #0f172a; /* Slate 900 */
     }
 
     body {
+        background-color: var(--bg-body);
         font-family: 'Inter', sans-serif;
-        background-color: var(--surface-ground);
         color: var(--text-main);
         -webkit-font-smoothing: antialiased;
     }
 
-    /* --- 2. LAYOUT & CONTAINERS --- */
-    .spa-width { max-width: 1400px; margin: 0 auto; padding: 0 1rem; width: 100%; }
+    /* --- 2. LAYOUT UTILITIES --- */
+    .app-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
 
-    .glass-panel {
-        background: var(--surface-card);
-        border: 1px solid var(--border-color);
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-        border-radius: 1rem;
-        transition: all 0.2s ease;
+    @media (max-width: 640px) {
+        .app-container { padding: 0 0.75rem; } /* Reduced padding for mobile wide-view */
+    }
+
+    /* Cards - Modified for professional mobile appearance */
+    .feature-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease-in-out;
         overflow: hidden;
     }
 
-    .glass-panel:hover {
-        border-color: var(--brand-indigo);
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+    @media (max-width: 640px) {
+        .feature-card {
+            border-radius: 0; /* Flat look on mobile for edge-to-edge feel */
+            border-left: none;
+            border-right: none;
+            box-shadow: none;
+        }
+        .tab-pane { padding-top: 0.5rem; }
     }
 
-    .glass-panel-interactive {
-        cursor: pointer;
-    }
-    .glass-panel-interactive:hover {
+    .feature-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         transform: translateY(-2px);
     }
 
-    /* --- 3. TYPOGRAPHY --- */
-    .h-mega-sm {
-        font-size: clamp(1.8rem, 5vw, 2.5rem);
-        font-weight: 900;
-        letter-spacing: -0.04em;
-        line-height: 1;
-        color: var(--text-main);
+    /* --- 3. NAVIGATION TABS --- */
+    .sticky-nav {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border-subtle);
     }
 
-    .mini-label {
-        font-size: 10px;
-        font-weight: 800;
+    .nav-tab {
+        position: relative;
+        padding: 1rem 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--secondary);
+        transition: color 0.2s;
+        white-space: nowrap;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .nav-tab:hover { color: var(--primary); }
+    .nav-tab.active { color: var(--primary); }
+
+    .nav-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: var(--primary);
+    }
+
+    /* --- 4. FORM ELEMENTS --- */
+    .input-std {
+        width: 100%;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        padding: 0.625rem 0.875rem;
+        font-size: 1rem; /* Better for mobile zoom prevention */
+        color: #334155;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+    @media (min-width: 640px) {
+        .input-std { font-size: 0.875rem; }
+    }
+
+    .input-std:focus { border-color: var(--primary); ring: 2px solid #e0e7ff; }
+
+    .btn-main {
+        background-color: var(--primary);
+        color: white;
+        font-weight: 600;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-main:hover { background-color: var(--primary-dark); }
+
+    .btn-outline {
+        background-color: white;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-weight: 600;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: #f8fafc; }
+
+    /* --- 5. UTILS --- */
+    .mini-heading {
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--text-muted);
-        display: block;
+        letter-spacing: 0.05em;
+        color: var(--secondary);
         margin-bottom: 0.5rem;
     }
 
-    /* --- 4. NAVIGATION PILLS --- */
-    .nav-pill {
-        padding: 0.5rem 1.25rem;
-        font-weight: 700;
-        font-size: 0.75rem;
-        border-radius: 9999px; /* Pill shape */
-        transition: all 0.2s;
-        color: var(--text-muted);
-        background: transparent;
-        border: 1px solid transparent;
-        white-space: nowrap;
+    /* Calendar Overrides */
+    .fc { font-family: 'Inter', sans-serif; --fc-border-color: #e2e8f0; --fc-button-bg-color: #4f46e5; --fc-button-border-color: #4f46e5; }
+    .fc .fc-toolbar-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
+    @media (min-width: 640px) { .fc .fc-toolbar-title { font-size: 1.25rem; } }
+    .fc-theme-standard .fc-scrollgrid { border: none; }
+
+    /* Scrollbar for nav */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Mobile Modal Form Improvements */
+    @media (max-width: 640px) {
+        #settings-modal-overlay > div {
+            max-width: 100%;
+            height: 100%;
+            max-height: 100vh;
+            border-radius: 0;
+        }
+        .modal-pane { padding-bottom: 2rem; }
     }
-
-    .nav-pill:hover {
-        color: var(--brand-indigo);
-        background: white;
-        border-color: var(--border-color);
-    }
-
-    .nav-pill.active {
-        background: var(--brand-indigo);
-        color: white;
-        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
-    }
-
-    /* --- 5. FORM ELEMENTS --- */
-    .input-modern {
-        background: white;
-        border: 1px solid var(--border-color);
-        padding: 0.6rem 1rem;
-        border-radius: 0.75rem;
-        font-size: 0.875rem;
-        font-weight: 600;
-        outline: none;
-        width: 100%;
-        color: var(--text-main);
-        transition: border-color 0.2s;
-    }
-    .input-modern:focus { border-color: var(--brand-indigo); }
-
-    .btn-primary {
-        background: var(--brand-indigo);
-        color: white;
-        padding: 0.6rem 1.25rem;
-        border-radius: 0.75rem;
-        font-weight: 700;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    .btn-primary:hover { background: var(--brand-indigo-dark); transform: translateY(-1px); }
-
-    .btn-light {
-        background: white;
-        color: var(--brand-indigo);
-        padding: 0.6rem 1.25rem;
-        border: 1px solid var(--border-color);
-        border-radius: 0.75rem;
-        font-weight: 700;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    .btn-light:hover { background: var(--brand-indigo-dark); color: white; transform: translateY(-1px); }
-
-    .btn-secondary {
-        background: white;
-        border: 1px solid var(--border-color);
-        color: var(--text-main);
-        padding: 0.6rem 1.25rem;
-        border-radius: 0.75rem;
-        font-weight: 700;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    .btn-secondary:hover { border-color: var(--brand-indigo); color: var(--brand-indigo); }
-
-    /* --- 6. FULLCALENDAR OVERRIDES --- */
-    .fc { font-family: 'Inter', sans-serif; --fc-border-color: #f1f5f9; --fc-button-bg-color: #6366f1; --fc-button-border-color: #6366f1; --fc-today-bg-color: #f8fafc; }
-    .fc .fc-toolbar-title { font-size: 1.25rem; font-weight: 800; color: #1e293b; letter-spacing: -0.02em; }
-    .fc .fc-button { border-radius: 0.5rem; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; padding: 0.4rem 0.8rem; }
-    .fc .fc-col-header-cell-cushion { padding-top: 10px; padding-bottom: 10px; color: #64748b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
-    .fc-daygrid-event { border-radius: 4px; padding: 2px 4px; font-size: 0.75rem; font-weight: 600; color:#4f46e5; }
-
-    /* Custom Scrollbar */
-    .custom-scroll::-webkit-scrollbar { width: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
-
-    /* Animations */
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-fade-up { animation: fadeUp 0.3s ease-out forwards; }
 </style>
 
-<div class="min-h-screen py-8 md:py-12">
 
-<header class="mb-6 lg:mb-10 mt-2">
-    <div class="spa-width px-4 lg:px-0">
-        <div class="flex flex-col gap-5 lg:flex-row lg:justify-between lg:items-end">
 
-            <div class="flex flex-col gap-1.5">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[9px] lg:text-[10px] font-black uppercase tracking-wider rounded">
-                        Business Admin
-                    </span>
-                    <span class="text-slate-300">•</span>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full {% if business.is_active %}bg-emerald-500{% else %}bg-red-500{% endif %}"></span>
-                        <span class="text-[10px] font-bold uppercase tracking-tight text-slate-500">
+<header class="bg-white pt-6 md:pt-8 pb-2">
+    <div class="app-container">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+            <div class="flex items-center gap-3 md:gap-4">
+
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 leading-tight">{{ business.name }}</h1>
+                        <button onclick="toggleHelpModal2()" class="text-slate-400 hover:text-indigo-600 transition-colors p-1" title="Help">
+                            <i class="fa-regular fa-circle-question text-lg"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-wide {% if business.is_active %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}">
+                            <span class="w-1.5 h-1.5 rounded-full {% if business.is_active %}bg-emerald-500{% else %}bg-red-500{% endif %}"></span>
                             {% if business.is_active %}Active{% else %}Inactive{% endif %}
                         </span>
+                        <span class="text-xs text-slate-400">•</span>
+                        <a href="{% url 'business_detail' business.id %}" target="_blank" class="text-xs font-medium text-slate-500 hover:text-indigo-600 transition-colors">
+                           View Public Page <i class="fa-solid fa-arrow-up-right-from-square ml-0.5"></i>
+                        </a>
                     </div>
                 </div>
-
-                <div class="flex items-center gap-2.5">
-                    <h1 class="text-2xl lg:text-3xl font-black tracking-tight text-slate-900 leading-none">
-                        {{ business.name }}
-                    </h1>
-                    <button onclick="toggleHelpModal2()"
-                            class="flex-shrink-0 w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-brand-indigo hover:border-brand-indigo transition-all bg-white"
-                            title="Help">
-                        <i class="fa-solid fa-question text-[10px]"></i>
-                    </button>
-                </div>
-
-                {% if days_left <= 5 %}
-                <div class="mt-1 flex items-center gap-2 text-[11px] font-bold text-red-600 bg-red-50/50 px-2 py-1 rounded border border-red-100 w-fit">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    <span>Expires in {{ days_left }} days</span>
-                    {% if request.user == business.owner %}
-                        <a href="{{ pay_url }}" class="underline decoration-red-300 hover:text-red-700 ml-1">Renew</a>
-                    {% endif %}
-                </div>
-                {% endif %}
             </div>
 
-            <div class="flex items-center gap-2 w-full lg:w-auto">
-                <a href="{% url 'master_appointments' business.id %}"
-                   class="btn-primary flex-1 lg:flex-none flex items-center justify-center gap-2 py-2 px-3 text-xs sm:text-sm font-bold">
-                    <i class="fa fa-calendar-check"></i>
-                    <span>Bookings</span>
+            <div class="hidden md:flex items-center gap-2 md:gap-3 mt-2 md:mt-0">
+                <a href="{% url 'master_appointments' business.id %}" class="btn-main whitespace-nowrap py-2 px-4 text-xs">
+                    <i class="fa-regular fa-calendar-check"></i> Bookings
                 </a>
-
-                <a href="{% url 'client-list' %}"
-                   class="btn-light flex-1 lg:flex-none flex items-center justify-center gap-2 py-2 px-3 text-xs sm:text-sm font-bold border border-slate-200">
-                    <i class="fa fa-users"></i>
-                    <span>Clients</span>
-                </a>
-
-                <a href="{% url 'business_detail' business.id %}" target="_blank"
-                   class="btn-secondary flex-1 lg:flex-none flex items-center justify-center gap-2 py-2 px-3 text-xs sm:text-sm font-bold border border-slate-200">
-                    <i class="fa fa-external-link"></i>
-                    <span>Public</span>
+                <a href="{% url 'client-list' %}" class="btn-outline whitespace-nowrap py-2 px-4 text-xs">
+                    <i class="fa-solid fa-users"></i> Clients
                 </a>
             </div>
 
         </div>
     </div>
 </header>
+{% if days_left <= 5 %}
+<div class="bg-red-50 border-b mt-3 border-red-100 text-red text-[11px] md:text-xs font-bold text-center py-2 px-4">
+    <i class="fa-solid fa-circle-exclamation mr-2"></i>
+    Subscription expires in {{ days_left }} days.
+    {% if request.user == business.owner %}
+    <a href="{{ pay_url }}" class="underline hover:text-amber-900 ml-1">Renew Now</a>
+    {% endif %}
+</div>
+{% endif %}
 
-    <div class="sticky top-4 z-40 mb-8">
-        <div class="spa-width">
-            <div class="glass-panel p-2 flex overflow-x-auto custom-scroll gap-2 bg-white/90 backdrop-blur-md">
-                <button class="nav-pill active" onclick="switchDashTab(event, 'dash-team')">Team</button>
-                <button class="nav-pill hidden md:block" onclick="switchDashTab(event, 'dash-calendar')">Calendar</button>
-                <button class="nav-pill" onclick="switchDashTab(event, 'dash-links')">Portals & Links</button>
-                <button class="nav-pill" onclick="switchDashTab(event, 'dash-services')">Service Menu</button>
-                {% if user == business.owner %}
-                <button class="nav-pill" onclick="switchDashTab(event, 'dash-settings')">Settings</button>
-                {% endif %}
-            </div>
+<nav class="sticky-nav mt-3">
+    <div class="app-container">
+        <div class="flex gap-4 md:gap-6 overflow-x-auto hide-scrollbar">
+            <button class="nav-tab active" onclick="switchDashTab(event, 'dash-team')">
+                Team
+            </button>
+            <button class="nav-tab" onclick="switchDashTab(event, 'dash-links')">
+                Portals
+            </button>
+            <button class="nav-tab" onclick="switchDashTab(event, 'dash-services')">
+                Services
+            </button>
+            {% if user == business.owner %}
+            <button class="nav-tab" onclick="switchDashTab(event, 'dash-settings')">
+                Settings
+            </button>
+            {% endif %}
         </div>
     </div>
+</nav>
 
-    <main class="spa-width min-h-[500px]">
+<main class="py-4 md:py-8 min-h-screen">
+    <div class="app-container">
 
-        <section id="dash-team" class="tab-pane animate-fade-up">
+        <section id="dash-team" class="tab-pane animate-fade-in">
+
+
             <div class="grid lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-1">
-                    <div class="glass-panel p-6 h-full border-l-4 border-l-indigo-500">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                                <i class="fa-solid fa-user-plus"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-slate-900">Invite Staff</h3>
-                                <p class="text-[10px] uppercase font-bold text-slate-400">Expand your team</p>
-                            </div>
+                    <div class="feature-card h-full bg-gradient-to-b from-indigo-50 to-white border-indigo-100 p-6 text-center">
+                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-user-plus text-xl"></i>
                         </div>
+                        <h3 class="font-bold text-slate-900 mb-2">Invite New Staff</h3>
+                        <p class="text-sm text-slate-500 mb-6">Staff use this code to link their accounts to this business.</p>
 
-                        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 text-center mb-4">
-                            <p class="mini-label mb-2">Unique Join Code</p>
-                            <code id="joinCodeText" class="block text-3xl font-black text-indigo-600 tracking-[0.2em] mb-3">{{ business.join_code }}</code>
-                            <button class="btn-secondary w-full text-[10px]" onclick="copyJoinCode(this)">
-                                <i class="fa-regular fa-copy"></i> Copy Code
-                            </button>
+                        <div class="bg-white border border-indigo-200 rounded-lg p-3 mb-4 shadow-sm">
+                            <p class="text-[10px] font-bold uppercase text-indigo-400 tracking-widest mb-1">Join Code</p>
+                            <code id="joinCodeText" class="text-2xl font-black text-slate-800 block tracking-widest">{{ business.join_code }}</code>
                         </div>
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            Share this code with your staff. They can use it to create their own accounts linked to your business.
-                        </p>
+                        <button class="btn-main w-full justify-center" onclick="copyJoinCode(this)">
+                            <i class="fa-regular fa-copy"></i> Copy Code
+                        </button>
                     </div>
                 </div>
 
                 <div class="lg:col-span-2">
-                    <div class="glass-panel p-6 min-h-full">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="font-bold text-lg text-slate-900">Active Roster</h3>
-                            <span class="mini-label">{{ staff_members.count }} Members</span>
+                    <div class="feature-card min-h-full p-0">
+                        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Active Members</h3>
+                            <span class="bg-slate-200 text-slate-600 text-xs font-bold px-2 py-1 rounded-full">{{ staff_members.count }}</span>
                         </div>
-
-                        <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="divide-y divide-slate-100">
                             {% for s in staff_members %}
-                            <div class="flex items-center gap-4 p-4 border border-slate-100 rounded-xl hover:border-indigo-100 transition-colors bg-slate-50/50">
-                                <div class="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            <div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden text-slate-500 font-bold">
                                     {% if s.user.profile.avatar %}
                                         <img src="{{ s.user.profile.avatar.url }}" class="w-full h-full object-cover">
                                     {% else %}
-                                        <span class="font-black text-slate-300 text-lg">{{ s.name|slice:":1" }}</span>
+                                        {{ s.name|slice:":1" }}
                                     {% endif %}
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-sm text-slate-900">{{ s.name }}</h4>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase">{{ s.email|default:"Staff" }}</p>
+                                    <h4 class="font-bold text-slate-900 text-sm">{{ s.name }}</h4>
+                                    <p class="text-xs text-slate-500">{{ s.email|default:"No email" }}</p>
                                 </div>
                                 <div class="ml-auto">
-                                    <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500" title="Active"></span>
                                 </div>
                             </div>
                             {% empty %}
-                            <div class="col-span-full py-12 text-center text-slate-300 font-bold uppercase text-xs">
-                                No staff added yet
+                            <div class="p-8 text-center text-slate-400 italic text-sm">
+                                No staff members found.
                             </div>
                             {% endfor %}
                         </div>
@@ -323,218 +313,262 @@
             </div>
         </section>
 
-        <section id="dash-calendar" class="tab-pane hidden animate-fade-up">
-            <div class="glass-panel p-6">
-                <div id="calendar" class="min-h-[700px]"></div>
-            </div>
-        </section>
 
-        <section id="dash-links" class="tab-pane hidden animate-fade-up space-y-8">
-            {% for form in booking_forms %}
-            <div class="glass-panel p-8 border-l-4 border-l-indigo-600 relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 text-9xl text-slate-50 pointer-events-none">
-                    <i class="fa-solid fa-link opacity-50"></i>
-                </div>
+        <section id="dash-links" class="tab-pane hidden animate-fade-in">
+    <div class="max-w-4xl mx-auto space-y-6">
 
-                <div class="relative z-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Active Portal</span>
-                            </div>
-                            <h3 class="text-2xl font-black text-slate-900">{{ form.name }}</h3>
+        {# 1. Fetch the single form and assign it to "form" #}
+{% with form=business.booking_form %}
+
+    {# 2. Safety check: Only show if a form actually exists #}
+    {% if form %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden group hover:border-indigo-300 transition-all duration-300">
+
+        <div class="p-6 md:p-8">
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
+                        <i class="fa-solid fa-link text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">{{ form.name }}</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="flex w-2 h-2 bg-emerald-500 rounded-full"></span>
+                            <span class="text-xs font-medium text-slate-500 uppercase tracking-wide">Live Booking Page</span>
                         </div>
-                        <button onclick="openHelpModal()" class="text-xs font-bold text-indigo-500 hover:text-indigo-700 flex items-center gap-2">
-                            <i class="fa-solid fa-circle-question"></i> How to use this?
+                    </div>
+                </div>
+                <button onclick="openHelpModal()" class="text-sm text-slate-400 hover:text-indigo-600 font-medium transition-colors">
+                    How does this work?
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <label class="text-xs font-bold text-indigo-900 uppercase tracking-wider ml-1">Your Booking Link</label>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        {# Updated to use business.slug for the clean URL #}
+                        <input type="text"
+                               value="{{ request.scheme }}://{{ request.get_host }}/book/{{ business.slug }}/"
+                               id="link_main"
+                               readonly
+                               class="w-full h-12 pl-4 pr-4 bg-white border border-slate-300 rounded-lg text-slate-600 font-mono text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all">
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="copyAction('link_main')" class="h-12 px-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold shadow-sm transition-colors flex items-center gap-2">
+                            <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+
+                        {# Updated WhatsApp and Instagram links to use business.slug #}
+                        <a href="https://wa.me/?text=Book%20here:%20{{ request.scheme }}://{{ request.get_host }}/book/{{ business.slug }}/" target="_blank" class="h-12 w-12 flex items-center justify-center border border-slate-200 rounded-lg text-slate-500 hover:text-emerald-600 hover:border-emerald-500 hover:bg-emerald-50 transition-all" title="Share on WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                        </a>
+                        <button onclick="openInstagramApp('{{ request.scheme }}://{{ request.get_host }}/book/{{ business.slug }}/')" class="h-12 w-12 flex items-center justify-center border border-slate-200 rounded-lg text-slate-500 hover:text-pink-600 hover:border-pink-500 hover:bg-pink-50 transition-all" title="Share on Instagram">
+                            <i class="fa-brands fa-instagram text-lg"></i>
                         </button>
                     </div>
-
-                    <div class="grid lg:grid-cols-2 gap-8">
-                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400">
-                                    <i class="fa-solid fa-code"></i>
-                                </div>
-                                <h4 class="font-bold text-sm text-slate-900">Website Widget Code</h4>
-                            </div>
-                            <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-                                Copy this snippet to add a pop-up booking form to your existing website. Users don't have to leave your website when booking.
-                            </p>
-                            <button onclick="copyEmbedSnippet('{{ request.scheme }}://{{ request.get_host }}/book/{{ form.embed_token }}/', 'embedBtn{{ forloop.index }}')"
-                                id="embedBtn{{ forloop.index }}" class="btn-primary w-full justify-center">
-                                Copy Embed Code
-                            </button>
-                        </div>
-
-                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400">
-                                    <i class="fa-solid fa-share-nodes"></i>
-                                </div>
-                                <h4 class="font-bold text-sm text-slate-900">Direct Booking Links</h4>
-                            </div>
-
-                            <div class="flex gap-2 mb-4">
-                                <input type="text" value="{{ request.scheme }}://{{ request.get_host }}/book/{{ form.embed_token }}/" id="link{{ forloop.index }}" readonly class="input-modern bg-white text-xs font-mono text-slate-500">
-                                <button onclick="copyAction('link{{ forloop.index }}')" class="btn-secondary !px-3">
-                                    <i class="fa-solid fa-copy"></i>
-                                </button>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-3">
-                                <a href="https://wa.me/?text=Book%20here:%20{{ request.scheme }}://{{ request.get_host }}/book/{{ form.embed_token }}/" target="_blank" class="btn-secondary justify-center hover:!text-emerald-600 hover:!border-emerald-200">
-                                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                                </a>
-                                <button onclick="openInstagramApp('{{ request.scheme }}://{{ request.get_host }}/book/{{ form.embed_token }}/')" class="btn-secondary justify-center hover:!text-pink-600 hover:!border-pink-200">
-                                    <i class="fa-brands fa-instagram"></i> Instagram
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
-            {% endfor %}
-        </section>
 
-        <section id="dash-services" class="tab-pane hidden animate-fade-up">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="font-black text-xl text-slate-900">Service Menu</h3>
-                    <p class="text-xs text-slate-400 font-medium">Manage offerings and pricing</p>
+        </div>
+
+        <div class="bg-slate-50 border-t border-slate-200 px-6 md:px-8 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-white rounded border border-slate-200 text-slate-400">
+                    <i class="fa-solid fa-code"></i>
                 </div>
-                <a href="{% url 'service_create' business.id %}" class="btn-primary">
-                    <i class="fa-solid fa-plus"></i> Add New
+                <div>
+                    <p class="text-sm font-bold text-slate-700">Website Integration</p>
+                    <p class="text-xs text-slate-500">Embed this form on your own site.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="hidden lg:block text-[10px] font-mono text-slate-400 bg-white border border-slate-200 px-3 py-1.5 rounded select-none">
+                    &lt;button&gt;Book Now&lt;/button&gt;
+                </div>
+
+                {# Ensure business.slug is passed to the embed snippet function #}
+                <button onclick="copyEmbedSnippet('{{ business.slug }}', 'embedBtn_main')"
+                        id="embedBtn_main"
+                        class="flex-1 md:flex-none text-xs font-bold text-indigo-600 bg-white border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 px-4 py-2.5 rounded-lg transition-all shadow-sm">
+                    Copy Embed Code
+                </button>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+        <div class="p-8 bg-white border-2 border-dashed border-slate-200 rounded-xl text-center">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-plus text-slate-400 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800">No booking form found</h3>
+            <p class="text-slate-500 text-sm mb-6">You need a booking form to start accepting appointments.</p>
+            <a href="{% url 'create_booking_form' %}" class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all">
+                Create My Form
+            </a>
+        </div>
+    {% endif %}
+
+{% endwith %}
+
+    </div>
+</section>
+        <section id="dash-services" class="tab-pane hidden animate-fade-in">
+            <div class="flex justify-between items-center mb-6 px-1 md:px-0">
+
+                <a href="{% url 'service_create' business.id %}" class="btn-main py-2 px-3 text-xs">
+                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Add Service</span>
                 </a>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {% for s in services %}
-                    <a href="{% url 'service_edit' business.id s.id %}" class="glass-panel glass-panel-interactive p-4 flex flex-col justify-between group h-fit">
-                        <div>
-                            <div class="flex justify-between items-start mb-1">
-                                <h4 class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight">{{ s.name }}</h4>
-                                <span class="bg-slate-50 text-slate-600 px-2 py-0.5 rounded text-[10px] font-black border border-slate-100">R{{ s.price|floatformat:0 }}</span>
-                            </div>
+                <div class="group relative bg-white border border-slate-200 rounded-lg hover:border-indigo-400 hover:shadow-sm transition-all duration-200 mb-2">
+    <div class="flex items-center justify-between p-3 sm:px-5">
 
-                            <div class="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                                <i class="fa-regular fa-clock"></i> {{ s.default_length_minutes }} Mins
-                            </div>
+        <a href="{% url 'service_edit' business.id s.id %}" class="flex flex-1 items-center min-w-0 gap-4">
+            <span class="flex-shrink-0 text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">
+                R{{ s.price|floatformat:0 }}
+            </span>
 
-                            {% if s.description %}
-                                <p class="text-xs text-slate-400 line-clamp-1">{{ s.description }}</p>
-                            {% else %}
-                            <p class="text-xs text-slate-400 line-clamp-1">A professional session to perfect your look</p>
-                            {% endif %}
-                        </div>
+            <div class="min-w-0">
+                <h4 class="text-sm font-semibold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                    {{ s.name }}
+                </h4>
+                <p class="text-[11px] text-slate-400 flex items-center gap-2">
+                    <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> {{ s.default_length_minutes }}m</span>
+                    {% if s.description %}
+                        <span class="hidden md:inline truncate opacity-60">• {{ s.description|truncatechars:60 }}</span>
+                    {% endif %}
+                </p>
+            </div>
+        </a>
 
-                        <div class="mt-2 pt-2 border-t border-slate-50 flex items-center text-[10px] font-bold text-indigo-500 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">
-                            Edit <i class="fa-solid fa-arrow-right ml-2"></i>
-                        </div>
-                    </a>
+        <div class="flex items-center gap-2 ml-4">
+            <a href="{% url 'service_edit' business.id s.id %}" class="hidden sm:block text-[11px] font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-wider">
+                Edit
+            </a>
+
+            <form action="{% url 'service_delete' business.id s.id %}" method="POST" class="inline">
+                {% csrf_token %}
+                <button type="submit"
+                        onclick="return confirm('Delete this service?');"
+                        class="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                        title="Delete Service">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
                 {% endfor %}
             </div>
         </section>
 
         {% if user == business.owner %}
-        <section id="dash-settings" class="tab-pane hidden animate-fade-up">
-            <div class="mb-6">
-                <h3 class="font-black text-xl text-slate-900">Control Center</h3>
-                <p class="text-xs text-slate-400 font-medium">Configure business operations</p>
-            </div>
+        <section id="dash-settings" class="tab-pane hidden animate-fade-in">
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <button onclick="openSettingsModal('modal-profile', 'Business Identity')" class="glass-panel glass-panel-interactive p-6 text-left group">
-                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div class="feature-card p-6 cursor-pointer" onclick="openSettingsModal('modal-profile', 'Business Identity')">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4">
                         <i class="fa-solid fa-store"></i>
                     </div>
-                    <h4 class="font-bold text-slate-900 mb-1">Profile & Identity</h4>
-                    <p class="text-xs text-slate-400">Name, Logo, Social Links</p>
-                </button>
+                    <h3 class="font-bold text-slate-900">Business Profile</h3>
+                    <p class="text-sm text-slate-500 mt-1">Update name, logo, industry, contact details and address.</p>
+                </div>
 
-                <button onclick="openSettingsModal('modal-hours', 'Operating Schedule')" class="glass-panel glass-panel-interactive p-6 text-left group">
-                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <div class="feature-card p-6 cursor-pointer" onclick="openSettingsModal('modal-hours', 'Operating Schedule')">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4">
                         <i class="fa-solid fa-clock"></i>
                     </div>
-                    <h4 class="font-bold text-slate-900 mb-1">Operating Hours</h4>
-                    <p class="text-xs text-slate-400">Weekly schedule & times</p>
-                </button>
+                    <h3 class="font-bold text-slate-900">Operating Hours</h3>
+                    <p class="text-sm text-slate-500 mt-1">Set your weekly opening and closing times.</p>
+                </div>
 
-                <button onclick="openSettingsModal('modal-blocks', 'Blocked Dates')" class="glass-panel glass-panel-interactive p-6 text-left group">
-                    <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors">
-                        <i class="fa-solid fa-calendar-xmark"></i>
+                <div class="feature-card p-6 cursor-pointer" onclick="openSettingsModal('modal-blocks', 'Blocked Dates')">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4">
+                        <i class="fa-regular fa-calendar-xmark"></i>
                     </div>
-                    <h4 class="font-bold text-slate-900 mb-1">Blocked Dates</h4>
-                    <p class="text-xs text-slate-400">Holidays & time off</p>
-                </button>
+                    <h3 class="font-bold text-slate-900">Blocked Dates</h3>
+                    <p class="text-sm text-slate-500 mt-1">Close your business for specific holidays or time off.</p>
+                </div>
 
-                <button onclick="openSettingsModal('modal-pay', 'Payment Gateway')" class="glass-panel glass-panel-interactive p-6 text-left group">
-                    <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <div class="feature-card p-6 cursor-pointer" onclick="openSettingsModal('modal-pay', 'Payment Gateway')">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4">
                         <i class="fa-solid fa-credit-card"></i>
                     </div>
-                    <h4 class="font-bold text-slate-900 mb-1">Payments & Deposits</h4>
-                    <p class="text-xs text-slate-400">PayFast integration details</p>
-                </button>
+                    <h3 class="font-bold text-slate-900">Payments & Deposits</h3>
+                    <p class="text-sm text-slate-500 mt-1">Configure PayFast integration and deposit rules.</p>
+                </div>
 
-                <button onclick="openSettingsModal('modal-refer', 'Referral Rewards')" class="glass-panel glass-panel-interactive p-6 text-left group">
-                    <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                <div class="feature-card p-6 cursor-pointer" onclick="openSettingsModal('modal-refer', 'Referral Rewards')">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4">
                         <i class="fa-solid fa-gift"></i>
                     </div>
-                    <h4 class="font-bold text-slate-900 mb-1">Referral Program</h4>
-                    <p class="text-xs text-slate-400">Get free subscription time</p>
-                </button>
+                    <h3 class="font-bold text-slate-900">Referral Program</h3>
+                    <p class="text-sm text-slate-500 mt-1">Get free subscription months by inviting others.</p>
+                </div>
 
-                <button onclick="openSettingsModal('modal-sub', 'Subscription Plan')" class="glass-panel glass-panel-interactive p-6 text-left group border-slate-200">
-                    <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center mb-4 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+                <div class="feature-card p-6 cursor-pointer border-slate-300" onclick="openSettingsModal('modal-sub', 'Subscription Plan')">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl mb-4">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
-                    <h4 class="font-bold text-slate-900 mb-1">Billing & Plan</h4>
-                    <p class="text-xs text-slate-400">
-                        {% if days_left > 0 %}<span class="text-emerald-600">{{ days_left }} Days active</span>{% else %}<span class="text-red-500">Expired</span>{% endif %}
+                    <h3 class="font-bold text-slate-900">Billing & Plan</h3>
+                    <p class="text-sm text-slate-500 mt-1">
+                        {% if days_left > 0 %}
+                            Active: <span class="text-emerald-600 font-bold">{{ days_left }} Days left</span>
+                        {% else %}
+                            <span class="text-red-600 font-bold">Subscription Expired</span>
+                        {% endif %}
                     </p>
-                </button>
+                </div>
             </div>
         </section>
         {% endif %}
+    </div>
+</main>
 
-    </main>
-</div>
+<div id="settings-modal-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-0 md:p-4">
+    <div class="bg-white w-full max-w-xl max-h-full md:max-h-[90vh] flex flex-col shadow-2xl md:rounded-xl overflow-hidden animate-fade-up">
 
-<div id="settings-modal-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-    <div class="glass-panel w-full max-w-xl max-h-[85vh] flex flex-col animate-fade-up shadow-2xl">
-
-        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <h3 id="modal-display-title" class="font-black uppercase text-xs tracking-widest text-slate-900">Settings</h3>
-            <button onclick="closeSettingsModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
-                <i class="fa-solid fa-xmark text-lg"></i>
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 sticky top-0 z-10">
+            <h3 id="modal-display-title" class="font-bold uppercase text-xs tracking-widest text-slate-500">Settings</h3>
+            <button onclick="closeSettingsModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
             </button>
         </div>
 
-        <div class="p-6 overflow-y-auto custom-scroll">
+        <div class="p-5 md:p-8 overflow-y-auto">
 
-            <div id="modal-profile" class="modal-pane hidden space-y-5">
-                <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            <div id="modal-profile" class="modal-pane hidden space-y-6">
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="update_profile">
 
                     <div>
-                        <label class="mini-label">Brand Visuals</label>
-                        <div class="flex items-center gap-4 p-3 border border-slate-100 rounded-xl bg-slate-50">
+                        <label class="mini-heading block">Brand Visuals</label>
+                        <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg bg-slate-50">
                             {% if business.cover_image %}
-                                <img src="{{ business.cover_image.url }}" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+                                <img src="{{ business.cover_image.url }}" class="h-14 w-14 object-cover rounded-lg border border-slate-200 shadow-sm">
                             {% endif %}
-                            <input type="file" name="cover_image" accept="image/*" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 transition-all">
+                            <input type="file" name="cover_image" accept="image/*" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="mini-label">Name</label>
-                            <input type="text" name="name" value="{{ business.name }}" class="input-modern" required>
+                            <label class="mini-heading block">Name</label>
+                            <input type="text" name="name" value="{{ business.name }}" class="input-std" required>
                         </div>
                         <div>
-                            <label class="mini-label">Industry</label>
-                            <select name="industry" class="input-modern">
+                            <label class="mini-heading block">Industry</label>
+                            <select name="industry" class="input-std">
                                 {% for value, label in business.INDUSTRY_CHOICES %}
                                     <option value="{{ value }}" {% if business.industry == value %}selected{% endif %}>{{ label }}</option>
                                 {% endfor %}
@@ -542,104 +576,172 @@
                         </div>
                     </div>
 
+
                     <div>
-                        <label class="mini-label">Description</label>
-                        <textarea name="description" rows="3" class="input-modern">{{ business.description|default:'' }}</textarea>
+                        <label class="mini-heading block">Description</label>
+                        <textarea name="description" rows="3" class="input-std" placeholder="Describe your business...">{{ business.description|default:'' }}</textarea>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="mini-label">Phone</label>
-                            <input type="text" name="phone_number" value="{{ business.contact_number|default:'' }}" class="input-modern">
+                            <label class="mini-heading block">Phone</label>
+                            <input type="text" name="phone_number" value="{{ business.contact_number|default:'' }}" class="input-std">
                         </div>
                         <div>
-                            <label class="mini-label">Address</label>
-                            <input type="text" name="address" value="{{ business.address|default:'' }}" class="input-modern">
+                            <label class="mini-heading block">Address</label>
+                            <input type="text" name="address" value="{{ business.address|default:'' }}" class="input-std">
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-primary w-full">Save Changes</button>
+                    <button type="submit" class="btn-main w-full justify-center py-3 text-base">Save Changes</button>
                 </form>
             </div>
 
-            <div id="modal-hours" class="modal-pane hidden space-y-4">
-                <form method="POST" class="space-y-4">
-                    {% csrf_token %}<input type="hidden" name="action" value="update_hours">
-
-                    <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/50">
-                        <div class="flex justify-between mb-2"><span class="text-xs font-bold uppercase">Weekdays</span></div>
-                        <div class="flex gap-2">
-                            <input type="time" name="open_mon_fri" value="{{ operating_hours.mon_fri.open_time|time:'H:i' }}" class="input-modern">
-                            <input type="time" name="close_mon_fri" value="{{ operating_hours.mon_fri.close_time|time:'H:i' }}" class="input-modern">
-                        </div>
-                    </div>
-
-                    <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/50">
-                        <div class="flex justify-between mb-2"><span class="text-xs font-bold uppercase">Saturday</span></div>
-                        <div class="flex gap-2">
-                            <input type="time" name="open_sat" value="{{ operating_hours.sat.open_time|time:'H:i' }}" class="input-modern">
-                            <input type="time" name="close_sat" value="{{ operating_hours.sat.close_time|time:'H:i' }}" class="input-modern">
-                        </div>
-                    </div>
-
-                    <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/50">
-                        <div class="flex justify-between mb-2"><span class="text-xs font-bold uppercase text-slate-400">Sunday</span></div>
-                        <div class="flex gap-2">
-                            <input type="time" name="open_sun" value="{{ operating_hours.sun.open_time|time:'H:i' }}" class="input-modern">
-                            <input type="time" name="close_sun" value="{{ operating_hours.sun.close_time|time:'H:i' }}" class="input-modern">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary w-full">Update Schedule</button>
-                </form>
-            </div>
-
-            <div id="modal-blocks" class="modal-pane hidden">
-                <form method="POST" class="flex gap-3 mb-6">
-                    {% csrf_token %}<input type="hidden" name="action" value="add_block">
-                    <input type="date" name="block_date" required class="input-modern">
-                    <button type="submit" class="btn-primary !bg-slate-900 !text-white whitespace-nowrap">Block Date</button>
-                </form>
-
-                <div class="space-y-2 max-h-[300px] overflow-y-auto custom-scroll">
-                    {% for block in business_blocks %}
-                    <div class="flex justify-between items-center bg-white p-3 border border-slate-100 rounded-lg shadow-sm">
-                        <span class="text-xs font-bold uppercase text-slate-700">{{ block.block_date|date:"d M Y" }}</span>
-                        <form method="POST" class="m-0">
-                            {% csrf_token %}<input type="hidden" name="action" value="delete_block">
-                            <input type="hidden" name="block_id" value="{{ block.id }}">
-                            <button type="submit" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
-                        </form>
-                    </div>
-                    {% empty %}
-                    <div class="text-center py-8 text-slate-300 text-xs font-bold uppercase border border-dashed border-slate-200 rounded-xl">No blocked dates</div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div id="modal-pay" class="modal-pane hidden">
-    <form method="POST" class="space-y-5">
+            <div id="modal-hours" class="modal-pane hidden">
+    <form method="POST" class="space-y-8">
         {% csrf_token %}
-        <input type="hidden" name="action" value="update_payfast">
+        <input type="hidden" name="action" value="update_hours">
 
-        <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 mb-4">
-            <h4 class="text-xs font-black uppercase text-indigo-900 mb-2">PayFast Credentials</h4>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="mini-label">Merchant ID</label>
-                    <input type="text" name="payfast_merchant_id" value="{{ business.payfast_merchant_id|default:'' }}" class="input-modern">
-                </div>
-                <div>
-                    <label class="mini-label">Merchant Key</label>
-                    <input type="password" name="payfast_merchant_key" value="{{ business.payfast_merchant_key|default:'' }}" class="input-modern">
+        <div class="border-b border-slate-100 pb-4">
+            <h3 class="text-base font-bold text-slate-800 tracking-tight">Schedule & Buffer</h3>
+            <p class="text-xs text-slate-500 mt-1">Set your availability and the required gap between appointments.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 items-center gap-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-600 mb-1">
+                    Booking Buffer
+                </label>
+                <p class="text-[11px] text-slate-400">Minutes required between sessions to prevent back-to-back fatigue.</p>
+            </div>
+            <div class="relative max-w-[160px] ml-auto">
+                <input type="number" name="buffer_time"
+                       value="{{ business.buffer_time|default:0 }}"
+                       class="input-std !pl-10 !py-2.5 shadow-sm" min="0" step="5">
+                <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                    <i class="fa-solid fa-hourglass-half text-xs"></i>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Weekly Operating Hours</label>
+
+            <div class="group flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors border-b border-slate-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
+                    <span class="text-sm font-medium text-slate-700">Weekdays</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="time" name="open_mon_fri" value="{{ operating_hours.mon_fri.open_time|time:'H:i' }}" class="input-std !w-28 !py-1.5 !text-sm">
+                    <span class="text-slate-300 text-xs">—</span>
+                    <input type="time" name="close_mon_fri" value="{{ operating_hours.mon_fri.close_time|time:'H:i' }}" class="input-std !w-28 !py-1.5 !text-sm">
+                </div>
+            </div>
+
+            <div class="group flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors border-b border-slate-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full bg-slate-300"></div>
+                    <span class="text-sm font-medium text-slate-700">Saturday</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="time" name="open_sat" value="{{ operating_hours.sat.open_time|time:'H:i' }}" class="input-std !w-28 !py-1.5 !text-sm">
+                    <span class="text-slate-300 text-xs">—</span>
+                    <input type="time" name="close_sat" value="{{ operating_hours.sat.close_time|time:'H:i' }}" class="input-std !w-28 !py-1.5 !text-sm">
+                </div>
+            </div>
+
+            <div class="group flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <span class="text-sm font-medium text-slate-400">Sunday</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="time" name="open_sun" value="{{ operating_hours.sun.open_time|time:'H:i' }}" class="input-std !w-28 !py-1.5 !text-sm">
+                    <span class="text-slate-300 text-xs">—</span>
+                    <input type="time" name="close_sun" value="{{ operating_hours.sun.close_time|time:'H:i' }}" class="input-std !w-28 !py-1.5 !text-sm">
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-2">
+            <button type="submit" class="btn-main w-full py-3.5 text-sm font-bold shadow-indigo-100 shadow-lg hover:translate-y-[-1px] transition-all">
+                Update Business Schedule
+            </button>
+        </div>
+    </form>
+</div>
+
+            <div id="modal-blocks" class="modal-pane hidden">
+                <form method="POST" class="flex flex-col sm:flex-row gap-3 mb-8">
+                    {% csrf_token %}<input type="hidden" name="action" value="add_block">
+                    <input type="date" name="block_date" required class="input-std">
+                    <button type="submit" class="btn-main !bg-slate-800 whitespace-nowrap py-3">Block This Date</button>
+                </form>
+
+                <div class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                    {% for block in business_blocks %}
+                    <div class="flex justify-between items-center bg-slate-50 p-4 border border-slate-200 rounded-xl">
+                        <span class="text-sm font-bold text-slate-700">{{ block.block_date|date:"d M Y" }}</span>
+                        <form method="POST" class="m-0">
+                            {% csrf_token %}<input type="hidden" name="action" value="delete_block">
+                            <input type="hidden" name="block_id" value="{{ block.id }}">
+                            <button type="submit" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-12 text-slate-400 text-sm italic">No dates currently blocked</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+    <div id="modal-pay" class="modal-pane hidden">
+    <form method="POST" action="{% url 'owner_dashboard' business.id %}" id="payfast-form">
+
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_payfast">
+
+        <!-- Inline Server Errors -->
+        <div id="payfast-error" class="hidden px-4 py-2 mb-2 rounded text-sm bg-red-100 text-red-700"></div>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'error' %}
+                    <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                            const errorDiv = document.getElementById("payfast-error");
+                            errorDiv.textContent = "{{ message|escapejs }}";
+                            errorDiv.classList.remove("hidden");
+                        });
+                    </script>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <!-- PayFast Credentials -->
+        <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-6">
+            <div class="flex items-center justify-center mb-4">
+                <img src="{% static 'img/Payfast.png' %}" alt="PayFast" class="h-6">
+            </div>
+
+            <h4 class="mini-heading text-indigo-900 mb-4">PayFast Credentials</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="text-xs font-bold mb-1 block text-slate-600">Merchant ID</label>
+                    <input type="text" name="payfast_merchant_id" value="{{ business.payfast_merchant_id|default:'' }}" class="input-std" autocomplete="off">
+                </div>
+                <div>
+                    <label class="text-xs font-bold mb-1 block text-slate-600">Merchant Key</label>
+                    <input type="password" name="payfast_merchant_key" value="{{ business.payfast_merchant_key|default:'' }}" class="input-std" autocomplete="new-password">
+                </div>
+            </div>
+        </div>
+
+        <!-- Deposit Type -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="mini-label">Deposit Type</label>
-                <select name="deposit_type" id="deposit_type_select" class="input-modern">
+                <label class="mini-heading block">Deposit Type</label>
+                <select name="deposit_type" id="deposit_type_select" class="input-std">
                     <option value="fixed" {% if business.deposit_type == 'fixed' %}selected{% endif %}>Fixed Amount (R)</option>
                     <option value="percentage" {% if business.deposit_type == 'percentage' %}selected{% endif %}>Percentage (%)</option>
                 </select>
@@ -647,92 +749,134 @@
 
             <div>
                 <div id="fixed_amount_container">
-                    <label class="mini-label">Fixed Amount (R)</label>
-                    <input type="number" step="0.01" name="deposit_amount" value="{{ business.deposit_amount|default:'0.00' }}" class="input-modern">
+                    <label class="mini-heading block">Fixed Amount (R)</label>
+                    <input type="number" step="0.01" name="deposit_amount" value="{{ business.deposit_amount|default:'0.00' }}" class="input-std">
                 </div>
                 <div id="percentage_container" style="display: none;">
-                    <label class="mini-label">Deposit Percentage (%)</label>
-                    <input type="number" name="deposit_percentage" value="{{ business.deposit_percentage|default:'50' }}" class="input-modern" min="1" max="100">
+                    <label class="mini-heading block">Deposit Percentage (%)</label>
+                    <input type="number" name="deposit_percentage" value="{{ business.deposit_percentage|default:'50' }}" class="input-std" min="1" max="100">
                 </div>
             </div>
         </div>
 
+        <!-- Reschedule & Policy -->
         <div>
-            <label class="mini-label">Reschedule Window (Hours)</label>
-            <input type="number" name="reschedule_window_hours" value="{{ business.reschedule_window_hours|default:'24' }}" class="input-modern">
-            <p class="text-[10px] text-gray-500 mt-1">Hours before appointment where deposit is forfeited if rescheduled.</p>
+            <label class="mini-heading block">Reschedule Window (Hours)</label>
+            <input type="number" name="reschedule_window_hours" value="{{ business.reschedule_window_hours|default:'24' }}" class="input-std">
+            <p class="text-[10px] text-slate-400 mt-1 italic">Minimum hours before appointment, that a client can change their booking before they lose their deposit.</p>
         </div>
 
         <div>
-            <label class="mini-label">Policy Text</label>
-            <textarea name="deposit_policy" rows="3" class="input-modern">{{ business.deposit_policy }}</textarea>
+            <label class="mini-heading block">Policy Text</label>
+            <textarea name="deposit_policy" rows="3" class="input-std" placeholder="E.g. Deposits are non-refundable if cancelled within 24 hours.">{{ business.deposit_policy }}</textarea>
         </div>
 
-        <button type="submit" class="btn-primary w-full">Save Payment Settings</button>
+        <!-- Submit Button -->
+        <button type="submit" class="btn-main w-full justify-center py-3" id="payfast-submit">Save Payment Settings</button>
     </form>
 </div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const select = document.getElementById('deposit_type_select');
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("payfast-form");
+    const submitBtn = document.getElementById("payfast-submit");
+    const merchantIdInput = form.querySelector('input[name="payfast_merchant_id"]');
+    const merchantKeyInput = form.querySelector('input[name="payfast_merchant_key"]');
+    const errorDiv = document.getElementById("payfast-error");
+
+    // --- Deposit Type Toggle ---
+    const depositSelect = document.getElementById('deposit_type_select');
     const fixedCont = document.getElementById('fixed_amount_container');
     const percentCont = document.getElementById('percentage_container');
 
-    const fixedInput = fixedCont.querySelector('input');
-    const percentInput = percentCont.querySelector('input');
-
     function toggleDepositFields() {
-        if (select.value === 'fixed') {
+        if (depositSelect.value === 'fixed') {
             fixedCont.style.display = 'block';
             percentCont.style.display = 'none';
-
-            fixedInput.disabled = false;
-            percentInput.disabled = true;
+            fixedCont.querySelector('input').disabled = false;
+            percentCont.querySelector('input').disabled = true;
         } else {
             fixedCont.style.display = 'none';
             percentCont.style.display = 'block';
-
-            fixedInput.disabled = true;
-            percentInput.disabled = false;
+            fixedCont.querySelector('input').disabled = true;
+            percentCont.querySelector('input').disabled = false;
         }
     }
 
-    // Run on change
-    select.addEventListener('change', toggleDepositFields);
-
-    // Run on page load to set correct initial state
+    depositSelect.addEventListener('change', toggleDepositFields);
     toggleDepositFields();
+
+    // --- Enable/Disable Submit ---
+    function toggleSubmit() {
+        submitBtn.disabled = !(merchantIdInput.value.trim() && merchantKeyInput.value.trim());
+    }
+    merchantIdInput.addEventListener("input", toggleSubmit);
+    merchantKeyInput.addEventListener("input", toggleSubmit);
+    toggleSubmit();
+
+    // --- Client-side Validation on Submit ---
+    form.addEventListener("submit", function(e) {
+        errorDiv.classList.add("hidden");
+        errorDiv.textContent = "";
+
+        const merchantId = merchantIdInput.value.trim();
+        const merchantKey = merchantKeyInput.value.trim();
+
+        if (!merchantId || !merchantKey) {
+            e.preventDefault();
+            errorDiv.textContent = "Merchant ID and Key are required.";
+            errorDiv.classList.remove("hidden");
+            return;
+        }
+
+        if (!/^\d+$/.test(merchantId)) {
+            e.preventDefault();
+            errorDiv.textContent = "Merchant ID must be numeric.";
+            errorDiv.classList.remove("hidden");
+            return;
+        }
+
+        if (merchantKey.length < 10) {
+            e.preventDefault();
+            errorDiv.textContent = "Merchant Key looks invalid.";
+            errorDiv.classList.remove("hidden");
+            return;
+        }
+    });
 });
 </script>
 
+
             <div id="modal-sub" class="modal-pane hidden">
-                <div class="flex justify-between items-center mb-6 bg-slate-900 text-white p-6 rounded-xl">
+                <div class="flex justify-between items-center mb-6 bg-slate-900 text-white p-6 rounded-xl shadow-lg">
                     <div>
                         <p class="text-[10px] font-bold uppercase opacity-60">Time Remaining</p>
                         <p class="text-4xl font-black uppercase">{{ days_left }} Days</p>
                     </div>
                     <div class="text-right">
                         <p class="text-[10px] font-bold uppercase opacity-60">Status</p>
-                        <p class="font-black text-sm uppercase {% if days_left > 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
+                        <p class="font-bold text-sm uppercase {% if days_left > 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
                             {% if days_left > 0 %}Active{% else %}Expired{% endif %}
                         </p>
                     </div>
                 </div>
-                <a href="{{ pay_url }}" class="btn-primary w-full justify-center !py-4">
-                    Renew Subscription (R149 / 30 Days)
+                <a href="{{ pay_url }}" class="btn-main w-full justify-center py-4 text-base">
+                    Renew Subscription (R199 / 30 Days)
                 </a>
+                <p class="text-[11px] mt-2 text-center text-slate-400 mt-8 leading-relaxed">Renewal adds 30 days to your current expiry date so no days lost on early renewal.</p>
             </div>
 
             <div id="modal-refer" class="modal-pane hidden">
-                <div class="text-center p-8 border border-dashed border-slate-200 rounded-xl bg-slate-50">
-                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa-solid fa-gift text-xl"></i>
+                <div class="text-center p-6 md:p-10 border border-dashed border-slate-300 rounded-2xl bg-slate-50">
+                    <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa-solid fa-gift text-2xl"></i>
                     </div>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Your Referral Code</p>
-                    <code class="block text-3xl font-black text-slate-900 mb-6 tracking-widest">{{ business.referral_code }}</code>
-                    <button onclick="copyReferralCode('{{ business.referral_code }}', this)" class="btn-secondary">
+                    <p class="mini-heading mb-4">Your Referral Code</p>
+                    <code class="block text-3xl font-black text-slate-900 mb-8 tracking-widest">{{ business.referral_code }}</code>
+                    <button onclick="copyReferralCode('{{ business.referral_code }}', this)" class="btn-outline w-full py-3">
                         Copy Code to Clipboard
                     </button>
-                    <p class="text-[10px] text-slate-400 mt-6">Share this code with other business owners.<br>When they subscribe, you both get +30 days free.</p>
+                    <p class="text-[11px] text-slate-400 mt-8 leading-relaxed">Share this code with other business owners.<br>When they subscribe, you both get +30 days free.</p>
                 </div>
             </div>
 
@@ -740,75 +884,192 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-<div id="calendar-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-    <div class="glass-panel w-full max-w-2xl animate-fade-up shadow-2xl">
-        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+<div id="calendar-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md animate-fade-up shadow-2xl rounded-xl overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
             <div>
-                <span class="mini-label">Agenda</span>
-                <h3 id="modal-date-title" class="text-lg font-black uppercase text-slate-900">Date Details</h3>
+                <span class="mini-heading block">Agenda</span>
+                <h3 id="modal-date-title" class="text-lg font-bold text-slate-900">Date Details</h3>
             </div>
-            <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
-                <i class="fa-solid fa-xmark"></i>
+            <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
             </button>
         </div>
-        <div id="modal-body" class="p-6 space-y-3 max-h-[60vh] overflow-y-auto custom-scroll bg-slate-50/50"></div>
+        <div id="modal-body" class="p-4 space-y-3 max-h-[60vh] overflow-y-auto"></div>
     </div>
 </div>
 
-<div id="helpModal2" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="toggleHelpModal2()"></div>
-    <div class="relative glass-panel w-full max-w-4xl max-h-[85vh] animate-fade-up flex flex-col overflow-hidden">
-        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+<div id="helpModal2" class="fixed inset-0 z-[60] hidden items-center justify-center p-0 md:p-4">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="toggleHelpModal2()"></div>
+
+    <div class="relative bg-white w-full max-w-3xl h-full md:max-h-[90vh] animate-fade-up flex flex-col overflow-hidden md:rounded-xl shadow-2xl font-sans">
+
+        <div class="px-6 md:px-8 py-3 md:py-3 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
             <div>
-                <span class="text-indigo-600 text-[10px] font-black uppercase tracking-wider mb-1 block">Quick Start Guide</span>
-                <h2 class="text-2xl font-black text-slate-900">Dashboard Overview</h2>
+                <span class="text-indigo-600 text-[10px] font-bold uppercase tracking-wider mb-1 block">Owner Manual</span>
+                <h2 class="text-xl md:text-2xl font-bold text-slate-900">How to manage your Business</h2>
             </div>
-            <button onclick="toggleHelpModal2()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
-                <i class="fa-solid fa-xmark text-lg"></i>
+            <button onclick="toggleHelpModal2()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
             </button>
         </div>
-        <div class="overflow-y-auto flex-1 bg-slate-50 p-8 custom-scroll">
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-link text-indigo-500"></i> Portals
-                    </h3>
-                    <p class="text-xs text-slate-500">Links for Instagram bios and code to embed booking buttons on your own website.</p>
+
+        <div class="overflow-y-auto flex-1 bg-slate-50/50 p-6 md:p-10 space-y-8">
+
+            <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-3">
+                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-lg">Team Management</h3>
+                        <p class="text-xs text-slate-500">How to onboard your staff</p>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-tags text-emerald-500"></i> Services
-                    </h3>
-                    <p class="text-xs text-slate-500">Create your menu. Prices and durations here automatically sync to your public page.</p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            We use a secure <strong>Join Code</strong> system. You do not create passwords for your staff; they manage their own login details.
+                        </p>
+                        <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                            <h4 class="text-xs font-bold uppercase text-indigo-800 mb-2">The Process:</h4>
+                            <ol class="list-decimal pl-4 space-y-2 text-xs text-indigo-900 font-medium">
+                                <li>Staff member goes to the <strong>Register</strong> page.</li>
+                                <li>They create their own personal account.</li>
+                                <li>They select <strong>"Join Existing Business"</strong>.</li>
+                                <li>They enter the <span class="bg-white px-2 py-0.5 rounded border border-indigo-200 font-mono">Join Code</span> found on your Team tab.</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-center gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-500 mt-1"></i>
+                            <p class="text-xs text-slate-600">Once joined, they appear in your "Active Members" list instantly.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-500 mt-1"></i>
+                            <p class="text-xs text-slate-600">They can immediately view bookings assigned to them.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-users text-amber-500"></i> Team
-                    </h3>
-                    <p class="text-xs text-slate-500">Use the Join Code to let staff create accounts linked to this dashboard.</p>
+            </section>
+
+            <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-3">
+                    <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-lg">Booking Portals</h3>
+                        <p class="text-xs text-slate-500">Public Page vs. Website Integration</p>
+                    </div>
                 </div>
-                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-gears text-slate-500"></i> Settings
-                    </h3>
-                    <p class="text-xs text-slate-500">Manage hours, block holidays, set up payments, and customize your profile.</p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="border border-slate-200 rounded-lg p-4 hover:border-emerald-400 transition-colors group">
+                        <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded uppercase tracking-wide">Option 1</span>
+                        <h4 class="font-bold text-slate-900 mt-2 mb-2">Booking Link and/or Public Page (Direct Link)</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                            A booking link directly to your booking form and a standalone webpage hosted by us. It displays your services, business details, client reviews and more.
+                        </p>
+                        <p class="text-xs font-bold text-slate-700"><i class="fa-brands fa-whatsapp text-green-500 mr-1"></i> Best for WhatsApp, Instagram Bio, or if you don't have a website.</p>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-lg p-4 hover:border-emerald-400 transition-colors group">
+                        <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded uppercase tracking-wide">Option 2</span>
+                        <h4 class="font-bold text-slate-900 mt-2 mb-2">Website Integration (Embed)</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                            A smooth popup experience. Users stay on <strong>your</strong> website while booking. They are never redirected away from your brand.
+                        </p>
+                        <p class="text-xs font-bold text-slate-700"><i class="fa-solid fa-code text-indigo-500 mr-1"></i> Best for Wix, WordPress, or Custom sites.</p>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <section class="grid lg:grid-cols-3 gap-6">
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-1">
+                    <div class="w-8 h-8 bg-amber-100 text-amber-600 rounded flex items-center justify-center text-sm mb-3">
+                        <i class="fa-solid fa-scissors"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-2">Services</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-3">
+                        This is the engine of your dashboard. You can <strong>Add</strong>, <strong>Edit</strong>, or <strong>Delete</strong> services at any time.
+                    </p>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Changes made here update immediately across all your booking links and embed popups.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
+                    <div class="w-8 h-8 bg-slate-100 text-slate-700 rounded flex items-center justify-center text-sm mb-3">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-4">Settings & Configuration</h4>
+
+                    <div class="grid sm:grid-cols-2 gap-y-6 gap-x-8">
+                        <div>
+                            <h5 class="text-xs font-bold uppercase text-slate-700 mb-1 flex items-center gap-2">
+                                <i class="fa-regular fa-credit-card text-indigo-500"></i> Payments & Deposits
+                            </h5>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">
+                                Enter your <strong>PayFast</strong> credentials to require upfront deposits (Fixed or %). <br>
+                                <span class="text-emerald-600 font-bold">Want free bookings?</span> Simply leave the PayFast fields empty.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h5 class="text-xs font-bold uppercase text-slate-700 mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-gift text-purple-500"></i> Referral Rewards
+                            </h5>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">
+                                Share your unique code found in Settings. If another business signs up using it, <strong>you BOTH get 30 days of free subscription</strong> added automatically.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h5 class="text-xs font-bold uppercase text-slate-700 mb-1 flex items-center gap-2">
+                                <i class="fa-regular fa-calendar-xmark text-red-500"></i> Schedule Control
+                            </h5>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">
+                                Manage <strong>Operating Hours</strong> (weekly schedule) and <strong>Block Dates</strong> (specific holidays or days off) to prevent unwanted bookings.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h5 class="text-xs font-bold uppercase text-slate-700 mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-receipt text-slate-500"></i> Billing
+                            </h5>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">
+                                View your active days remaining. Renewing early simply adds 30 days to your current expiry date, so you never lose time.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+
+        <div class="p-6 border-t border-slate-100 bg-white flex justify-end items-center shrink-0">
+            <button onclick="toggleHelpModal2()" class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-bold text-sm hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
+                Got It
+            </button>
         </div>
     </div>
 </div>
-
-<div id="helpModal" class="fixed inset-0 hidden items-center justify-center z-[200] p-4 bg-slate-900/60 backdrop-blur-sm">
-    <div class="glass-panel p-8 max-w-md w-full animate-fade-up">
-        <h3 class="font-black text-xl text-slate-900 mb-4">How it works</h3>
+<div id="helpModal" class="fixed inset-0 hidden items-center justify-center z-[60] p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white p-8 max-w-md w-full animate-fade-up rounded-xl shadow-xl">
+        <h3 class="font-bold text-xl text-slate-900 mb-4">How it works</h3>
         <p class="text-slate-500 text-sm leading-relaxed mb-6">
-            The website form creates a seamless popup ("modal") on your existing website. This keeps users on your page while they book.
+            The website form creates a seamless popup window on your existing website, exactly how this message popped up. This keeps users on your page while they book. If you don't have a website and need one, contact support and we will sort you out!
         </p>
-        <button onclick="closeHelpModal()" class="btn-primary w-full">Understood</button>
+        <button onclick="closeHelpModal()" class="btn-main w-full justify-center">Got It</button>
     </div>
 </div>
 
-<div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-full shadow-2xl opacity-0 transition-all duration-300 pointer-events-none transform translate-y-4">
+<div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-slate-800 text-white font-bold text-[10px] uppercase tracking-wider rounded-full shadow-2xl opacity-0 transition-all duration-300 pointer-events-none transform translate-y-4">
     Action Successful
 </div>
 
@@ -830,16 +1091,14 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endfor %}
 
     // --- 2. TABS LOGIC ---
-    let calendar; // Scope calendar variable
+    let calendar;
 
     function switchDashTab(evt, tabId) {
         document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
-        document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
-
+        document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.remove('hidden');
-        evt.currentTarget.classList.add('active');
-
-        // Resize calendar if showing
+        const clickedBtn = evt.currentTarget;
+        clickedBtn.classList.add('active');
         if(tabId === 'dash-calendar' && calendar) {
             setTimeout(() => calendar.updateSize(), 50);
         }
@@ -853,25 +1112,23 @@ document.addEventListener('DOMContentLoaded', function() {
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
-                dayMaxEvents: 3,
+                dayMaxEvents: 2,
+                height: 'auto',
                 events: allAppointments.map(a => ({
                     title: a.name,
                     start: `${a.date}T${a.time}`,
-                    backgroundColor: a.status === 'confirmed' ? '#6366f1' : '#cbd5e1',
+                    backgroundColor: a.status === 'confirmed' ? '#4f46e5' : '#cbd5e1',
                     borderColor: 'transparent',
                     textColor: a.status === 'confirmed' ? '#fff' : '#475569',
                     extendedProps: { detailUrl: a.detailUrl, service: a.service, status: a.status }
                 })),
                 eventClick: (info) => openDateModal(info.event.startStr.split('T')[0]),
                 dateClick: (info) => openDateModal(info.dateStr),
-                height: 'auto'
             });
             calendar.render();
         }
-
-        // Auto-select first tab
-        const firstBtn = document.querySelector('.nav-pill');
-        if(firstBtn) firstBtn.click();
+        const firstTab = document.querySelector('.nav-tab');
+        if(firstTab) firstTab.classList.add('active');
     });
 
     // --- 4. MODALS & UTILS ---
@@ -887,18 +1144,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (dayAppts.length > 0) {
             body.innerHTML = dayAppts.map(a => `
-                <div class="bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between hover:border-indigo-200 transition-colors">
+                <div class="bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between hover:border-indigo-200 transition-colors shadow-sm">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="text-sm font-black text-slate-900">${a.time}</span>
-                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${a.status==='confirmed' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}">${a.status}</span>
+                            <span class="text-sm font-bold text-slate-900">${a.time}</span>
+                            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded ${a.status==='confirmed' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}">${a.status}</span>
                         </div>
                         <h4 class="font-bold text-sm text-slate-700">${a.name}</h4>
                         <p class="text-xs text-slate-400">${a.service}</p>
                     </div>
-                    <a href="${a.detailUrl}" class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-colors">
-                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                    </a>
                 </div>
             `).join('');
         } else {
@@ -975,20 +1229,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Embed Script Generation
-    function copyEmbedSnippet(bookingUrl, buttonId) {
-        const separator = bookingUrl.includes('?') ? '&' : '?';
-        const embedUrl = `${bookingUrl}${separator}embed=true`;
-        const snippet = `
-<button onclick="openGMB()" style="background:#000;color:#fff;padding:12px 24px;border:0;cursor:pointer;font-family:sans-serif;font-weight:700;text-transform:uppercase;font-size:12px;border-radius:6px;">Book Now</button>
-<script>(function(){if(window.openGMB)return;const s=document.createElement('style');s.textContent='.gmb-o{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center}.gmb-w{width:100%;max-width:500px;height:85vh;background:#fff;position:relative}.gmb-f{width:100%;height:100%;border:0}.gmb-c{position:absolute;top:10px;right:10px;background:#000;color:#fff;border:0;width:30px;height:30px;cursor:pointer;z-index:10000}';document.head.appendChild(s);window.openGMB=function(){if(document.getElementById('gmb-o'))return;const d=document.createElement('div');d.id='gmb-o';d.className='gmb-o';d.innerHTML='<div class="gmb-w"><iframe class="gmb-f" src="${embedUrl}"></iframe><button class="gmb-c" onclick="closeGMB()">×</button></div>';document.body.appendChild(d);document.body.style.overflow='hidden'};window.closeGMB=function(){const el=document.getElementById('gmb-o');if(el)el.remove();document.body.style.overflow=''}})()<\/script>`;
+    function copyEmbedSnippet(businessSlug, buttonId) {
+    // Construct the URL based on the current domain and the business slug
+    const bookingUrl = `${window.location.origin}/book/${businessSlug}/`;
+    const embedUrl = `${bookingUrl}?embed=true`;
 
-        navigator.clipboard.writeText(snippet).then(() => {
-            const btn = document.getElementById(buttonId);
-            const original = btn.innerHTML;
-            btn.innerHTML = '✓ Copied';
-            setTimeout(() => btn.innerHTML = original, 2000);
-        });
-    }
+    const snippet = `
+<button onclick="openGMB()" style="background:#4f46e5;color:#fff;padding:12px 24px;border:0;cursor:pointer;font-family:sans-serif;font-weight:700;text-transform:uppercase;font-size:12px;border-radius:6px;transition:background 0.2s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4f46e5'">Book Now</button>
+<script>(function(){if(window.openGMB)return;const s=document.createElement('style');s.textContent='.gmb-o{position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}.gmb-w{width:100%;max-width:500px;height:85vh;background:#fff;position:relative;border-radius:12px;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)}.gmb-f{width:100%;height:100%;border:0}.gmb-c{position:absolute;top:15px;right:15px;background:#f1f5f9;color:#64748b;border:0;width:32px;height:32px;cursor:pointer;z-index:10000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all 0.2s} .gmb-c:hover{background:#e2e8f0;color:#0f172a}';document.head.appendChild(s);window.openGMB=function(){if(document.getElementById('gmb-o'))return;const d=document.createElement('div');d.id='gmb-o';d.className='gmb-o';d.innerHTML='<div class="gmb-w"><iframe class="gmb-f" src="${embedUrl}"></iframe><button class="gmb-c" onclick="closeGMB()">×</button></div>';document.body.appendChild(d);document.body.style.overflow='hidden'};window.closeGMB=function(){const el=document.getElementById('gmb-o');if(el)el.remove();document.body.style.overflow=""}})()<\/script>`;
+
+    navigator.clipboard.writeText(snippet.trim()).then(() => {
+        const btn = document.getElementById(buttonId);
+        const originalText = btn.innerText;
+        btn.innerText = '✓ Copied Code';
+        btn.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
+
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.classList.remove('bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
+        }, 2000);
+    });
+}
 </script>
 {% endblock %}

@@ -64,37 +64,46 @@
                     </tr>
 
                     <tr>
-                        <td style="padding-top: 60px;">
-                            <div style="background-color: #000000; padding: 60px; border-radius: 4px; text-align: left;">
-                                
-                                {% if not business.deposit_required %}
-                                    <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 32px; letter-spacing: -1px;">Make a decision</div>
-                                    
-                                    <table cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td>
-                                                <a href="{{ site_url }}{% url 'appointment_email_decision' appointment.pk 'confirm' %}" style="display: inline-block; background-color: #ffffff; color: #008000; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-right: 15px;">
-                                                    Approve Request
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="{{ site_url }}{% url 'appointment_email_decision' appointment.pk 'decline' %}" style="display: inline-block; background-color: transparent; color: #ff4d4d; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #3f3f46;">
-                                                    Decline
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                {% else %}
-                                    <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px;">Awaiting Deposit</div>
-                                    <p style="color: #94a3b8; font-size: 18px; line-height: 1.6; margin: 0; max-width: 500px;">
-                                        This booking requires a deposit of <span style="color: #ffffff; font-weight: 600;">R{{ business.deposit_amount }}</span>. 
-                                        Once the customer pays, the appointment will be <span style="color: #ffffff; font-weight: 600;">automatically confirmed</span> and added to your calendar.
-                                    </p>
-                                {% endif %}
-
-                            </div>
+    <td style="padding-top: 60px;">
+        <div style="background-color: #000000; padding: 60px; border-radius: 4px; text-align: left;">
+            
+            {% if not business.deposit_required %}
+                <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 32px; letter-spacing: -1px;">Make a decision</div>
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            <a href="{{ site_url }}{% url 'appointment_email_decision' appointment.pk 'confirm' %}" style="display: inline-block; background-color: #ffffff; color: #008000; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-right: 15px;">
+                                Approve Request
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ site_url }}{% url 'appointment_email_decision' appointment.pk 'decline' %}" style="display: inline-block; background-color: transparent; color: #ff4d4d; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #3f3f46;">
+                                Decline
+                            </a>
                         </td>
                     </tr>
+                </table>
+            {% else %}
+                <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px;">Awaiting Deposit</div>
+                <p style="color: #94a3b8; font-size: 18px; line-height: 1.6; margin: 0 0 32px 0; max-width: 500px;">
+                    This booking requires a deposit of <span style="color: #ffffff; font-weight: 600;">R{{ appointment.amount_to_pay }}</span>. 
+                    Once paid, the appointment will confirm automatically.
+                </p>
+                
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            <a href="{{ site_url }}{% url 'owner_dashboard' business.id %}" style="display: inline-block; background-color: #ffffff; color: #000000; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                Open Dashboard
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            {% endif %}
+
+        </div>
+    </td>
+</tr>
 
                     <tr>
                         <td style="padding-top: 80px;">
@@ -102,7 +111,7 @@
                                 <tr>
                                     <td>
                                         <a href="{{ site_url }}{% url 'owner_dashboard' business.id %}" style="font-size: 14px; color: #000000; text-decoration: none; font-weight: 700; border-bottom: 2px solid #000000; padding-bottom: 2px;">
-                                            Open Dashboard &rarr;
+                                            Owner Dashboard &rarr;
                                         </a>
                                     </td>
                                     <td align="right" style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">

@@ -453,7 +453,7 @@
                 </div>
             </div>
 
-            <form id="bookingForm" method="POST" action="{% url 'book_appointment' business.id %}" class="flex flex-col flex-1 overflow-hidden relative bg-slate-50/50">
+            <form id="bookingForm" method="POST" action="{% url 'book_appointment' business.slug %}" class="flex flex-col flex-1 overflow-hidden relative bg-slate-50/50">
                 {% csrf_token %}
                 <input type="hidden" name="appointment_start_time" id="final-time-input">
 
@@ -510,21 +510,27 @@
                         </div>
 
                         <div class="step-panel">
-                            {% if business.deposit_required %}
-                            <div class="bg-indigo-50/50 border border-indigo-100 p-5 rounded-xl mb-6">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <i class="fa-solid fa-shield-halved text-indigo-600"></i>
-                                    <h4 class="text-xs font-black uppercase tracking-widest text-indigo-900">Deposit Required</h4>
-                                </div>
-                                <div class="flex justify-between items-end mb-2">
-                                    <span class="text-sm font-medium text-indigo-700">Due Now:</span>
-                                    <span class="text-xl font-black text-indigo-600">R{{ business.deposit_amount|floatformat:2 }}</span>
-                                </div>
-                                <p class="text-[10px] text-indigo-500 leading-relaxed opacity-80">
-                                    Payment secured via PayFast.
-                                </p>
-                            </div>
-                            {% endif %}
+           {% if business.deposit_required %}
+<div class="bg-indigo-50/50 border border-indigo-100 p-5 rounded-xl mb-6">
+    <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-shield-halved text-indigo-600"></i>
+        <h4 class="text-xs font-black uppercase tracking-widest text-indigo-900">Deposit Required</h4>
+    </div>
+    <div class="flex justify-between items-end mb-2">
+        <span class="text-sm font-medium text-indigo-700">Due Now:</span>
+        <span id="dynamic-deposit" class="text-xl font-black text-indigo-600">
+            {% if business.deposit_type == 'percentage' %}
+                {{ business.deposit_percentage }}%
+            {% else %}
+                R{{ business.deposit_amount|floatformat:2 }}
+            {% endif %}
+        </span>
+    </div>
+    <p class="text-[10px] text-indigo-500 leading-relaxed opacity-80">
+        Payment secured via PayFast.
+    </p>
+</div>
+{% endif %}
 
                             <div class="space-y-4">
                                 <div>
@@ -566,280 +572,299 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- AVAILABILITY WIDGET LOGIC ---
-            const dateInput = document.getElementById('availabilityDate');
-            const staffInput = document.getElementById('availabilityStaff');
-            const container = document.getElementById('slotsContainer');
-            const noSlotsMsg = document.getElementById('noSlotsMessage');
-            const businessId = "{{ business.id }}";
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- AVAILABILITY WIDGET LOGIC (Live Schedule) ---
+        const dateInput = document.getElementById('availabilityDate');
+        const staffInput = document.getElementById('availabilityStaff');
+        const container = document.getElementById('slotsContainer');
+        const noSlotsMsg = document.getElementById('noSlotsMessage');
+        const businessId = "{{ business.id }}";
 
-            function fetchAvailability() {
-                const date = dateInput.value;
-                const staffId = staffInput.value;
+        function fetchAvailability() {
+            const date = dateInput.value;
+            const staffId = staffInput.value;
 
-                container.innerHTML = '<div class="col-span-full py-12 flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-indigo-500 mb-3"></i><span class="text-xs font-bold uppercase tracking-wider">Scanning Schedule...</span></div>';
-                noSlotsMsg.classList.add('hidden');
+            container.innerHTML = '<div class="col-span-full py-12 flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-indigo-500 mb-3"></i><span class="text-xs font-bold uppercase tracking-wider">Scanning Schedule...</span></div>';
+            noSlotsMsg.classList.add('hidden');
 
-                fetch(`/business/${businessId}/api/availability/?date=${date}&staff_id=${staffId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        container.innerHTML = '';
-                        if (data.slots.length === 0) {
-                            noSlotsMsg.classList.remove('hidden');
-                            return;
-                        }
-                        data.slots.forEach(slot => {
-                            const btn = document.createElement('button');
-                            // Updated aesthetic classes
-                            btn.className = 'py-3 px-2 text-sm font-bold text-indigo-600 bg-white border border-indigo-100 rounded-lg shadow-sm hover:bg-indigo-600 hover:text-white hover:shadow-md transition-all text-center';
-                            btn.textContent = slot;
-                            btn.onclick = function() {
-                                document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
-                            };
-                            container.appendChild(btn);
-                        });
-                    })
-                    .catch(error => {
-                        container.innerHTML = '<div class="col-span-full text-center text-rose-500 text-xs font-bold">Error loading slots.</div>';
+            fetch(`/business/${businessId}/api/availability/?date=${date}&staff_id=${staffId}`)
+                .then(response => response.json())
+                .then(data => {
+                    container.innerHTML = '';
+                    if (!data.slots || data.slots.length === 0) {
+                        noSlotsMsg.classList.remove('hidden');
+                        return;
+                    }
+                    data.slots.forEach(slot => {
+                        const btn = document.createElement('button');
+                        btn.className = 'py-3 px-2 text-sm font-bold text-indigo-600 bg-white border border-indigo-100 rounded-lg shadow-sm hover:bg-indigo-600 hover:text-white hover:shadow-md transition-all text-center';
+
+                        // FIX: Use slot.value instead of just slot
+                        btn.textContent = slot.value || slot;
+
+                        btn.onclick = function() {
+                            // If they click a time, scroll them to the services to start booking
+                            const servicesSection = document.getElementById('services');
+                            if(servicesSection) servicesSection.scrollIntoView({ behavior: 'smooth' });
+                        };
+                        container.appendChild(btn);
                     });
-            }
+                })
+                .catch(error => {
+                    console.error("Widget Error:", error);
+                    container.innerHTML = '<div class="col-span-full text-center text-rose-500 text-xs font-bold">Error loading slots.</div>';
+                });
+        }
 
-            fetchAvailability();
-            dateInput.addEventListener('change', fetchAvailability);
-            staffInput.addEventListener('change', fetchAvailability);
+        fetchAvailability();
+        dateInput.addEventListener('change', fetchAvailability);
+        staffInput.addEventListener('change', fetchAvailability);
 
-            // --- STAR RATING LOGIC ---
-            const starBtns = document.querySelectorAll('.star-input');
-            const ratingInput = document.getElementById('form-rating');
-            starBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const val = btn.dataset.val;
-                    ratingInput.value = val;
-                    starBtns.forEach(b => {
-                        b.classList.toggle('active', b.dataset.val <= val);
-                        b.classList.toggle('text-amber-400', b.dataset.val <= val);
-                        b.classList.toggle('text-slate-300', b.dataset.val > val);
-                    });
+        // --- STAR RATING LOGIC ---
+        const starBtns = document.querySelectorAll('.star-input');
+        const ratingInput = document.getElementById('form-rating');
+        starBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.dataset.val;
+                ratingInput.value = val;
+                starBtns.forEach(b => {
+                    b.classList.toggle('active', b.dataset.val <= val);
+                    b.classList.toggle('text-amber-400', b.dataset.val <= val);
+                    b.classList.toggle('text-slate-300', b.dataset.val > val);
                 });
             });
-
-            // --- DATE INPUT MIN ---
-            const dtInput = document.getElementById('date-input');
-            if(dtInput) dtInput.min = new Date().toISOString().split("T")[0];
         });
 
-        // --- SERVICE SCROLL LOGIC ---
-        function scrollServices(direction) {
-            const container = document.getElementById('services-carousel');
-            const scrollAmount = window.innerWidth < 768 ? window.innerWidth * 0.85 : 400;
-            if (container) {
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        // --- DATE INPUT MIN ---
+        const dtInput = document.getElementById('date-input');
+        if(dtInput) dtInput.min = new Date().toISOString().split("T")[0];
+    });
+
+    // --- SERVICE SCROLL LOGIC ---
+    function scrollServices(direction) {
+        const container = document.getElementById('services-carousel');
+        const scrollAmount = window.innerWidth < 768 ? window.innerWidth * 0.85 : 400;
+        if (container) {
+            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+    }
+
+    // --- MODAL & WIZARD LOGIC ---
+    let curStep = 1;
+    const totSteps = 3;
+    const wrap = document.getElementById('step-wrapper');
+    const modal = document.getElementById('booking-modal');
+
+    async function filterStaffByService(serviceId) {
+        const staffSelect = document.getElementById('staff-select');
+        if (!staffSelect || !serviceId) return;
+
+        staffSelect.options[0].textContent = "Filtering specialists...";
+
+        try {
+            const response = await fetch(`/ajax/get-staff-for-service/?service_id=${serviceId}`);
+            const data = await response.json();
+            const staffList = data.staff_list || [];
+
+            staffSelect.innerHTML = '';
+            const anyOpt = document.createElement('option');
+            anyOpt.value = "";
+            anyOpt.textContent = "Any Available Specialist";
+            staffSelect.appendChild(anyOpt);
+
+            if (staffList.length > 0) {
+                staffList.forEach(staff => {
+                    const opt = document.createElement('option');
+                    opt.value = staff.id;
+                    opt.textContent = staff.name;
+                    staffSelect.appendChild(opt);
+                });
+            }
+        } catch (error) {
+            console.error("Staff filter error:", error);
+            staffSelect.options[0].textContent = "Error loading staff";
+        } finally {
+            if (!staffSelect.value) staffSelect.selectedIndex = 0;
+            if (document.getElementById('date-input').value) fetchSlots();
+        }
+    }
+
+    function openBookingModal(step = 1, serviceId = null) {
+        if (!modal) return;
+        const serviceSelect = document.getElementById('svc-select');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        if (serviceId && serviceSelect) {
+            serviceSelect.value = serviceId;
+            filterStaffByService(serviceId);
+        }
+        goToStep(step);
+    }
+
+    function closeBookingModal() {
+        if (!modal) return;
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    const svcSelect = document.getElementById('svc-select');
+    if (svcSelect) {
+        svcSelect.addEventListener('change', function() {
+            filterStaffByService(this.value);
+        });
+    }
+
+    function moveStep(d) {
+        const n = curStep + d;
+        if (n >= 1 && n <= totSteps) {
+            if(d > 0 && !valStep(curStep)) return;
+            goToStep(n);
+        }
+    }
+
+    function valStep(s) {
+        if(s === 1 && !document.getElementById('svc-select').value) {
+            alert('Please select a service to continue.'); return false;
+        }
+        if(s === 2 && !document.getElementById('final-time-input').value) {
+            alert('Please select a time slot.'); return false;
+        }
+        return true;
+    }
+
+    function goToStep(s) {
+        curStep = s;
+        if(wrap) wrap.style.transform = `translateX(-${(s - 1) * 33.3333}%)`;
+
+        const labels = ['Service', 'Date & Time', 'Details'];
+        const labelEl = document.getElementById('step-label');
+        if(labelEl) labelEl.textContent = `Step ${s}: ${labels[s-1]}`;
+
+        for(let i=1; i<=3; i++) {
+            const b = document.getElementById(`pb-${i}`);
+            if (b) {
+                b.classList.toggle('bg-indigo-600', i <= s);
+                b.classList.toggle('bg-slate-100', i > s);
             }
         }
 
-        // --- MODAL & WIZARD LOGIC ---
-        let curStep = 1;
-        const totSteps = 3;
-        const wrap = document.getElementById('step-wrapper');
-        const modal = document.getElementById('booking-modal');
+        document.getElementById('prevBtn').classList.toggle('hidden', s === 1);
+        document.getElementById('nextBtn').classList.toggle('hidden', s === 3);
+        document.getElementById('submitBtn').classList.toggle('hidden', s !== 3);
 
-        // Filter Staff by Service
-        async function filterStaffByService(serviceId) {
-            const staffSelect = document.getElementById('staff-select');
-            if (!staffSelect || !serviceId) return;
+        if(s === 3) genSumm();
+    }
 
-            // Show a loading state in the dropdown
-            const originalFirstOptionText = "Any Available Specialist";
-            staffSelect.options[0].textContent = "Filtering specialists...";
+    function genSumm() {
+        const sel = document.getElementById('svc-select');
+        if (!sel) return;
 
-            try {
-                // Use the same URL structure as your other successful calls
-                const response = await fetch(`/ajax/get-staff-for-service/?service_id=${serviceId}`);
-                const data = await response.json();
+        const selectedOptionText = sel.options[sel.selectedIndex].text;
 
-                // The key from your view is 'staff_list' (based on previous steps)
-                const staffList = data.staff_list || [];
+        // 1. Extract price from the option text "R150 — Haircut"
+        const priceMatch = selectedOptionText.match(/R(\d+)/);
+        const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
 
-                // Clear all current options
-                staffSelect.innerHTML = '';
+        // 2. Fetch business settings from Django context
+        const depositType = "{{ business.deposit_type }}";
+        const depositPercent = parseFloat("{{ business.deposit_percentage|default:0 }}");
+        const depositFixed = parseFloat("{{ business.deposit_amount|default:0 }}");
 
-                // 1. Re-add the "Any" option
-                const anyOpt = document.createElement('option');
-                anyOpt.value = "";
-                anyOpt.textContent = originalFirstOptionText;
-                staffSelect.appendChild(anyOpt);
-
-                // 2. Add only the qualified staff
-                if (staffList.length > 0) {
-                    staffList.forEach(staff => {
-                        const opt = document.createElement('option');
-                        opt.value = staff.id;
-                        opt.textContent = staff.name;
-                        staffSelect.appendChild(opt);
-                    });
-                }
-
-            } catch (error) {
-                console.error("Staff filter error:", error);
-                staffSelect.options[0].textContent = "Error loading staff";
-            } finally {
-                // Ensure "Any" is selected if nothing else is
-                if (!staffSelect.value) staffSelect.selectedIndex = 0;
-                // If the date is already selected, refresh slots for the new staff list
-                if (document.getElementById('date-input').value) fetchSlots();
-            }
+        // 3. Calculate display value
+        let displayDeposit = "";
+        if (depositType === 'percentage') {
+            const calculated = (price * depositPercent) / 100;
+            displayDeposit = "R" + calculated.toFixed(2);
+        } else {
+            displayDeposit = "R" + depositFixed.toFixed(2);
         }
 
-        // Open Modal
-        function openBookingModal(step = 1, serviceId = null) {
-            if (!modal) return;
-            const serviceSelect = document.getElementById('svc-select');
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-
-            if (serviceId && serviceSelect) {
-                serviceSelect.value = serviceId;
-                if (typeof filterStaffByService === "function") filterStaffByService(serviceId);
-            }
-            goToStep(step);
+        // 4. Update the UI element
+        const depositDisplay = document.getElementById('dynamic-deposit');
+        if (depositDisplay) {
+            depositDisplay.innerText = displayDeposit;
         }
 
-        // Close Modal
-        function closeBookingModal() {
-            if (!modal) return;
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
+        // 5. Update the summary header
+        const name = selectedOptionText;
+        const date = document.getElementById('date-input').value;
+        const time = document.getElementById('final-time-input').value;
 
-        // Event listener for manual service change in modal
-        const svcSelect = document.getElementById('svc-select');
-        if (svcSelect) {
-            svcSelect.addEventListener('change', function() {
-                filterStaffByService(this.value);
-            });
-        }
-
-        // Wizard Navigation
-        function moveStep(d) {
-            const n = curStep + d;
-            if (n >= 1 && n <= totSteps) {
-                if(d > 0 && !valStep(curStep)) return;
-                goToStep(n);
-            }
-        }
-
-        function valStep(s) {
-            if(s === 1 && !document.getElementById('svc-select').value) {
-                alert('Please select a service to continue.'); return false;
-            }
-            if(s === 2 && !document.getElementById('final-time-input').value) {
-                alert('Please select a time slot.'); return false;
-            }
-            return true;
-        }
-
-        function goToStep(s) {
-            curStep = s;
-            wrap.style.transform = `translateX(-${(s - 1) * 33.3333}%)`;
-
-            // Labels & Progress
-            const labels = ['Service', 'Date & Time', 'Details'];
-            document.getElementById('step-label').textContent = `Step ${s}: ${labels[s-1]}`;
-
-            for(let i=1; i<=3; i++) {
-                const b = document.getElementById(`pb-${i}`);
-                if (i <= s) {
-                    b.classList.remove('bg-slate-100');
-                    b.classList.add('bg-indigo-600');
-                } else {
-                    b.classList.remove('bg-indigo-600');
-                    b.classList.add('bg-slate-100');
-                }
-            }
-
-            // Buttons visibility
-            document.getElementById('prevBtn').classList.toggle('hidden', s === 1);
-            document.getElementById('nextBtn').classList.toggle('hidden', s === 3);
-            document.getElementById('submitBtn').classList.toggle('hidden', s !== 3);
-
-            if(s === 3) genSumm();
-        }
-
-        function genSumm() {
-            const sel = document.getElementById('svc-select');
-            const name = sel.options[sel.selectedIndex].text;
-            const date = document.getElementById('date-input').value;
-            const time = document.getElementById('final-time-input').value;
-            document.getElementById('summary-text').innerHTML = `
+        const summaryText = document.getElementById('summary-text');
+        if (summaryText) {
+            summaryText.innerHTML = `
                 <div class="truncate max-w-[150px]">${name}</div>
                 <div class="text-[10px] opacity-70">${date} @ ${time}</div>
             `;
         }
+    }
 
-        async function fetchSlots() {
-            const d = document.getElementById('date-input').value;
-            const s = document.getElementById('svc-select').value;
-            const st = document.getElementById('staff-select') ? document.getElementById('staff-select').value : '';
-            const container = document.getElementById('slots-container');
+    async function fetchSlots() {
+        const d = document.getElementById('date-input').value;
+        const s = document.getElementById('svc-select').value;
+        const stSelect = document.getElementById('staff-select');
+        const st = stSelect ? stSelect.value : '';
+        const container = document.getElementById('slots-container');
 
-            if(!d || !s) return;
-            container.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i></div>';
+        if(!d || !s) return;
+        container.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i></div>';
 
-            try {
-                const res = await fetch(`/ajax/available-slots/?business_id={{ business.id }}&service_id=${s}&date=${d}&staff_id=${st}`);
-                const data = await res.json();
-                container.innerHTML = '';
+        try {
+            const res = await fetch(`/ajax/available-slots/?business_id={{ business.id }}&service_id=${s}&date=${d}&staff_id=${st}`);
+            const data = await res.json();
+            container.innerHTML = '';
 
-                if(data.slots && data.slots.length > 0) {
-                    data.slots.forEach(slot => {
-                        const b = document.createElement('button');
-                        b.type = 'button';
-                        b.className = 'slot-btn py-3';
-                        b.textContent = slot.value;
-                        b.onclick = () => {
-                            document.querySelectorAll('.slot-btn').forEach(x => x.classList.remove('selected'));
-                            b.classList.add('selected');
-                            document.getElementById('final-time-input').value = slot.value;
-                        };
-                        container.appendChild(b);
-                    });
-                } else {
-                    container.innerHTML = '<div class="col-span-3 text-center py-8 text-rose-400 font-bold text-xs uppercase tracking-wider">Fully Booked</div>';
-                }
-            } catch(e) { container.innerHTML = 'Error fetching slots'; }
-        }
+            if(data.slots && data.slots.length > 0) {
+                data.slots.forEach(slot => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'slot-btn py-3';
+                    // FIX: Ensure slot.value is used here too
+                    b.textContent = slot.value || slot;
+                    b.onclick = () => {
+                        document.querySelectorAll('.slot-btn').forEach(x => x.classList.remove('selected'));
+                        b.classList.add('selected');
+                        document.getElementById('final-time-input').value = slot.value || slot;
+                    };
+                    container.appendChild(b);
+                });
+            } else {
+                container.innerHTML = '<div class="col-span-3 text-center py-8 text-rose-400 font-bold text-xs uppercase tracking-wider">Fully Booked</div>';
+            }
+        } catch(e) { container.innerHTML = 'Error fetching slots'; }
+    }
 
-        // --- SCROLL SPY ---
-        const nLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let curr = "";
-            sections.forEach(s => {
-                if (pageYOffset >= (s.offsetTop - 200)) curr = s.getAttribute('id');
-            });
-            nLinks.forEach(l => {
-                l.classList.remove('active');
-                if (l.getAttribute('href').includes(curr)) l.classList.add('active');
-            });
+    // --- SCROLL SPY ---
+    const nLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section');
+    window.addEventListener('scroll', () => {
+        let curr = "";
+        sections.forEach(s => {
+            if (window.pageYOffset >= (s.offsetTop - 200)) curr = s.getAttribute('id');
         });
+        nLinks.forEach(l => {
+            l.classList.remove('active');
+            if (l.getAttribute('href').includes(curr)) l.classList.add('active');
+        });
+    });
 
-        // --- COPY URL ---
-        function copyPageUrl(btn) {
-            const url = window.location.href;
-            const btnText = btn.querySelector('.btn-text');
-            const icon = btn.querySelector('i');
-            navigator.clipboard.writeText(url).then(() => {
-                const originalText = btnText.innerText;
-                btnText.innerText = "COPIED";
-                icon.className = "fa-solid fa-check text-xs text-emerald-400";
-                setTimeout(() => {
-                    btnText.innerText = originalText;
-                    icon.className = "fa-solid fa-link text-xs group-hover:text-indigo-400";
-                }, 2000);
-            }).catch(err => console.error('Failed to copy: ', err));
-        }
-    </script>
+    // --- COPY URL ---
+    function copyPageUrl(btn) {
+        const url = window.location.href;
+        const btnText = btn.querySelector('.btn-text');
+        const icon = btn.querySelector('i');
+        navigator.clipboard.writeText(url).then(() => {
+            const originalText = btnText.innerText;
+            btnText.innerText = "COPIED";
+            icon.className = "fa-solid fa-check text-xs text-emerald-400";
+            setTimeout(() => {
+                btnText.innerText = originalText;
+                icon.className = "fa-solid fa-link text-xs group-hover:text-indigo-400";
+            }, 2000);
+        }).catch(err => console.error('Failed to copy: ', err));
+    }
+</script>
 </body>
 </html>

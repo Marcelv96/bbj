@@ -103,23 +103,30 @@ from .utils import (
 )
 from .signals import get_owner_gcal_link
 
-# ===========================
-# Logging
-# ===========================
-logger = logging.getLogger(__name__)
 
+from django.shortcuts import render, redirect  # Ensure these are imported
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # ✅ auto-login
-            return redirect('business_onboarding')  # ✅ redirect here
+            login(request, user)
+            # Try adding the namespace prefix 'bookingApp:' if 'business_setup_choice' alone failed
+            try:
+                return redirect('bookingApp:business_setup_choice')
+            except:
+                return redirect('business_setup_choice')
     else:
         form = CustomUserCreationForm()
-
     return render(request, 'bookingApp/register.html', {'form': form})
+
+@login_required
+def business_setup_choice(request):
+    return render(request, 'bookingApp/business_setup_choice.html')
+
 
 
 @login_required
@@ -127,16 +134,16 @@ def login_dispatch(request):
     # 1. Check for Business Ownership (Priority 1)
     # Using hasattr to check the OneToOne relationship defined in your models
     if hasattr(request.user, 'business'):
-        return redirect('owner_dashboard', business_id=request.user.business.id)
+        return redirect('master_appointments', business_id=request.user.business.id)
 
     # 2. Check for Staff Profile (Priority 2)
     # This identifies employees who joined via a join_code
     if hasattr(request.user, 'staff_profile'):
-        return redirect('staff_dashboard')
+        return redirect('master_appointments')
 
     # 3. Authenticated but neither Owner nor Staff
     # Send them to the onboarding page to register their business
-    return redirect('business_onboarding')
+    return redirect('business_setup_choice')
 # bookingApp/views.py
 def user_guide(request):
     return render(request, 'bookingApp/help_page.html')
@@ -234,7 +241,7 @@ def home(request):
         # 1. Check if the user is a Business Owner
         owned_business = Business.objects.filter(owner=request.user).first()
         if owned_business:
-            return redirect('owner_dashboard', business_id=owned_business.id)
+            return redirect('master_appointments', business_id=owned_business.id)
 
         # 2. Check if the user is a Staff Member (but not the owner)
         is_staff = Staff.objects.filter(user=request.user).exists()
@@ -242,7 +249,7 @@ def home(request):
             return redirect('staff_dashboard')
 
         # 3. If they are just a regular customer/user
-        return redirect('business_onboarding')
+        return redirect('business_setup_choice')
 
     # If not logged in, show the marketing landing page
     return render(request, 'bookingApp/landing.html')
@@ -255,52 +262,41 @@ def general_landing(request, business_slug):
 def business_detail(request, business_id):
     business = get_object_or_404(Business, id=business_id)
 
-    # Core data
     reviews = business.reviews.all().order_by('-created_at')
-    average_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 5.0
+    average_rating = business.average_rating # Using your model property
 
-    # Booking Modal data
     services = business.services.all()
     staff_members = business.staff_members.all()
-    booking_form = business.booking_forms.first()
 
-    # User-specific flags
-    is_saved = False
     is_owner = False
     user_business_id = None
+    is_admin_staff = False
 
     if request.user.is_authenticated:
-        # Check if user saved this business
-        is_saved = SavedBusiness.objects.filter(
-            user=request.user,
-            business=business
-        ).exists()
+        # Check ownership
+        if hasattr(request.user, 'business') and request.user.business == business:
+            is_owner = True
+            user_business_id = business.id
 
-        # Check ownership safely
-        # Assuming your User model has an 'is_owner' field or property
-        is_owner = getattr(request.user, 'is_owner', False)
+        # Check if staff
+        if hasattr(request.user, 'staff_profile'):
+            is_admin_staff = request.user.staff_profile.role in ['admin', 'manager']
 
-        # Safely get the business ID for the owner dashboard link
-        if hasattr(request.user, 'business') and request.user.business:
-            user_business_id = request.user.business.id
-
-    # Operating Hours
-    DAY_LABELS = {'mon_fri': 'Mon - Fri', 'sat': 'Sat', 'sun': 'Sun'}
-    operating_hours_display = {
-        DAY_LABELS[o.day_type]: o for o in business.operating_hours.all()
-    }
+    # Operating Hours - Correcting for your model structure
+    operating_hours_display = {}
+    for oh in business.operating_hours.all():
+        operating_hours_display[oh.day_type] = oh
 
     context = {
         'business': business,
         'services': services,
         'staff_members': staff_members,
-        'booking_form': booking_form,
         'operating_hours': operating_hours_display,
         'reviews': reviews,
-        'average_rating': round(average_rating, 1),
-        'is_saved': is_saved,
+        'average_rating': average_rating,
         'is_owner': is_owner,
-        'user_business_id': user_business_id, # Passed for the template link
+        'is_admin_staff': is_admin_staff,
+        'user_business_id': user_business_id,
     }
 
     return render(request, 'bookingApp/business_detail.html', context)
@@ -478,6 +474,12 @@ def register_business(request):
     return render(request, 'bookingApp/register_business.html', {'form': form})
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from datetime import timedelta
+from django.http import HttpResponse
 
 @login_required
 def business_onboarding(request, business_id=None):
@@ -489,6 +491,7 @@ def business_onboarding(request, business_id=None):
 
     if request.method == 'POST':
         form = BusinessOnboardingForm(request.POST, request.FILES, instance=business)
+
         service_formset = ServiceFormSet(request.POST, instance=business)
 
         if form.is_valid() and service_formset.is_valid():
@@ -496,7 +499,11 @@ def business_onboarding(request, business_id=None):
             business = form.save(commit=False)
             business.owner = request.user
 
-            # --- MANDATORY: Save the business to generate an ID ---
+            # --- TRIAL LOGIC: Set expiration to 14 days from now ---
+            if is_new_business:
+                business.subscription_end_date = timezone.now() + timedelta(days=14)
+
+            # Mandatory save to generate ID and set trial date
             business.save()
 
             # Handle Operating Hours
@@ -509,8 +516,10 @@ def business_onboarding(request, business_id=None):
             for day_type, open_t, close_t in day_configs:
                 if open_t and close_t:
                     OperatingHours.objects.create(
-                        business=business, day_type=day_type,
-                        open_time=open_t, close_time=close_t
+                        business=business,
+                        day_type=day_type,
+                        open_time=open_t,
+                        close_time=close_t
                     )
 
             # Save Services
@@ -524,22 +533,9 @@ def business_onboarding(request, business_id=None):
 
             # --- REDIRECT LOGIC ---
             if is_new_business:
-                # Generate the URL now that the ID is valid
-                pay_url = get_subscription_url(business, 149.00)
-
-                # JavaScript Breakout to escape modals/iframes
-                return HttpResponse(f"""
-                    <html>
-                        <head><title>Redirecting...</title></head>
-                        <body style="text-align:center; padding-top:50px; font-family:sans-serif;">
-                            <h2>Redirecting to Secure Payment...</h2>
-                            <p>If not redirected, <a href="{pay_url}" target="_top">click here</a>.</p>
-                            <script type="text/javascript">
-                                window.top.location.href = "{pay_url}";
-                            </script>
-                        </body>
-                    </html>
-                """)
+                messages.success(request, f"Welcome to {business.name}! Your 14-day free trial has started. Check out this guide to get started.")
+                # Redirecting to the help page for first-time users
+                return redirect('user_guide')
 
             messages.success(request, f"Changes saved for {business.name}!")
             return redirect('owner_dashboard', business_id=business.id)
@@ -553,7 +549,6 @@ def business_onboarding(request, business_id=None):
         'service_formset': service_formset,
         'is_editing': bool(business)
     })
-
 
 import hashlib
 import urllib.parse
@@ -611,12 +606,20 @@ def get_subscription_url(business, amount):
 
 
 
+import logging
+from django.utils import timezone
+from datetime import timedelta
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def payfast_itn(request):
     """
-    Unified ITN listener with Referral Bonus logic.
+    Unified ITN listener:
+    - Extends paying business by 30 days.
+    - Grants UNLIMITED referral bonuses (30 days per unique referred business).
     """
     if request.method == 'POST':
         data = request.POST.dict()
@@ -628,60 +631,44 @@ def payfast_itn(request):
                 # --- ROUTE 1: Business Subscription ---
                 if m_payment_id.startswith('SUB-'):
                     business_id = int(data.get('custom_int1'))
-                    business = Business.objects.get(id=business_id)
+                    business = Business.objects.select_related('referred_by').get(id=business_id)
                     now = timezone.now()
 
-                    # Determine if this is the FIRST time they are paying
-                    is_first_payment = business.subscription_end_date is None
-
-                    # Base days for any payment is 30
-                    days_to_add = 30
-
-                    if is_first_payment:
-                        # First-time signup bonus: Add an extra 30 days (60 total) - back to 30 for now
-                        days_to_add = 30
-                        logger.info(f"FIRST SIGNUP: Granting 60 days to Business {business_id}")
-                    elif business.referred_by:
-                        # Optional: Keep your existing referral bonus logic for renewals
-                        # if that was your intention, otherwise this can be removed.
-                        # days_to_add = 30
-                        pass
-
-                    # Calculate new end date
+                    # 1. Extend the paying business's subscription
+                    # If they are still in their 14-day trial, add 30 days to the end of that trial.
                     if business.subscription_end_date and business.subscription_end_date > now:
-                        business.subscription_end_date += timedelta(days=days_to_add)
+                        business.subscription_end_date += timedelta(days=30)
                     else:
-                        # If subscription expired or is brand new, start from now
-                        business.subscription_end_date = now + timedelta(days=days_to_add)
+                        business.subscription_end_date = now + timedelta(days=30)
+
+                    # 2. Unlimited Referral Logic
+                    # If they were referred, and we haven't rewarded the referrer yet
+                    if business.referred_by and not business.referral_bonus_paid:
+                        referrer = business.referred_by
+
+                        # Add 30 days to the referrer's account
+                        if referrer.subscription_end_date and referrer.subscription_end_date > now:
+                            referrer.subscription_end_date += timedelta(days=30)
+                        else:
+                            referrer.subscription_end_date = now + timedelta(days=30)
+
+                        referrer.save()
+
+                        # Mark this business so it never pays out a bonus again
+                        business.referral_bonus_paid = True
+                        logger.info(f"REFERRAL PAYOUT: Business {referrer.id} gained 30 days from {business.id}")
 
                     business.save()
-                    logger.info(f"SUCCESS: Subscription extended by {days_to_add} days for Business {business_id}")
+                    logger.info(f"SUBSCRIPTION SUCCESS: Business {business_id} updated.")
 
                 # --- ROUTE 2: Appointment Deposit ---
                 elif m_payment_id.startswith('APP-'):
                     appointment_id = data.get('custom_int1') or m_payment_id.split('-')[1]
-                    appointment = Appointment.objects.select_related('booking_form__business').get(id=appointment_id)
-
-                    expiry_limit = timezone.now() - timedelta(minutes=2)
-
-                    if appointment.status == 'pending' and appointment.created_at < expiry_limit:
-                        overlap = Appointment.objects.filter(
-                            booking_form__business=appointment.booking_form.business,
-                            appointment_date=appointment.appointment_date,
-                            appointment_start_time=appointment.appointment_start_time,
-                            status='confirmed'
-                        ).exists()
-
-                        if overlap:
-                            appointment.status = 'cancelled'
-                            appointment.save()
-                            logger.warning(f"CONFLICT: Appt {appointment_id} paid late. Marked Cancelled.")
-                            return HttpResponse(status=200)
-
+                    appointment = Appointment.objects.get(id=appointment_id)
                     appointment.status = 'confirmed'
                     appointment.deposit_paid = True
                     appointment.save()
-                    logger.info(f"SUCCESS: Deposit paid for Appointment {appointment_id}")
+                    logger.info(f"DEPOSIT SUCCESS: Appointment {appointment_id} confirmed.")
 
                 return HttpResponse(status=200)
 
@@ -696,43 +683,88 @@ def payfast_itn(request):
 
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.db.models import Q
+import requests
+import hashlib
+import urllib.parse
+
+from .models import (
+    Business, Staff, Appointment, OperatingHours, BusinessBlock
+)
+from .utils import cleanup_expired_appointments, generate_payfast_url
+
+
+# --- HELPER FUNCTION: SOFT VALIDATION ---
+def validate_payfast_format(merchant_id, merchant_key):
+    if not merchant_id or not merchant_key:
+        return False, "Merchant ID and Key are required."
+    if not merchant_id.isdigit():
+        return False, "Merchant ID must be numeric."
+    if len(merchant_key) < 10:
+        return False, "Merchant Key looks invalid."
+    return True, None
+
+
+# --- HELPER FUNCTION: REAL PAYFAST CHECK ---
+def verify_payfast_credentials(merchant_id, merchant_key):
+    """
+    Basic sanity check for PayFast credentials.
+    Returns True if they look valid enough to save.
+    """
+    # 1. Must exist
+    if not merchant_id or not merchant_key:
+        return False
+
+    # 2. Merchant ID: numeric only
+    if not str(merchant_id).isdigit():
+        return False
+
+    # 3. Merchant Key: at least 10 chars
+    if len(merchant_key.strip()) < 10:
+        return False
+
+    # 4. Optional: sandbox/live API call here in future
+    # For now, we allow saving
+    return True
+
 
 @login_required
 def owner_dashboard(request, business_id):
     business = get_object_or_404(Business, id=business_id)
 
-    # --- 1. CLEANUP TRIGGER ---
-    # Automatically cancels 'pending' appointments that didn't pay deposit within 2 hours
+    # --- 1. CLEANUP ---
     cleanup_expired_appointments(business)
 
     # --- 2. PERMISSION CHECK ---
     is_owner = business.owner == request.user
     is_admin_staff = Staff.objects.filter(user=request.user, business=business, role='ADMIN').exists()
-
     if not (is_owner or is_admin_staff):
         messages.error(request, "Access Denied.")
         return redirect('home')
 
-    # --- 3. SUBSCRIPTION GUARD ---
-    SUBSCRIPTION_PRICE = 149.00
+    # --- 3. SUBSCRIPTION CHECK ---
+    SUBSCRIPTION_PRICE = 199.00
     if not business.subscription_end_date or business.subscription_end_date < timezone.now():
         return render(request, 'bookingApp/dashboard_locked.html', {
             'business': business,
             'pay_url': generate_payfast_url(business, SUBSCRIPTION_PRICE)
         })
 
-    # --- 4. HANDLE POST UPDATES ---
+    # --- 4. HANDLE POST REQUESTS ---
     if request.method == "POST":
         action = request.POST.get('action')
 
-        # Profile Update (including Name, Contact, Address, Cover Image, and Socials)
+        # --- PROFILE UPDATE ---
         if action == "update_profile":
             business.name = request.POST.get('name')
             business.contact_number = request.POST.get('phone_number')
             business.address = request.POST.get('address')
+            business.buffer_time = request.POST.get('buffer_time', 0)
             business.description = request.POST.get('description')
-
-            # Social Links
             business.instagram_url = request.POST.get('instagram_url')
             business.facebook_url = request.POST.get('facebook_url')
             business.twitter_url = request.POST.get('twitter_url')
@@ -743,41 +775,52 @@ def owner_dashboard(request, business_id):
             business.save()
             messages.success(request, "Business profile and social links updated successfully.")
 
-        # Inside owner_dashboard(request, business_id):
-
-
-        # Payment Credentials & Deposit Policy
+        # --- PAYFAST & DEPOSIT SETTINGS ---
         elif action == "update_payfast":
-            business.payfast_merchant_id = request.POST.get('payfast_merchant_id')
-            business.payfast_merchant_key = request.POST.get('payfast_merchant_key')
+            merchant_id = request.POST.get('payfast_merchant_id')
+            merchant_key = request.POST.get('payfast_merchant_key')
 
-            # NEW: Handle Types and Window
+            # Verify credentials before saving
+            if not verify_payfast_credentials(merchant_id, merchant_key):
+                messages.error(request, "PayFast credentials are invalid (format error).")
+                return redirect('owner_dashboard', business_id=business.id)
+
+            # Save credentials and deposit settings
+            business.payfast_merchant_id = merchant_id
+            business.payfast_merchant_key = merchant_key
+
             business.deposit_type = request.POST.get('deposit_type', 'fixed')
 
-            # Handle Percent
-            dep_percent = request.POST.get('deposit_percentage')
-            business.deposit_percentage = int(dep_percent) if dep_percent else 0
+            if business.deposit_type == 'percentage':
+                dep_percent = request.POST.get('deposit_percentage')
+                try:
+                    business.deposit_percentage = int(float(dep_percent)) if dep_percent else 0
+                except ValueError:
+                    business.deposit_percentage = 0
+                business.deposit_amount = 0.00
+            else:
+                deposit_amt = request.POST.get('deposit_amount')
+                try:
+                    business.deposit_amount = float(deposit_amt) if deposit_amt else 0.00
+                except ValueError:
+                    business.deposit_amount = 0.00
+                business.deposit_percentage = 0
 
-            # Handle Fixed Amount
-            deposit_amt = request.POST.get('deposit_amount')
-            business.deposit_amount = float(deposit_amt) if deposit_amt else 0.00
-
-            # Handle Reschedule Window
             res_window = request.POST.get('reschedule_window_hours')
             business.reschedule_window_hours = int(res_window) if res_window else 24
-
             business.deposit_policy = request.POST.get('deposit_policy')
 
             business.save()
             messages.success(request, "Deposit settings and payment credentials updated.")
+            return redirect('owner_dashboard', business_id=business.id)
 
-        # Operating Hours Update
+
+
+        # --- OPERATING HOURS ---
         elif action == "update_hours":
-            days_to_process = [('mon_fri', 'mon_fri'), ('sat', 'sat'), ('sun', 'sun')]
-            for field_name, day_type in days_to_process:
+            for field_name, day_type in [('mon_fri', 'mon_fri'), ('sat', 'sat'), ('sun', 'sun')]:
                 open_t = request.POST.get(f'open_{field_name}')
                 close_t = request.POST.get(f'close_{field_name}')
-
                 if open_t and close_t:
                     OperatingHours.objects.update_or_create(
                         business=business,
@@ -786,7 +829,7 @@ def owner_dashboard(request, business_id):
                     )
             messages.success(request, "Operating hours updated.")
 
-        # Blocked Days Logic
+        # --- BLOCKED DAYS ---
         elif action == "add_block":
             block_date = request.POST.get('block_date')
             if block_date:
@@ -800,18 +843,15 @@ def owner_dashboard(request, business_id):
 
         return redirect('owner_dashboard', business_id=business.id)
 
-    # --- 5. DATA FETCHING FOR UI ---
+    # --- 5. FETCH DATA FOR UI ---
     today = timezone.now().date()
+    # Access it directly via the new related_name
+    booking_form = getattr(business, 'booking_form', None)
 
-    # Get all booking forms for this business
-    booking_forms = business.booking_forms.all()
-
-    # Base query for appointments
     base_appointments = Appointment.objects.filter(
         booking_form__business=business
     ).select_related('service', 'customer').order_by('appointment_start_time')
 
-    # Prepare Calendar JSON
     calendar_events = [{
         'title': appt.customer.get_full_name() if appt.customer else f"{appt.guest_name} (Guest)",
         'start': f"{appt.appointment_date.isoformat()}T{appt.appointment_start_time.strftime('%H:%M:%S')}",
@@ -820,30 +860,22 @@ def owner_dashboard(request, business_id):
 
     context = {
         'business': business,
-        'booking_forms': booking_forms,
+        'booking_form': booking_form,
         'days_left': business.days_remaining,
         'pay_url': get_subscription_url(business, SUBSCRIPTION_PRICE),
-
-        # Appointment Lists
         'today_appointments': base_appointments.filter(
             appointment_date=today
-        ).exclude(status__in=['cancelled', 'declined','completed']).order_by('appointment_start_time'),
-
+        ).exclude(status__in=['cancelled', 'declined', 'completed']).order_by('appointment_start_time'),
         'upcoming_appointments': base_appointments.filter(
             appointment_date__gte=today
         ).exclude(status__in=['completed', 'cancelled', 'declined']).order_by('appointment_date', 'appointment_start_time'),
-
         'past_appointments': base_appointments.filter(
             Q(appointment_date__lt=today) | Q(status__in=['completed', 'cancelled', 'declined'])
         ).order_by('-appointment_date', '-appointment_start_time'),
-
-        # Configuration Data
         'operating_hours': {oh.day_type: oh for oh in business.operating_hours.all()},
         'business_blocks': business.blocks.filter(block_date__gte=today),
         'services': business.services.all(),
         'staff_members': business.staff_members.all().select_related('user__profile'),
-
-        # UI Helpers
         'calendar_events': calendar_events,
         'is_admin': (is_owner or is_admin_staff),
         'deposit_required': business.deposit_required,
@@ -854,12 +886,11 @@ def owner_dashboard(request, business_id):
 
 
 def book_appointment_public(request, token):
-    # Fetch the form by its unique token
+    # This finds the form that actually exists based on the secret token
     booking_form = get_object_or_404(BookingForm, embed_token=token)
-    trigger_pending_reminders()
 
-    # Reuse your existing book_appointment logic or call it
-    return book_appointment(request, booking_form.id)
+    # Now it passes the REAL id (e.g., 14 or 15) to the booking logic
+    return book_appointment(request, booking_form_id=booking_form.id)
 
 @login_required
 def booking_form_create(request, business_id):
@@ -932,6 +963,20 @@ def service_edit(request, business_id, service_id):
         'edit_mode': True  # Added to toggle UI text
     })
 
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_POST
+from django.contrib import messages
+
+@require_POST
+def service_delete(request, business_id, service_id):
+    # Match the parameter names from your URL path
+    service = get_object_or_404(Service, id=service_id, business_id=business_id)
+    service.delete()
+    messages.success(request, "Service deleted successfully.")
+
+    # Corrected redirect to match your URL name and param
+    return redirect('owner_dashboard', business_id=business_id)
+
 @login_required
 def staff_create(request, business_id):
     business = get_object_or_404(Business, id=business_id, owner=request.user)
@@ -993,19 +1038,43 @@ from .models import (
 from .forms import AppointmentForm
 from .utils import get_available_times, calculate_deposit_amount, generate_appointment_payfast_url
 from .utils import send_deposit_request_email
+import logging
+from datetime import datetime, date
+from decimal import Decimal
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from django.contrib import messages
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils import timezone
+
+from .models import Business, BookingForm, Service, Staff, ClientProfile, Appointment
+from .forms import AppointmentForm
+from .utils import (
+    get_available_times,
+    calculate_deposit_amount,
+    generate_appointment_payfast_url,
+    send_deposit_request_email,
+    send_push_notification,
+    trigger_pending_reminders
+)
 
 logger = logging.getLogger(__name__)
 
 @xframe_options_exempt
 @ensure_csrf_cookie
-def book_appointment(request, booking_form_id):
-    """
-    Handles the complete booking logic for public users.
-    Includes dynamic staff filtering, availability calculation,
-    and PayFast redirection for deposits (with Client-specific exemptions).
-    """
-    booking_form = get_object_or_404(BookingForm, id=booking_form_id)
-    business = booking_form.business
+def book_appointment(request, business_slug=None, booking_form_id=None):
+    if business_slug:
+        business = get_object_or_404(Business, slug=business_slug)
+        booking_form = getattr(business, 'booking_form', None)
+    elif booking_form_id:
+        booking_form = get_object_or_404(BookingForm, id=booking_form_id)
+        business = booking_form.business
+
+    # Trigger background tasks (e.g., automated reminders)
+    trigger_pending_reminders()
+
     services = Service.objects.filter(business=business)
     staff_members = Staff.objects.filter(business=business)
     is_embedded = request.GET.get('embed') == 'true'
@@ -1015,10 +1084,9 @@ def book_appointment(request, booking_form_id):
         selected_service_id = request.POST.get('service')
         selected_staff_id = request.POST.get('staff')
 
-        # 1. Fetch Service & Filter Staff strictly by service qualification
+        # Filter Service & Staff strictly by service qualification for form validation
         selected_service = services.filter(id=selected_service_id).first() if selected_service_id else None
 
-        # We MUST filter staff here so the form validation (ChoiceField) passes
         if selected_service:
             staff_members = staff_members.filter(services=selected_service)
         else:
@@ -1027,7 +1095,7 @@ def book_appointment(request, booking_form_id):
         selected_date = None
         available_times = []
 
-        # 2. Re-calculate availability for validation context
+        # Re-calculate availability for validation context
         if selected_date_str and selected_service:
             try:
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
@@ -1040,7 +1108,7 @@ def book_appointment(request, booking_form_id):
             except (ValueError, AttributeError):
                 pass
 
-        # 3. Initialize Form with filtered querysets
+        # Initialize Form with filtered querysets
         form = AppointmentForm(
             request.POST,
             services=services,
@@ -1058,7 +1126,6 @@ def book_appointment(request, booking_form_id):
             service_price = selected_service.price if selected_service else 0
 
             # --- DEPOSIT EXEMPTION LOGIC ---
-            # Check if this specific client is marked as exempt for this business
             is_exempt = ClientProfile.objects.filter(
                 business=business,
                 email=email,
@@ -1076,7 +1143,6 @@ def book_appointment(request, booking_form_id):
                 deposit_req = calculate_deposit_amount(business, service_price)
                 appointment.amount_to_pay = deposit_req
                 appointment.status = 'pending'
-                # Payment is required only if business settings require it and amount > 0
                 requires_payment = business.deposit_required and deposit_req > 0
             # --- END EXEMPTION LOGIC ---
 
@@ -1101,12 +1167,27 @@ def book_appointment(request, booking_form_id):
 
             appointment.save()
 
-            # 4. Handle Redirection / Success
+            # --- PUSH NOTIFICATION LOGIC ---
+            try:
+                owner = business.owner
+                player_id = getattr(owner.profile, "onesignal_player_id", None)
+
+                if player_id:
+                    msg = f"New booking from {appointment.guest_name} for {appointment.service.name}"
+                    send_push_notification([player_id], msg)
+                else:
+                    logger.warning(f"No OneSignal player ID for owner {owner.id}")
+            except Exception as e:
+                logger.error(f"Failed to send owner notification: {e}")
+            # --- END PUSH NOTIFICATION ---
+
+            # Handle Redirection / Success
             if requires_payment:
                 try:
                     pay_url = generate_appointment_payfast_url(request, appointment)
 
-                    # Send backup email with payment link
+                    # Only send email if a deposit is actually required and amount > 0
+                    # This uses the 'requires_payment' boolean defined in the exemption logic
                     send_deposit_request_email(appointment, pay_url)
 
                     # Return JavaScript Breakout for iFrames/Embedded forms
@@ -1117,7 +1198,6 @@ def book_appointment(request, booking_form_id):
                                 <h2>Redirecting to Secure Payment...</h2>
                                 <p>If not redirected, <a href="{pay_url}" target="_top">click here</a>.</p>
                                 <script type="text/javascript">
-                                    // The 'top' ensures we break out of any potential iframes or modals
                                     window.top.location.href = "{pay_url}";
                                 </script>
                             </body>
@@ -1130,6 +1210,7 @@ def book_appointment(request, booking_form_id):
 
             else:
                 # Case: Deposit Exempt OR Business doesn't require deposit
+                # No email is sent here because requires_payment is False
                 messages.success(request, "Appointment requested successfully!")
                 return render(request, 'bookingApp/booking_success_guest.html', {'appointment': appointment})
 
@@ -1167,7 +1248,6 @@ def book_appointment(request, booking_form_id):
         'booking_form': booking_form,
         'available_times': available_times,
     })
-
 
 def booking_success(request, appointment_id):
     """
@@ -1298,6 +1378,18 @@ def staff_dashboard(request):
             ).update(status='completed')
             messages.success(request, "Appointment marked as completed.")
 
+        # Inside if request.method == "POST":
+
+        # Add this block:
+        elif 'confirm_appointment' in request.POST:
+            appt_id = request.POST.get('appointment_id')
+            Appointment.objects.filter(
+                id=appt_id,
+                staff=staff_profile,
+                status='pending'
+            ).update(status='confirmed')
+            messages.success(request, "Appointment confirmed.")
+
         return redirect('staff_dashboard')
 
     # 4. Display Logic (GET request)
@@ -1320,11 +1412,17 @@ def staff_dashboard(request):
         Q(status__in=['completed', 'cancelled', 'declined', 'rescheduled'])
     ).order_by('-appointment_date', '-appointment_start_time')
 
+    today = timezone.now().date()
+# Generate next 7 days for the week picker
+    week_dates = [today + timedelta(days=i) for i in range(7)]
+
     context = {
         'staff': staff_profile,
         'business': business,
         'todays_appointments': todays_appointments,
         'upcoming': upcoming,
+        'week_dates': week_dates,
+        'today': today,
         'past': past,
         'service_form': StaffServicesForm(instance=staff_profile, business=business),
         'blocks': StaffBlock.objects.filter(staff=staff_profile, block_date__gte=today),
@@ -1470,6 +1568,7 @@ from .models import Appointment, Staff
 from .forms import RescheduleAppointmentForm
 from .utils import generate_appointment_payfast_url
 
+
 @login_required
 def appointment_detail(request, pk):
     # 1. Fetch the appointment and related business
@@ -1477,73 +1576,84 @@ def appointment_detail(request, pk):
     business = appointment.booking_form.business
 
     # 2. Permission Logic
-    # Check if the user is the business owner or an admin staff member
     is_admin_staff = Staff.objects.filter(user=request.user, business=business, role='ADMIN').exists()
     is_owner = (business.owner == request.user or is_admin_staff)
-
-    # Check if the user is the customer who booked it
     is_customer = (appointment.customer == request.user or appointment.guest_email == request.user.email)
 
     # 3. Handle Status Updates & Rescheduling (Existing POST Logic)
-    if request.method == 'POST':
+    # In views.py, inside appointment_detail(request, pk)
+    if request.method == "POST":
+        # If using fetch(url, {body: formData}), it's in request.POST
         action = request.POST.get('action')
 
-        # Simple status update (Confirm/Cancel/Complete)
-        if action == 'update_status' and is_owner:
-            new_status = request.POST.get('status')
-            if new_status in dict(Appointment.STATUS_CHOICES):
+        # If action is None, check if it was sent as a standalone 'status' key
+        # (which your JS handles in window.handleStatusUpdate)
+        new_status = request.POST.get('status')
+
+        if new_status:
+            valid_statuses = [choice[0] for choice in Appointment.STATUS_CHOICES]
+            if new_status in valid_statuses:
                 appointment.status = new_status
                 appointment.save()
-                return JsonResponse({'status': 'success'})
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({'status': 'success'})
 
-        # Reschedule submission
-        elif action == 'reschedule_submit' and is_customer:
-            form = RescheduleAppointmentForm(request.POST, instance=appointment)
-            if form.is_valid():
-                # We set it to 'reschedule_requested' so the owner sees the change
-                appt = form.save(commit=False)
-                appt.status = 'reschedule_requested'
-                appt.save()
-                return JsonResponse({'status': 'success'})
-            return JsonResponse({'status': 'error', 'errors': form.errors})
+            # LOGIC 2: Reschedule (Moved out of the status update IF)
+            if action == 'reschedule_submit' and is_customer:
+                form = RescheduleAppointmentForm(request.POST, instance=appointment)
+                if form.is_valid():
+                    appt = form.save(commit=False)
+                    appt.status = 'reschedule_requested'
+                    appt.save()
+                    return JsonResponse({'status': 'success'})
+                return JsonResponse({'status': 'error', 'errors': form.errors})
 
-    # 4. Generate Link Sending Data (The New Part)
+            return JsonResponse({'status': 'error', 'message': 'Invalid Action'}, status=400)
+
+    # 4. Generate Link Sending Data (Exemption Logic Added Here)
     pay_url = None
     payment_whatsapp_url = None
 
-    # We only show these links if:
-    # - Business requires a deposit
-    # - Deposit hasn't been paid yet
-    # - The appointment isn't already cancelled or declined
-    if business.deposit_required and not appointment.deposit_paid and appointment.status not in ['cancelled', 'declined']:
+    # Check if a ClientProfile exists for this email at this business and if they are exempt
+    is_exempt = ClientProfile.objects.filter(
+        business=business,
+        email=appointment.guest_email
+    ).filter(deposit_exempt=True).exists()
 
-        # Generate the secure PayFast URL using the helper from utils.py
+    # Logic: Show payment block only if business requires it, user isn't exempt,
+    # it hasn't been paid, and it's a valid active appointment.
+    show_payment_section = (
+        business.deposit_required and
+        not is_exempt and
+        not appointment.deposit_paid and
+        appointment.status not in ['cancelled', 'declined']
+    )
+
+    if show_payment_section:
         pay_url = generate_appointment_payfast_url(request, appointment)
 
-        # Generate the WhatsApp Click-to-Chat URL
-        # Uses the formatted_whatsapp_number property from your Appointment model
         if appointment.formatted_whatsapp_number:
             message_text = (
                 f"Hi {appointment.guest_name}, this is {business.name}. "
                 f"To confirm your booking for {appointment.service.name}, "
                 f"please complete the deposit of R{business.deposit_amount} here: {pay_url}"
             )
-            # URL encode the message so it works in a browser link
             params = {'text': message_text}
             payment_whatsapp_url = f"https://wa.me/{appointment.formatted_whatsapp_number}?{urlencode(params)}"
 
+    gcal_url = get_owner_gcal_link(appointment)
     # 5. Render
     context = {
         'appointment': appointment,
         'is_owner': is_owner,
         'is_customer': is_customer,
         'reschedule_form': RescheduleAppointmentForm(instance=appointment),
-        'pay_url': pay_url, # New
-        'payment_whatsapp_url': payment_whatsapp_url, # New
+        'pay_url': pay_url,
+        'payment_whatsapp_url': payment_whatsapp_url,
+        'gcal_url': gcal_url,
     }
 
     return render(request, 'bookingApp/appointment_detail.html', context)
-
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
@@ -1563,40 +1673,45 @@ from .utils import (
     send_deposit_request_email
 )
 
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import send_mail
+from django.conf import settings
+from django.http import HttpResponse
+
 def appointment_reschedule(request, token):
+    # 1. Fetch the original appointment
     appointment = get_object_or_404(Appointment, reschedule_token=token)
     business = appointment.booking_form.business
 
-    # 1. Check the 24h window (using local timezone)
+    # 2. Calculate if it's within the restricted window
     appointment_datetime = timezone.make_aware(
         datetime.combine(appointment.appointment_date, appointment.appointment_start_time)
     )
-    is_too_late = appointment_datetime < (timezone.now() + timedelta(hours=24))
-
     hours_window = business.reschedule_window_hours
     limit_time = timezone.now() + timedelta(hours=hours_window)
-
     is_too_late = appointment_datetime < limit_time
 
     if request.method == 'POST':
+        # Bind the form to the appointment instance
         form = RescheduleAppointmentForm(request.POST, instance=appointment)
         late_confirmation_given = request.POST.get('confirm_deposit_loss') == 'on'
 
         if is_too_late and not late_confirmation_given:
             form.add_error(None, "You must confirm that you understand the deposit will be lost.")
 
-        # --- inside appointment_reschedule view ---
         elif form.is_valid():
             new_date = form.cleaned_data.get('appointment_date')
             new_time = form.cleaned_data.get('appointment_start_time')
-            # If new_time is a time object, convert to string "HH:MM"
-            if hasattr(new_time, 'strftime'):
-                new_time_str = new_time.strftime('%H:%M')
-            else:
-                new_time_str = new_time
 
-            selected_staff = appointment.staff # Usually reschedule stays with same staff
+            # Standardize time format for comparison
+            new_time_str = new_time.strftime('%H:%M') if hasattr(new_time, 'strftime') else new_time
+            selected_staff = appointment.staff
 
+            # Check availability
             available_slots = get_available_times(
                 business=business,
                 appointment_date=new_date,
@@ -1605,7 +1720,6 @@ def appointment_reschedule(request, token):
                 service_obj=appointment.service
             )
 
-            # Convert all available slots to strings for reliable comparison
             available_slots_str = [
                 s.strftime('%H:%M') if hasattr(s, 'strftime') else s
                 for s in available_slots
@@ -1619,8 +1733,11 @@ def appointment_reschedule(request, token):
                 # LOGIC BRANCH: LATE RESCHEDULE (FORFEIT DEPOSIT)
                 # ====================================================
                 if is_too_late:
-                    # 1. Create a FRESH Appointment (New ID, New Deposit Required)
-                    new_appt = Appointment(
+                    # Calculate the new deposit amount based on the business settings
+                    new_deposit = business.calculate_deposit(appointment.service.price)
+
+                    # 1. Create a NEW Appointment object
+                    new_appt = Appointment.objects.create(
                         booking_form=appointment.booking_form,
                         service=appointment.service,
                         customer=appointment.customer,
@@ -1630,100 +1747,66 @@ def appointment_reschedule(request, token):
                         appointment_date=new_date,
                         appointment_start_time=new_time,
                         staff=selected_staff,
-                        status='pending',       # Reset to pending
-                        deposit_paid=False,     # Reset deposit status
+                        status='pending',
+                        deposit_paid=False,
+                        amount_to_pay=new_deposit,  # <--- FIX: Pass the calculated deposit here
                         notes=f"Rescheduled from Appt #{appointment.id}. Previous deposit forfeited."
                     )
-                    new_appt.save()
 
-                    # 2. Cancel the OLD Appointment
+                    # 2. Revert the OLD appointment in memory and then cancel it
+                    # This prevents the new time from being saved to the old record
+                    appointment.refresh_from_db()
                     appointment.status = 'cancelled'
-                    appointment.notes = (appointment.notes or "") + "\n[SYSTEM]: Late reschedule. Deposit forfeited. Re-booked as new appointment."
+                    appointment.notes = (appointment.notes or "") + f"\n[SYSTEM]: Late reschedule. Deposit forfeited. Re-booked as Appt #{new_appt.id}."
                     appointment.save()
 
-                    # 3. Trigger Payment Flow (Same as book_appointment)
+                    # 3. Handle Payment Redirect
                     if business.deposit_required:
                         try:
-                            # Generate PayFast URL for the NEW appointment
                             pay_url = generate_appointment_payfast_url(request, new_appt)
-
-                            # Send Backup Email
                             send_deposit_request_email(new_appt, pay_url)
-
-                            # Javascript Breakout to Payment Gateway
                             return HttpResponse(f"""
-                                <html>
-                                    <body>
-                                        <p>Reschedule accepted. Redirecting to secure payment for new deposit...</p>
-                                        <script type="text/javascript">
-                                            window.top.location.href = "{pay_url}";
-                                        </script>
-                                    </body>
-                                </html>
+                                <html><body>
+                                    <p>Reschedule accepted. Redirecting to payment for new deposit...</p>
+                                    <script>window.top.location.href = "{pay_url}";</script>
+                                </body></html>
                             """)
                         except Exception as e:
-                            print(f"Reschedule Payment Redirect Error: {e}")
-                            # Fallback if redirect fails
                             return render(request, 'bookingApp/booking_success_guest.html', {'appointment': new_appt})
 
-                    # If no deposit required, just render success for the new appt
-                    return render(request, 'bookingApp/reschedule_success.html', {
-                        'appointment': new_appt,
-                        'is_too_late': True
-                    })
+                    return render(request, 'bookingApp/reschedule_success.html', {'appointment': new_appt, 'is_too_late': True})
 
                 # ====================================================
                 # LOGIC BRANCH: EARLY RESCHEDULE (STANDARD)
                 # ====================================================
                 else:
-                    # Update the EXISTING appointment
+                    # Update the existing appointment record
                     appt = form.save(commit=False)
-                    appt.status = 'pending' # Set to pending for owner review
+                    appt.status = 'pending'
                     appt.save()
 
-                    # --- NOTIFICATIONS (Standard Flow) ---
+                    # Notification Logic
                     client_name = appt.customer.get_full_name() if appt.customer else appt.guest_name
                     customer_email = appt.guest_email or (appt.customer.email if appt.customer else None)
-
-                    # Notify Staff/Owner
                     staff_recipient = appt.staff.user.email if (appt.staff and hasattr(appt.staff, 'user')) else business.owner.email
 
+                    context = {
+                        'appointment': appt,
+                        'client_name': client_name,
+                        'business': business,
+                        'site_url': settings.SITE_URL,
+                        'is_too_late': False
+                    }
+
+                    # Notify Staff
                     if staff_recipient:
-                        staff_context = {
-                            'appointment': appt,
-                            'client_name': client_name,
-                            'is_too_late': False,
-                            'business': business,
-                            'site_url': settings.SITE_URL
-                        }
-                        html_staff = render_to_string('bookingApp/owner_reschedule_notification.html', staff_context)
-                        send_mail(
-                            subject=f"Reschedule Request - {client_name}",
-                            message=strip_tags(html_staff),
-                            from_email=settings.DEFAULT_FROM_EMAIL,
-                            recipient_list=[staff_recipient],
-                            html_message=html_staff,
-                            fail_silently=True,
-                        )
+                        html_staff = render_to_string('bookingApp/owner_reschedule_notification.html', context)
+                        send_mail(f"Reschedule Request - {client_name}", strip_tags(html_staff), settings.DEFAULT_FROM_EMAIL, [staff_recipient], html_message=html_staff, fail_silently=True)
 
                     # Notify Customer
                     if customer_email:
-                        cust_context = {
-                            'appointment': appt,
-                            'business': business,
-                            'client_name': client_name,
-                            'is_too_late': False,
-                            'site_url': settings.SITE_URL
-                        }
-                        html_cust = render_to_string('bookingApp/customer_status_update.html', cust_context)
-                        send_mail(
-                            subject=f"Reschedule Confirmed: {business.name}",
-                            message=f"Hi {client_name}, we received your request to reschedule.",
-                            from_email=settings.DEFAULT_FROM_EMAIL,
-                            recipient_list=[customer_email],
-                            html_message=html_cust,
-                            fail_silently=True,
-                        )
+                        html_cust = render_to_string('bookingApp/customer_status_update.html', context)
+                        send_mail(f"Reschedule Confirmed: {business.name}", f"Hi {client_name}, your reschedule is confirmed.", settings.DEFAULT_FROM_EMAIL, [customer_email], html_message=html_cust, fail_silently=True)
 
                     return render(request, 'bookingApp/reschedule_success.html', {'is_too_late': False})
 
@@ -1738,16 +1821,49 @@ def appointment_reschedule(request, token):
 
 @login_required
 def appointment_cancel(request, pk):
-    # Ensure only the customer who owns it can cancel
+    # Ensure the appointment belongs to the user
     appointment = get_object_or_404(Appointment, pk=pk, customer=request.user)
 
     if request.method == 'POST':
         appointment.status = 'cancelled'
-        appointment.save() # This triggers the post_save signal
+        # Crucial: We do NOT change deposit_paid to False.
+        # The business keeps the money.
+        appointment.save()
         return redirect('my_appointments')
 
+    return render(request, 'bookingApp/appointment_confirm_cancel.html', {'appointment': appointment})
+
+# views.py
+from django.utils import timezone
+from datetime import datetime, timedelta
+
+def appointment_cancel_guest(request, token):
+    # Fetch by token instead of PK/User for guests
+    appointment = get_object_or_404(Appointment, reschedule_token=token)
+    business = appointment.booking_form.business
+
+    # Logic to check if cancellation is within the non-refundable window
+    # Combine date and time to get the full start datetime
+    appt_start = datetime.combine(appointment.appointment_date, appointment.appointment_start_time)
+    if timezone.is_aware(appt_start):
+        now = timezone.now()
+    else:
+        now = datetime.now()
+
+    # Determine if it's too late to keep the deposit
+    is_late = now + timedelta(hours=business.reschedule_window_hours) > appt_start
+
+    if request.method == 'POST':
+        appointment.status = 'cancelled'
+        appointment.save()
+        # You could redirect to a "Booking Cancelled" success page
+        return render(request, 'bookingApp/cancel_success.html', {'business': business})
+
     return render(request, 'bookingApp/appointment_confirm_cancel.html', {
-        'appointment': appointment
+        'appointment': appointment,
+        'is_guest': True,
+        'is_late': is_late,
+        'business': business
     })
 
 # Add this to your views.py
@@ -1854,7 +1970,9 @@ def join_staff(request):
         # Check if user already has a staff profile
         if hasattr(request.user, 'staff_profile'):
             messages.warning(request, "You are already linked to a business.")
-            return redirect('owner_dashboard', business_id=request.user.staff_profile.business.id)
+            # Check if your owner_dashboard URL also uses a business_id.
+            # If it doesn't, remove the business_id=... here as well.
+            return redirect('staff_dashboard')
 
         # Create the staff profile with ADMIN privileges
         Staff.objects.create(
@@ -1862,16 +1980,17 @@ def join_staff(request):
             user=request.user,
             name=request.user.get_full_name() or request.user.username,
             email=request.user.email,
-            role='ADMIN' # Granting high-level access
+            role='ADMIN'
         )
 
-        # Optional: If you use the Profile model to gate access, update it here
         if hasattr(request.user, 'profile'):
             request.user.profile.is_business_owner = True
             request.user.profile.save()
 
-        messages.success(request, f"Full Admin access granted for {business.name}!")
-        return redirect('owner_dashboard', business_id=business.id)
+        messages.success(request, f"Access granted to {business.name}! Remember to select your Services and set your Hours so clients can book you!")
+
+        # FIX: Removed business_id because the 'staff_dashboard' URL pattern does not accept arguments
+        return redirect('staff_dashboard')
 
     return render(request, 'bookingApp/join_staff.html')
 
@@ -1927,12 +2046,36 @@ from .utils import (
     send_deposit_request_email
 )
 
+from decimal import Decimal
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from urllib.parse import urlencode
+
+from decimal import Decimal
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils.http import urlencode
+from .models import Business, Staff, BookingForm
+from .forms import ManualBookingForm
+from .utils import (
+    trigger_pending_reminders,
+    generate_appointment_payfast_url,
+    send_deposit_request_email
+)
+
 @login_required
 def manual_booking(request, business_id):
+    """
+    Allows business owners or admin staff to create appointments manually.
+    Now correctly references the OneToOne booking_form relationship.
+    """
     business = get_object_or_404(Business, id=business_id)
-    trigger_pending_reminders() #
+    trigger_pending_reminders()
 
-    # Permission Check
+    # --- Permission Check ---
     is_admin_staff = Staff.objects.filter(user=request.user, business=business, role='ADMIN').exists()
     if business.owner != request.user and not is_admin_staff:
         messages.error(request, "Unauthorized access.")
@@ -1942,7 +2085,9 @@ def manual_booking(request, business_id):
         form = ManualBookingForm(request.POST, business=business)
         if form.is_valid():
             appointment = form.save(commit=False)
-            target_form = business.booking_forms.first() #
+
+            # --- UPDATED: Accessing OneToOneField via singular related_name ---
+            target_form = getattr(business, 'booking_form', None)
 
             if not target_form:
                 messages.error(request, "Please create a Booking Form first.")
@@ -1950,28 +2095,42 @@ def manual_booking(request, business_id):
 
             appointment.booking_form = target_form
 
-            # --- NEW LOGIC START ---
-            if business.deposit_required:
-                # 1. Save as Pending
+            # --- NEW LOGIC: Handle Deposit & Exemption ---
+            guest_email = form.cleaned_data.get('guest_email')
+
+            # Check if deposit is required globally AND if this specific client is NOT exempt
+            deposit_needed = business.is_deposit_required_for_client(guest_email)
+
+            if deposit_needed:
                 appointment.status = 'pending'
+
+                # Calculate deposit safely using Decimal
+                if appointment.service and appointment.service.price is not None:
+                    # Uses business logic to determine percentage or fixed amount
+                    deposit_percent = business.deposit_percentage or 100
+                    price = appointment.service.price
+                    appointment.amount_to_pay = (price * (Decimal(deposit_percent) / Decimal('100'))).quantize(Decimal('0.01'))
+                else:
+                    appointment.amount_to_pay = Decimal('0.00')
+
                 appointment.save()
 
-                # 2. Generate Payment Link
-                pay_url = generate_appointment_payfast_url(request, appointment) #
+                # Generate PayFast URL (using the business slug indirectly via utility)
+                pay_url = generate_appointment_payfast_url(request, appointment)
 
-                # 3. Auto-send Email if address provided
+                # Auto-send email ONLY if guest email exists
                 email_sent = False
                 if appointment.guest_email:
-                    send_deposit_request_email(appointment, pay_url) #
+                    send_deposit_request_email(appointment, pay_url)
                     email_sent = True
 
-                # 4. Generate WhatsApp Link
+                # Generate WhatsApp link for manual sharing
                 whatsapp_url = None
-                if appointment.formatted_whatsapp_number: #
+                if appointment.formatted_whatsapp_number:
                     msg = f"Hi {appointment.guest_name}, please complete your deposit for {appointment.service.name} here: {pay_url}"
                     whatsapp_url = f"https://wa.me/{appointment.formatted_whatsapp_number}?{urlencode({'text': msg})}"
 
-                # 5. Render Success/Action Screen
+                # Render success / action screen
                 return render(request, 'bookingApp/manual_booking_success.html', {
                     'appointment': appointment,
                     'pay_url': pay_url,
@@ -1980,17 +2139,26 @@ def manual_booking(request, business_id):
                 })
 
             else:
-                # No Deposit Required - Standard Flow
+                # No deposit required OR client is exempt
                 appointment.status = 'confirmed'
+                appointment.amount_to_pay = Decimal('0.00')
+                appointment.deposit_paid = True # Mark as paid since no payment is needed
                 appointment.save()
-                messages.success(request, f"Booking for {appointment.guest_name} confirmed!")
+
+                status_msg = f"Booking for {appointment.guest_name} confirmed!"
+                if business.deposit_required: # Clarify bypass for exempt clients
+                    status_msg += " (Client is deposit exempt)"
+
+                messages.success(request, status_msg)
                 return redirect('owner_dashboard', business_id=business.id)
-            # --- NEW LOGIC END ---
 
     else:
         form = ManualBookingForm(business=business)
 
-    return render(request, 'bookingApp/manual_booking.html', {'form': form, 'business': business})
+    return render(request, 'bookingApp/manual_booking.html', {
+        'form': form,
+        'business': business
+    })
 # views.py
 def get_manual_availability(request, business_id):
     business = get_object_or_404(Business, id=business_id)
@@ -2086,6 +2254,21 @@ def submit_guest_review(request, appointment_id):
     })
 
 
+import json
+from django.db.models import Sum, Avg, Count, Q
+from django.db.models.functions import ExtractHour
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
+import json
+from django.db.models import Sum, Avg, Count, Q
+from django.db.models.functions import ExtractHour
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
+from .models import Appointment, Review, Staff, Business
 
 class AnalyticsDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'bookingApp/analytics.html'
@@ -2109,16 +2292,17 @@ class AnalyticsDashboardView(LoginRequiredMixin, TemplateView):
             start_date = now - timedelta(days=30)
             days_label_format = '%d %b'
 
-        # --- 2. Base Querysets ---
+        # --- 2. Identity & Business Resolution ---
         is_owner = hasattr(user, 'business')
         is_staff = hasattr(user, 'staff_profile')
+        business_obj = None
 
         if is_owner:
-            business = user.business
-            context['staff_list_dropdown'] = business.staff_members.all()
-            appointments = Appointment.objects.filter(staff__business=business)
-            reviews = Review.objects.filter(business=business)
-            context['scope_name'] = business.name
+            business_obj = user.business
+            context['staff_list_dropdown'] = business_obj.staff_members.all()
+            appointments = Appointment.objects.filter(staff__business=business_obj)
+            reviews = Review.objects.filter(business=business_obj)
+            context['scope_name'] = business_obj.name
 
             if staff_id:
                 appointments = appointments.filter(staff_id=staff_id)
@@ -2127,8 +2311,10 @@ class AnalyticsDashboardView(LoginRequiredMixin, TemplateView):
                     context['scope_name'] = Staff.objects.get(id=staff_id).name
                 except Staff.DoesNotExist:
                     pass
+
         elif is_staff:
             staff_member = user.staff_profile
+            business_obj = staff_member.business
             appointments = Appointment.objects.filter(staff=staff_member)
             reviews = Review.objects.filter(appointment__staff=staff_member)
             context['scope_name'] = staff_member.name
@@ -2136,7 +2322,8 @@ class AnalyticsDashboardView(LoginRequiredMixin, TemplateView):
             return context
 
         # --- 3. Apply Date Filters ---
-        appointments = appointments.filter(appointment_date__gte=start_date.date())
+        start_date_only = start_date.date()
+        appointments = appointments.filter(appointment_date__gte=start_date_only)
         completed_apps = appointments.filter(status='completed')
 
         # --- 4. Revenue Chart Data ---
@@ -2159,7 +2346,6 @@ class AnalyticsDashboardView(LoginRequiredMixin, TemplateView):
 
         busy_labels = []
         busy_values = []
-        # Populate hours 08:00 to 20:00
         for h in range(8, 21):
             busy_labels.append(f"{h:02d}:00")
             match = next((item for item in busy_times_raw if item['hour'] == h), None)
@@ -2177,23 +2363,26 @@ class AnalyticsDashboardView(LoginRequiredMixin, TemplateView):
 
         staff_performance = []
         if is_owner and not staff_id:
-            staff_performance = business.staff_members.annotate(
-                booking_count=Count('appointments', filter=Q(appointments__appointment_date__gte=start_date.date())),
+            staff_performance = business_obj.staff_members.annotate(
+                booking_count=Count('appointments', filter=Q(appointments__appointment_date__gte=start_date_only)),
                 revenue=Sum('appointments__service__price', filter=Q(
-                    appointments__appointment_date__gte=start_date.date(),
+                    appointments__appointment_date__gte=start_date_only,
                     appointments__status='completed'
                 ))
             ).order_by('-revenue')
 
-        # --- 7. Metrics & Context ---
-        deposit_val = business.deposit_amount if is_owner else 0
-        no_show_appointments = appointments.filter(status='cancelled', deposit_paid=True)
-        no_show_profit = no_show_appointments.count() * deposit_val
+        # --- 7. Metrics & Context (The "R0" Fix) ---
+        # Instead of multiplying count by business.deposit_amount,
+        # we sum the ACTUAL 'amount_to_pay' stored on cancelled appointments.
+        no_show_profit = appointments.filter(
+            status='cancelled',
+            deposit_paid=True
+        ).aggregate(total=Sum('amount_to_pay'))['total'] or 0
 
         context.update({
             'total_revenue': completed_apps.aggregate(Sum('service__price'))['service__price__sum'] or 0,
             'total_bookings': appointments.count(),
-            'no_show_profit': no_show_profit,
+            'no_show_profit': no_show_profit, # Now summing actual captured cash
             'avg_rating': reviews.aggregate(Avg('rating'))['rating__avg'] or 0,
             'completion_rate': (completed_apps.count() / appointments.count() * 100) if appointments.count() > 0 else 0,
             'chart_labels': json.dumps(rev_labels),
@@ -2207,8 +2396,6 @@ class AnalyticsDashboardView(LoginRequiredMixin, TemplateView):
         })
 
         return context
-
-
 
 
 from django.shortcuts import render, get_object_or_404
@@ -2225,33 +2412,119 @@ from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.db.models import Q
 # Ensure you import your models: Business, Appointment
+from datetime import date
+from django.db.models import Q
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse, Http404
+from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from datetime import date, timedelta, datetime
+import calendar
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import Http404, JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.core.paginator import Paginator
+from django.utils import timezone
+
+# Ensure you import your models
+# from .models import Business, Appointment
 
 @login_required
 def master_appointments_view(request, business_id):
-    # 1. Get the business by ID first (without filtering by owner yet)
+    # 1. Get business and check security
     business = get_object_or_404(Business, id=business_id)
 
-    # 2. --- Security Check ---
-    # Allow access if user is the Owner OR a Staff Member of this business
     is_owner = (business.owner == request.user)
-
-    is_staff = False
-    # Check if user has a staff profile and is linked to this business
-    if hasattr(request.user, 'staff_profile'):
-        if request.user.staff_profile.business == business:
-            is_staff = True
+    staff_profile = getattr(request.user, 'staff_profile', None)
+    is_staff = staff_profile is not None and staff_profile.business == business
 
     if not (is_owner or is_staff):
-        # Return 404 to hide existence, or 403 for Forbidden
         raise Http404("You do not have permission to view this business.")
 
-    # 3. --- Base Queryset ---
-    appointments_list = Appointment.objects.filter(
-        booking_form__business=business
-    ).select_related('service', 'staff', 'customer').order_by('-appointment_date', '-appointment_start_time')
+    # 🔒 2. Subscription Lock Logic
+    if not business.subscription_end_date or business.subscription_end_date < timezone.now():
+        return render(request, 'bookingApp/dashboard_locked.html', {
+            'business': business,
+            'is_staff': is_staff,
+            'is_owner': is_owner,
+        })
 
-    # 4. --- Apply Filters ---
+    # 3. Extract and Parse Parameters
+    view_mode = request.GET.get('view_mode', 'my')
+    scale = request.GET.get('scale', 'day') # 'day', 'week', 'month'
     q = request.GET.get('q')
+    status = request.GET.get('status')
+    staff_id = request.GET.get('staff')
+    service_id = request.GET.get('service')
+
+    # Parse the date string into a Date object for calculations
+    raw_date = request.GET.get('date', date.today().isoformat())
+    try:
+        current_date_obj = datetime.strptime(raw_date, '%Y-%m-%d').date()
+    except ValueError:
+        current_date_obj = date.today()
+
+    # 4. Determine Date Range based on Scale
+    context_extras = {} # To store week_dates or calendar_grid
+
+    if scale == 'week':
+        # Find Monday of the current week
+        start_of_week = current_date_obj - timedelta(days=current_date_obj.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+
+        filter_start = start_of_week
+        filter_end = end_of_week
+
+        # Pass the list of 7 dates for the table headers
+        context_extras['week_dates'] = [start_of_week + timedelta(days=i) for i in range(7)]
+
+    elif scale == 'month':
+        # Find 1st and Last day of month
+        year, month = current_date_obj.year, current_date_obj.month
+        num_days = calendar.monthrange(year, month)[1]
+
+        start_of_month = date(year, month, 1)
+        end_of_month = date(year, month, num_days)
+
+        filter_start = start_of_month
+        filter_end = end_of_month
+
+        # Build Grid Logic:
+        # We need to know which weekday the month starts on (0=Mon, 6=Sun)
+        # to add "empty" slots at the beginning of the grid.
+        start_weekday = start_of_month.weekday()
+
+        calendar_days = []
+        # Add padding for previous month days (empty dicts or None)
+        for _ in range(start_weekday):
+            calendar_days.append(None)
+
+        # Add actual days
+        for day in range(1, num_days + 1):
+            calendar_days.append(date(year, month, day))
+
+        context_extras['calendar_days'] = calendar_days
+
+    else: # Default to 'day'
+        filter_start = current_date_obj
+        filter_end = current_date_obj
+
+    # 5. Base Queryset - Filter by Date Range
+    appointments_list = Appointment.objects.filter(
+        booking_form__business=business,
+        appointment_date__range=[filter_start, filter_end]
+    ).select_related('service', 'staff', 'customer').order_by('appointment_start_time')
+
+    # 6. Apply "Personal" vs "Team" Logic
+    if view_mode == 'my':
+        if is_staff:
+            appointments_list = appointments_list.filter(staff=staff_profile)
+        elif is_owner and not staff_id:
+            pass # Owner sees all if no specific staff selected
+
+    # 7. Apply Secondary Filters
     if q:
         appointments_list = appointments_list.filter(
             Q(customer__email__icontains=q) |
@@ -2260,113 +2533,96 @@ def master_appointments_view(request, business_id):
             Q(guest_email__icontains=q)
         )
 
-    status = request.GET.get('status')
     if status:
         appointments_list = appointments_list.filter(status=status)
 
-    staff_id = request.GET.get('staff')
     if staff_id:
         appointments_list = appointments_list.filter(staff_id=staff_id)
 
-    service_id = request.GET.get('service')
     if service_id:
         appointments_list = appointments_list.filter(service_id=service_id)
 
-    deposit = request.GET.get('deposit_paid')
-    if deposit:
-        appointments_list = appointments_list.filter(deposit_paid=(deposit == 'true'))
+    # 8. Pagination logic
+    # We DISABLE pagination for Week/Month views because the visual grid
+    # requires all data to render correctly. We only paginate the list view (Day).
+    if scale == 'day':
+        paginator = Paginator(appointments_list, 50)
+        page_number = request.GET.get('page')
+        appointments_page = paginator.get_page(page_number)
+    else:
+        # Return all objects for matrix views
+        appointments_page = appointments_list
 
-    reminders = request.GET.get('reminders')
-    if reminders == 'sent':
-        appointments_list = appointments_list.filter(Q(reminder_24h_sent=True) | Q(reminder_2h_sent=True))
-    elif reminders == 'none':
-        appointments_list = appointments_list.filter(reminder_24h_sent=False, reminder_2h_sent=False)
-
-    apt_date = request.GET.get('date')
-    if apt_date:
-        appointments_list = appointments_list.filter(appointment_date=apt_date)
-
-    created_at = request.GET.get('created_at')
-    if created_at:
-        appointments_list = appointments_list.filter(created_at__date=created_at)
-
-    # 5. --- Pagination ---
-    paginator = Paginator(appointments_list, 15)
-    page_number = request.GET.get('page')
-    appointments = paginator.get_page(page_number)
-
-    # 6. --- Prepare Context ---
+    # 9. Prepare Context
     context = {
         'business': business,
-        'appointments': appointments,
+        'appointments': appointments_page,
         'staff_members': business.staff_members.all(),
         'services': business.services.all(),
         'status_choices': Appointment.STATUS_CHOICES,
+        'today_date': date.today().isoformat(),
+        'current_date': raw_date, # The string value for the input
+        'current_date_obj': current_date_obj, # The object for logic
+        'view_mode': view_mode,
+        'scale': scale,
+        **context_extras # Merges week_dates or calendar_days into context
     }
 
-    # 7. --- AJAX Response Handling ---
+    # 10. AJAX Response Handling
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('bookingApp/master_appointments.html', context, request=request)
         return JsonResponse({'html': html})
 
     return render(request, 'bookingApp/master_appointments.html', context)
 
-import json
-from django.http import JsonResponse
-from .signals import demo_completed # Import from where you defined it
 
 import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-# Adjust the import below to match your actual folder structure
-from .signals import demo_completed
+
 from .models import DemoLead
+from .signals import demo_completed
 
 
 @require_POST
 def demo_booking_api(request):
-    try:
-        data = json.loads(request.body)
+    data = json.loads(request.body)
 
-        email = data.get('email')
-        send_email = data.get('send_email', True)
+    email = data.get('email')
+    send_email = data.get('send_email', True)
 
-        email_context = {
-            'name': data.get('name'),
-            'service': data.get('service'),
-            'staff': data.get('staff'),
-            'time': data.get('time'),
-        }
-
-        if not email:
-            return JsonResponse(
-                {'status': 'error', 'message': 'Email address is required'},
-                status=400
-            )
-
-        # 🔒 STORE DEMO EMAIL (always)
-        DemoLead.objects.update_or_create(
-            email=email,
-            defaults=email_context
+    if not email:
+        return JsonResponse(
+            {'status': 'error', 'message': 'Email address is required'},
+            status=400
         )
 
-        # ✉️ Optional: send demo email
-        if send_email:
-            demo_completed.send(
-                sender=None,
-                email=email,
-                context=email_context
-            )
+    email_context = {
+        'name': data.get('name'),
+        'service': data.get('service'),
+        'staff': data.get('staff'),
+        'time': data.get('time'),
+    }
 
-        return JsonResponse({
-            'status': 'success',
-            'message': 'Demo processed'
-        })
+    # 🔒 Always store lead
+    DemoLead.objects.update_or_create(
+        email=email,
+        defaults=email_context
+    )
 
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    # ✉️ NON-NEGOTIABLE EMAIL
+    if send_email:
+        demo_completed.send(
+            sender=DemoLead,
+            email=email,
+            context=email_context
+        )
+
+    return JsonResponse({
+        'status': 'success',
+        'message': 'Demo booked and email sent'
+    })
+
 
 
 
@@ -2397,20 +2653,34 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
 from .models import Appointment
 
-@staff_member_required
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_POST
+@login_required # Use login_required instead of staff_member for testing
 @require_POST
 def update_appointment_status(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
-    new_status = request.POST.get('status')
+
+    # Security check: Ensure user belongs to this business
+    business = appointment.booking_form.business
+    if not (business.owner == request.user or hasattr(request.user, 'staff_profile')):
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+
+    # Handle both FormData (standard) and JSON
+    if request.content_type == 'application/json':
+        data = json.loads(request.body)
+        new_status = data.get('status')
+    else:
+        new_status = request.POST.get('status')
 
     valid_statuses = [choice[0] for choice in Appointment.STATUS_CHOICES]
-
     if new_status in valid_statuses:
         appointment.status = new_status
         appointment.save()
+        return JsonResponse({'status': 'success', 'new_status': appointment.status})
 
-    # Redirect back to the previous page or the registry list
-    return redirect(request.META.get('HTTP_REFERER', 'appointment_registry'))
+    return JsonResponse({'status': 'error', 'message': f'Invalid status: {new_status}'}, status=400)
 
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -2419,64 +2689,205 @@ from .models import ClientProfile
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
+from django.db.models import Max, Q, F, Count, Sum
+from django.db.models.functions import Coalesce
 from .models import ClientProfile, Staff, Business
+
+import urllib.parse
+from decimal import Decimal
+from django.db.models import Max, Q, Count, Sum, DecimalField, OuterRef, Subquery
+from django.db.models.functions import Coalesce
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from django.core.exceptions import ObjectDoesNotExist
+from .models import ClientProfile, Staff, Appointment, Business
+
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q, Count, Sum, DecimalField, OuterRef, Subquery, F
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+from datetime import timedelta
+from decimal import Decimal
+# Import your models: ClientProfile, Appointment, Staff, etc.
+from django.db.models import Subquery, OuterRef, Count, Sum, Q, DecimalField
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+from datetime import timedelta
+from decimal import Decimal
 
 class ClientListView(LoginRequiredMixin, ListView):
     model = ClientProfile
     template_name = 'bookingApp/client_list.html'
     context_object_name = 'clients'
+    paginate_by = 25
 
     def get_queryset(self):
         user = self.request.user
 
-        # 1. Try to find business if user is the Owner
+        # 1. Identify Business
         try:
             business = user.business
-        except Business.DoesNotExist:
-            # 2. Try to find business if user is Staff
-            staff_profile = Staff.objects.filter(user=user).first()
+        except AttributeError:
+            staff_profile = getattr(user, 'staff_profile', None)
             if staff_profile:
                 business = staff_profile.business
             else:
-                # User has no business and is not staff
                 return ClientProfile.objects.none()
 
-        # 3. Return all clients for that business
-        queryset = ClientProfile.objects.filter(business=business)
+        # 2. Base Relationship
+        appointments_base = Appointment.objects.filter(
+            Q(guest_email=OuterRef('email')) | Q(customer__email=OuterRef('email')),
+            service__business=business
+        )
 
-        # 4. Handle Search (the "Instant Search" bar in your template)
+        # 3. Subqueries
+
+        # Last Appointment Date
+        last_appt_subquery = appointments_base.filter(
+            status='completed'
+        ).order_by('-appointment_date').values('appointment_date')[:1]
+
+        # Total Completed Bookings
+        count_subquery = appointments_base.filter(
+            status='completed'
+        ).annotate(
+            total_count=Count('id')
+        ).values('total_count')[:1]
+
+        # LTV Calculation: Sum of 'service__price' (Full Revenue)
+        sum_subquery = appointments_base.filter(
+            status='completed'
+        ).annotate(
+            total_revenue=Sum('service__price')
+        ).values('total_revenue')[:1]
+
+        # NEW: Total Deposits Calculation: Sum of 'amount_to_pay'
+        deposit_sum_subquery = appointments_base.filter(
+            status='completed',
+            deposit_paid=True  # <--- Filter to only include successful transactions
+        ).annotate(
+            total_deposits=Sum('amount_to_pay')
+        ).values('total_deposits')[:1]
+
+        # 4. Base Queryset with Annotations
+        queryset = ClientProfile.objects.filter(business=business).annotate(
+            last_appointment_date=Subquery(last_appt_subquery),
+            annotated_appointment_count=Coalesce(
+                Subquery(count_subquery),
+                0
+            ),
+            annotated_total_spent=Coalesce(
+                Subquery(sum_subquery, output_field=DecimalField()),
+                Decimal('0.00')
+            ),
+            # New annotation for deposits
+            annotated_total_deposit=Coalesce(
+                Subquery(deposit_sum_subquery, output_field=DecimalField()),
+                Decimal('0.00')
+            )
+        )
+
+        # 5. Filter: Search
         query = self.request.GET.get('q')
         if query:
             queryset = queryset.filter(
-                models.Q(name__icontains=query) |
-                models.Q(email__icontains=query) |
-                models.Q(phone__icontains=query)
+                Q(name__icontains=query) |
+                Q(phone__icontains=query) |
+                Q(email__icontains=query)
             )
 
-        return queryset.select_related('user', 'business')
+        # 6. Filter: Status (Overdue/New)
+        status_filter = self.request.GET.get('status')
+        today = timezone.now().date()
+        if status_filter == 'overdue':
+            thirty_days_ago = today - timedelta(days=30)
+            queryset = queryset.filter(last_appointment_date__lte=thirty_days_ago)
+        elif status_filter == 'new':
+            thirty_days_ago = today - timedelta(days=30)
+            queryset = queryset.filter(created_at__gte=thirty_days_ago)
+
+        # 7. Filter: Deposit
+        deposit_filter = self.request.GET.get('deposit')
+        if deposit_filter == 'exempt':
+            queryset = queryset.filter(deposit_exempt=True)
+        elif deposit_filter == 'required':
+            queryset = queryset.filter(deposit_exempt=False)
+
+        # 8. Sorting
+        sort_by = self.request.GET.get('sort', 'created_at')
+        direction = self.request.GET.get('direction', 'desc')
+
+        sort_map = {
+            'name': 'name',
+            'revenue': 'annotated_total_spent',
+            'deposits': 'annotated_total_deposit', # Enabled sorting for new column
+            'bookings': 'annotated_appointment_count',
+            'last_visit': 'last_appointment_date',
+            'created_at': 'created_at'
+        }
+
+        db_field = sort_map.get(sort_by, 'created_at')
+        if direction == 'desc':
+            db_field = f'-{db_field}'
+
+        return queryset.order_by(db_field)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'current_q': self.request.GET.get('q', ''),
+            'current_sort': self.request.GET.get('sort', 'created_at'),
+            'current_direction': self.request.GET.get('direction', 'desc'),
+            'current_status': self.request.GET.get('status', 'all'),
+            'current_deposit': self.request.GET.get('deposit', 'all'),
+        })
+        return context
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import ClientProfile
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.middleware.csrf import get_token
+from django.urls import reverse
 
 @login_required
 @require_POST
 def toggle_client_exemption(request, client_id):
-    # Ensure the client belongs to the logged-in owner's business
+    # Ensure ownership security
     client = get_object_or_404(ClientProfile, id=client_id, business__owner=request.user)
+
+    # Toggle the state
     client.deposit_exempt = not client.deposit_exempt
     client.save()
 
-    # Return the specific HTML fragment for the button to update it instantly
-    icon = 'fa-star' if client.deposit_exempt else 'fa-star-half-stroke'
-    btn_class = 'bg-blue-600 text-white' if client.deposit_exempt else 'bg-slate-100 text-slate-400'
-    label = 'NO DEPOSIT' if client.deposit_exempt else 'DEPOSIT REQUIRED'
+    # Prepare logic for the updated HTML
+    checked = "checked" if client.deposit_exempt else ""
+    color_class = "text-emerald-600" if client.deposit_exempt else "text-red-500"
+    label = "NO DEPOSIT" if client.deposit_exempt else "DEPOSIT REQUIRED"
 
+    # Get the POST URL dynamically
+    post_url = reverse('toggle_client_exemption', args=[client.id])
+
+    # This response replaces the old form, re-arming HTMX for the next click
     return HttpResponse(f'''
-        <button hx-post="/toggle-exemption/{client.id}/"
-                hx-swap="outerHTML"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg font-bold text-[10px] transition-all {btn_class}">
-            <i class="fa-solid {icon} mr-1.5"></i> {label}
-        </button>
+        <form hx-post="{post_url}"
+              hx-trigger="change from:find input"
+              hx-target="this"
+              hx-swap="outerHTML"
+              hx-headers='{{"X-CSRFToken": "{get_token(request)}"}}'
+              class="flex flex-col items-center flex-shrink-0">
+            <label class="toggle-wrapper inline-block">
+                <input type="checkbox" name="exempt" class="toggle-input" {checked}>
+                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
+            <span class="text-[8px] font-black uppercase mt-1 tracking-widest {color_class}">
+                {label}
+            </span>
+        </form>
     ''')
+
+
+

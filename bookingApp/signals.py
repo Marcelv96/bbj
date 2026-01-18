@@ -186,6 +186,19 @@ def create_business_booking_form(sender, instance, created, **kwargs):
 
 logger = logging.getLogger(__name__)
 
+import logging
+import hashlib
+import urllib.parse
+from datetime import datetime, timedelta
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Appointment
+
+logger = logging.getLogger(__name__)
+
 @receiver(post_save, sender=Appointment)
 def notify_workflow(sender, instance, created, **kwargs):
     try:
@@ -200,26 +213,29 @@ def notify_workflow(sender, instance, created, **kwargs):
         customer_name = instance.guest_name or (instance.customer.get_full_name() if instance.customer else "Valued Customer")
 
         # --- SECTION 1: OWNER NOTIFICATIONS (New Bookings) ---
+        # Triggered for EVERY new appointment creation
         if created and instance.status == 'pending':
-            if not business.deposit_required:
-                context = {
-                    'appointment': instance,
-                    'business': business,
-                    'owner': owner,
-                    'customer_name': customer_name,
-                    'site_url': settings.SITE_URL, # Ensure this is passed
-                }
-                html_owner = render_to_string('bookingApp/owner_notification.html', context)
-                send_mail(
-                    subject=f"New Request: {instance.service.name} - {customer_name}",
-                    message=f"New booking request from {customer_name}.",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[owner.email],
-                    html_message=html_owner,
-                    fail_silently=True
-                )
-            else:
-                logger.info(f"Appt {instance.id} created. Skipping owner notification (Awaiting Deposit).")
+            context = {
+                'appointment': instance,
+                'business': business,
+                'owner': owner,
+                'customer_name': customer_name,
+                'site_url': settings.SITE_URL,
+            }
+            # Note: Using your requested template name 'owner_notify.html'
+            html_owner = render_to_string('bookingApp/owner_notification.html', context)
+
+            send_mail(
+                subject=f"New Request: {instance.service.name} - {customer_name}",
+                message=f"New booking request from {customer_name}.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[owner.email],
+                html_message=html_owner,
+                fail_silently=True
+            )
+
+            if business.deposit_required:
+                logger.info(f"Appt {instance.id}: Owner notified. Customer must still pay deposit.")
 
         # --- SECTION 2: STATUS UPDATES ---
         if instance.status == 'cancelled':
@@ -227,7 +243,8 @@ def notify_workflow(sender, instance, created, **kwargs):
             context_owner = {
                 'appointment': instance,
                 'customer_name': customer_name,
-                'site_url': settings.SITE_URL
+                'site_url': settings.SITE_URL,
+                'business': business
             }
             html_cancel_owner = render_to_string('bookingApp/owner_cancelled.html', context_owner)
             send_mail(f"🚨 Cancelled: {customer_name}", "", settings.DEFAULT_FROM_EMAIL, [owner.email], html_message=html_cancel_owner, fail_silently=True)
@@ -240,7 +257,14 @@ def notify_workflow(sender, instance, created, **kwargs):
                     'site_url': settings.SITE_URL
                 }
                 html_declined = render_to_string('bookingApp/email_appointment_cancelled.html', context_cust)
-                send_mail("Booking Update: Cancelled", "", settings.DEFAULT_FROM_EMAIL, [recipient], html_message=html_declined, fail_silently=True)
+                send_mail(
+                    subject="Booking Update: Cancelled",
+                    message=f"Your appointment at {business.name} has been cancelled.",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[recipient],
+                    html_message=html_declined,
+                    fail_silently=True
+                )
 
         elif instance.status == 'confirmed' and recipient:
             # 1. GCal Link Generation
@@ -273,10 +297,7 @@ def notify_workflow(sender, instance, created, **kwargs):
                     ('item_name', f"Deposit {instance.service.name}"),
                 ]
 
-                pf_common = ""
-                for k, v in pf_params:
-                    pf_common += f"{k}={urllib.parse.quote_plus(str(v).strip())}&"
-
+                pf_common = "".join([f"{k}={urllib.parse.quote_plus(str(v).strip())}&" for k, v in pf_params])
                 pf_string = pf_common + "passphrase=VanWyknBake420"
                 sig = hashlib.md5(pf_string.encode()).hexdigest()
 
@@ -284,13 +305,12 @@ def notify_workflow(sender, instance, created, **kwargs):
                 final_params['signature'] = sig
                 payfast_url = "https://www.payfast.co.za/eng/process?" + urllib.parse.urlencode(final_params)
 
-            # --- KEY FIX HERE ---
             context = {
                 'appointment': instance,
                 'business': business,
                 'gcal_link': gcal_link,
                 'payfast_url': payfast_url,
-                'site_url': settings.SITE_URL, # <--- This fixes the reschedule button
+                'site_url': settings.SITE_URL,
             }
 
             html_cust = render_to_string('bookingApp/customer_status_update.html', context)
@@ -299,11 +319,13 @@ def notify_workflow(sender, instance, created, **kwargs):
         # --- SECTION 3: THANK YOU & REVIEW REQUEST ---
         elif instance.status == 'completed' and recipient:
             review_url = f"{settings.SITE_URL}/review/{instance.id}/"
+            booking_form_id = instance.booking_form.id if instance.booking_form else None
             context = {
                 'customer_name': customer_name,
                 'business_name': business.name,
                 'review_url': review_url,
                 'site_url': settings.SITE_URL,
+                'booking_form_id': booking_form_id,
             }
             html_thank_you = render_to_string('bookingApp/email_thank_you_review.html', context)
 
@@ -320,29 +342,34 @@ def notify_workflow(sender, instance, created, **kwargs):
         logger.error(f"Signal Error for Appt {instance.id}: {str(e)}", exc_info=True)
 # Keep your create_owner_as_staff and get_owner_gcal_link functions as they were
 
+from datetime import datetime, timedelta, timezone as dt_timezone # Add this
+from django.utils import timezone
+import urllib.parse
+
 def get_owner_gcal_link(instance):
-    """
-    Safely generates a GCal link for the owner,
-    handling both Registered Customers and Guests.
-    """
     business = instance.booking_form.business
 
-    # --- FIX START ---
-    # Check if registered customer exists, otherwise use guest name
     if instance.customer:
         customer_id = instance.customer.username
     else:
         customer_id = f"{instance.guest_name} (Guest)"
-    # --- FIX END ---
 
-    start_dt = datetime.combine(instance.appointment_date, instance.appointment_start_time)
-    end_dt = start_dt + timedelta(minutes=instance.service.default_length_minutes)
+    naive_start = datetime.combine(instance.appointment_date, instance.appointment_start_time)
+
+    # Make it aware using the project's local timezone (SAST)
+    start_local = timezone.make_aware(naive_start)
+    end_local = start_local + timedelta(minutes=instance.service.default_length_minutes)
+
     fmt = "%Y%m%dT%H%M%SZ"
+
+    # Use dt_timezone.utc from the standard library
+    start_utc = start_local.astimezone(dt_timezone.utc).strftime(fmt)
+    end_utc = end_local.astimezone(dt_timezone.utc).strftime(fmt)
 
     gcal_params = {
         'action': 'TEMPLATE',
         'text': f"CONFIRMED: {instance.service.name} - {customer_id}",
-        'dates': f"{start_dt.strftime(fmt)}/{end_dt.strftime(fmt)}",
+        'dates': f"{start_utc}/{end_utc}",
         'details': (
             f"Service: {instance.service.name}\n"
             f"Customer: {customer_id}\n"
@@ -404,75 +431,93 @@ def notify_admin_allauth_signup(request, user, **kwargs):
     )
 
 
-from django.dispatch import receiver, Signal
+from django.dispatch import Signal, receiver
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 import logging
 
-# Set up logging to see errors in your console/logs
 logger = logging.getLogger(__name__)
 
-demo_completed = Signal()
+# 🔔 Explicit signal
+demo_completed = Signal()  # no providing_args in modern Django
+
 
 @receiver(demo_completed)
-def send_demo_confirmation(sender, email, context=None, **kwargs):
+def send_demo_confirmation(sender, *, email, context=None, **kwargs):
+    """
+    HARD-FAIL email sender.
+    If this errors → request crashes.
+    """
+
     if not email:
-        return
+        raise ValueError("Email is required for demo confirmation")
 
     final_context = {
         'name': 'Valued Client',
         'service': 'Gents Fade & Beard Trim',
         'staff': 'Sarah',
-        'time': 'Tomorrow @ 10:30 AM'
+        'time': 'Tomorrow @ 10:30 AM',
     }
 
     if context:
-        clean_context = {k: v for k, v in context.items() if v}
-        final_context.update(clean_context)
+        final_context.update({k: v for k, v in context.items() if v})
 
     subject = f"✨ Appointment Confirmed: {final_context['service']}"
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'webmaster@localhost')
+    from_email = settings.DEFAULT_FROM_EMAIL
 
-    try:
-        html_content = render_to_string('bookingApp/demo_confirmation.html', final_context)
+    # 🔥 TEMPLATE MUST EXIST HERE:
+    # bookingApp/templates/bookingApp/demo_confirmation.html
+    html_content = render_to_string(
+        'bookingApp/demo_confirmation.html',
+        final_context
+    )
 
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=f"Your booking for {final_context['service']} is confirmed!",
-            from_email=from_email,
-            to=[email.strip()] # Strip whitespace from email
-        )
-        msg.attach_alternative(html_content, "text/html")
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Your booking for {final_context['service']} is confirmed.",
+        from_email=from_email,
+        to=[email.strip()],
+    )
+    msg.attach_alternative(html_content, "text/html")
 
-        # fail_silently=False helps us see errors during development
-        msg.send(fail_silently=False)
-        print(f"✅ Email successfully sent to {email}")
+    # 🚨 HARD FAIL — NO SILENT MODE
+    msg.send(fail_silently=False)
 
-    except Exception as e:
-        logger.error(f"❌ Failed to send demo email to {email}: {str(e)}")
-        # If this is for a demo/portfolio, we don't want to crash the whole view
+    logger.info(f"✅ Demo email sent to {email}")
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Appointment
 from .utils import send_push_notification
-
 @receiver(post_save, sender=Appointment)
 def notify_new_appointment(sender, instance, created, **kwargs):
-    if created:
-        # Notify staff assigned to appointment
-        staff_user = instance.staff.user if instance.staff else None
-        if staff_user and hasattr(staff_user, 'profile') and staff_user.profile.onesignal_player_id:
+    if not created:
+        return
+
+    # 1. Safely identify the service name for the message
+    service_name = instance.service.name if instance.service else "Service"
+
+    # 2. Notify staff assigned to appointment
+    if instance.staff and instance.staff.user:
+        staff_user = instance.staff.user
+        player_id = getattr(getattr(staff_user, 'profile', None), 'onesignal_player_id', None)
+
+        if player_id:
             send_push_notification(
-                [staff_user.profile.onesignal_player_id],
-                f"New booking: {instance.service.name if instance.service else 'Service'} on {instance.appointment_date}"
+                [player_id],
+                f"New booking: {service_name} on {instance.appointment_date}"
             )
 
-        # Optionally notify business owner
+    # 3. Notify business owner (Safely check booking_form)
+    if instance.booking_form and instance.booking_form.business:
         owner = instance.booking_form.business.owner
-        if owner and hasattr(owner, 'profile') and owner.profile.onesignal_player_id:
-            send_push_notification(
-                [owner.profile.onesignal_player_id],
-                f"New booking for your business: {instance.service.name if instance.service else 'Service'} on {instance.appointment_date}"
-            )
+        if owner:
+            owner_player_id = getattr(getattr(owner, 'profile', None), 'onesignal_player_id', None)
+
+            if owner_player_id:
+                send_push_notification(
+                    [owner_player_id],
+                    f"New booking for your business: {service_name} on {instance.appointment_date}"
+                )
+

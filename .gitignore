@@ -1,2 +1,23 @@
-tailwind.exe 
-tailwind.exe 
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# Collected / generated static
+static/downloads/
+static/img/
+
+# OS
+.DS_Store

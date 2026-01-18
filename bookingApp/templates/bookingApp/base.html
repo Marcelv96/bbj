@@ -61,10 +61,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="manifest" href="{% static 'manifest.json' %}">
 
-    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
       tailwind.config = {
+
         theme: {
           extend: {
             colors: {
@@ -90,39 +92,9 @@
       }
     </script>
 
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-    <script>
-    window.OneSignal = window.OneSignal || [];
-    OneSignal.push(function() {
-        OneSignal.init({
-            appId: "755c884c-75a6-4624-b4fe-5089ee21abac",
-            notifyButton: {
-                enable: true,
-                position: 'bottom-right',
-                size: 'medium',
-                prenotify: true,
-                showCredit: false
-            },
-            allowLocalhostAsSecureOrigin: true
-        });
 
-        // Save player ID to Django
-        OneSignal.on('subscriptionChange', function(isSubscribed) {
-            if (isSubscribed) {
-                OneSignal.getUserId(function(playerId) {
-                    fetch("/save-player-id/", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": "{{ csrf_token }}"
-                        },
-                        body: JSON.stringify({player_id: playerId})
-                    });
-                });
-            }
-        });
-    });
-    </script>
+
+</script>
 
     <style type="text/tailwindcss">
         @layer components {
@@ -264,6 +236,37 @@
             animation: loaderMove 1s infinite ease-in-out;
         }
         @keyframes loaderMove { 0% { left: -30%; } 100% { left: 100%; } }
+
+        /* Remove default triangle and style the header */
+.sidebar-accordion summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+.sidebar-accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Indent the links inside the accordion */
+.accordion-content {
+    padding-left: 15px;
+}
+
+.accordion-content .nav-link {
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+    color: white;
+}
+
+/* Optional: Rotate arrow when open */
+details[open] summary i {
+    transform: rotate(180deg);
+}
     </style>
 </head>
 
@@ -287,58 +290,76 @@
         </a>
     </div>
 
-    <nav class="flex-grow overflow-y-auto py-2 custom-scroll">
-        {% if user.is_authenticated %}
-            {% if user.business or user.staff_profile.role == 'ADMIN' %}
-                <div class="sidebar-section-title">Management</div>
-                {% with b_id=user.business.id|default:user.staff_profile.business.id b_name=user.business.name|default:user.staff_profile.business.name %}
+<nav class="flex-grow overflow-y-auto py-2 custom-scroll">
+    {% if user.is_authenticated %}
+
+        {# MANAGEMENT SECTION #}
+        {% if user.business or user.staff_profile.role == 'ADMIN' %}
+            <div class="sidebar-section-title">Management</div>
+            {% with b_id=user.business.id|default:user.staff_profile.business.id b_name=user.business.name|default:user.staff_profile.business.name %}
                 <a href="{% url 'owner_dashboard' b_id %}" class="nav-link {% if 'owner_dashboard' in request.path %}active{% endif %}">
                     <i class="fa-solid fa-store"></i>
                     <span class="sidebar-text truncate">{{ b_name }}</span>
                 </a>
                 <a href="{% url 'master_appointments' b_id %}" class="nav-link {% if 'master_appointments' in request.path %}active{% endif %}">
-                    <i class="fa-solid fa-clipboard-list"></i>
-                    <span class="sidebar-text">All Bookings</span>
+                    <i class="fa fa-calendar-days"></i>
+                    <span class="sidebar-text">Calendar</span>
                     <span id="nav-badge-business-desktop" class="badge-count ml-auto bg-brand-primary text-white text-[9px] font-black px-1.5 rounded-full hidden">0</span>
                 </a>
-                {% endwith %}
-            {% else %}
-                <a href="{% url 'business_onboarding' %}" class="nav-link {% if 'business_onboarding' in request.path %}active{% endif %}">
-                    <i class="fa fa-scissors"></i>
-                    <span class="sidebar-text">Register Business</span>
+                <a href="{% url 'client-list' %}" class="nav-link {% if 'master_appointments' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span class="sidebar-text">All Clients</span>
+                    <span id="nav-badge-business-desktop" class="badge-count ml-auto bg-brand-primary text-white text-[9px] font-black px-1.5 rounded-full hidden">0</span>
                 </a>
-                <a href="{% url 'join_staff' %}" class="nav-link {% if 'join_staff' in request.path %}active{% endif %}">
-                    <i class="fa fa-user-plus"></i>
-                    <span class="sidebar-text">Join As Staff</span>
-                </a>
-            {% endif %}
-
-            {% if user.staff_profile %}
-                <div class="sidebar-section-title">Workspace</div>
-                <a href="{% url 'staff_dashboard' %}" class="nav-link {% if 'staff_dashboard' in request.path %}active{% endif %}">
-                    <i class="fa-regular fa-calendar-check"></i>
-                    <span class="sidebar-text">Schedule</span>
-                    <span id="nav-badge-staff-desktop" class="badge-count ml-auto bg-brand-primary text-white text-[9px] font-black px-1.5 rounded-full hidden">0</span>
-                </a>
-                <a href="{% url 'analytics_dashboard' %}" class="nav-link {% if 'analytics_dashboard' in request.path %}active{% endif %}">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span class="sidebar-text">Analytics</span>
-                </a>
-            {% endif %}
+            {% endwith %}
+        {% else %}
+            <a href="{% url 'business_onboarding' %}" class="nav-link {% if 'business_onboarding' in request.path %}active{% endif %}">
+                <i class="fa fa-scissors"></i>
+                <span class="sidebar-text">Register Business</span>
+            </a>
+            <a href="{% url 'join_staff' %}" class="nav-link {% if 'join_staff' in request.path %}active{% endif %}">
+                <i class="fa fa-user-plus"></i>
+                <span class="sidebar-text">Join As Staff</span>
+            </a>
         {% endif %}
 
-        <div class="sidebar-section-title">System</div>
+        {# WORKSPACE SECTION #}
+        {% if user.staff_profile %}
+            <div class="sidebar-section-title mt-4">Workspace</div>
+            <a href="{% url 'staff_dashboard' %}" class="nav-link {% if 'staff_dashboard' in request.path %}active{% endif %}">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span class="sidebar-text">My Services</span>
+            </a>
+            <a href="{% url 'analytics_dashboard' %}" class="nav-link {% if 'analytics_dashboard' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-chart-line"></i>
+                <span class="sidebar-text">Insights</span>
+            </a>
+        {% endif %}
 
-        <a href="{% url 'user_guide' %}" class="nav-link">
-            <i class="fa fa-question-circle" aria-hidden="true"></i>
-            <span class="sidebar-text">Help Center</span>
-        </a>
+    {% endif %}
 
-        <a href="mailto:getmebookedinfo@gmail.com" class="nav-link">
-            <i class="fa fa-envelope" aria-hidden="true"></i>
-            <span class="sidebar-text">Support</span>
-        </a>
-    </nav>
+    {# SYSTEM ACCORDION #}
+    <div class="sidebar-section mt-4">
+        <details class="sidebar-accordion group" {% if 'user_guide' in request.path %}open{% endif %}>
+            <summary class="sidebar-section-title flex items-center justify-between cursor-pointer list-none list-image-none">
+                <span>System</span>
+                <i class="fa fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+            </summary>
+
+            <div class="accordion-content mt-1">
+                <a href="{% url 'user_guide' %}" class="nav-link {% if 'user_guide' in request.path %}active{% endif %}">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i>
+                    <span class="sidebar-text">Help Guide</span>
+                </a>
+
+                <a href="mailto:getmebookedinfo@gmail.com" class="nav-link">
+                    <i class="fa fa-envelope" aria-hidden="true"></i>
+                    <span class="sidebar-text">Support</span>
+                </a>
+            </div>
+        </details>
+    </div>
+</nav>
 
     <div class="p-4 border-t border-slate-800 bg-black/20">
         {% if user.is_authenticated %}
@@ -374,22 +395,27 @@
 
 <nav class="lg:hidden mobile-nav">
     <a href="{% if request.user.business %}{% url 'master_appointments' request.user.business.id %}{% elif request.user.staff_profile %}{% url 'master_appointments' request.user.staff_profile.business.id %}{% else %}{% url 'home' %}{% endif %}"
-       class="mobile-tab {% if 'master_appointments' in request.path %}active{% endif %}">
-        <i class="fa-solid fa-clipboard-list text-xl"></i>
-        <span class="text-[10px] font-bold">Bookings</span>
+       class="mobile-tab relative {% if 'master_appointments' in request.path %}active{% endif %}">
+
+        <i class="fa fa-calendar-days text-xl"></i>
+        <span class="text-[10px] font-bold">Calendar</span>
+
+        <span id="nav-badge-staff-mobile"
+              class="absolute top-1 right-[28%] bg-brand-primary text-white text-[9px] min-w-[16px] h-[16px] flex items-center justify-center rounded-full border border-white font-bold hidden">
+              0
+        </span>
     </a>
 
     {% if user.is_authenticated %}
-            <button data-bs-toggle="offcanvas" data-bs-target="#workspaceMenu" class="mobile-tab relative">
-                <i class="fa-solid fa-briefcase text-xl"></i>
-                <span class="text-[10px] font-bold">Work</span>
-                <span id="nav-badge-staff-mobile" class="absolute top-1 right-1/4 bg-brand-primary text-white text-[9px] min-w-[16px] h-[16px] flex items-center justify-center rounded-full border border-white font-bold hidden">0</span>
-            </button>
+        <button data-bs-toggle="offcanvas" data-bs-target="#workspaceMenu" class="mobile-tab relative">
+            <i class="fa-solid fa-briefcase text-xl"></i>
+            <span class="text-[10px] font-bold">Manage</span>
+        </button>
     {% endif %}
 
-    <button data-bs-toggle="offcanvas" data-bs-target="#profileMenu" class="mobile-tab">
+    <button data-bs-toggle="offcanvas" data-bs-target="#profileMenu" class="mobile-tab relative">
         {% if user.is_authenticated and user.profile.avatar %}
-            <img src="{{ user.profile.avatar.url }}" class="w-6 h-6 rounded-full object-cover border border-slate-200">
+            <img src="{{ user.profile.avatar.url }}" class="w-6 h-6 rounded-full object-cover border border-slate-200 mx-auto">
         {% else %}
             <i class="fa-solid fa-user text-xl"></i>
         {% endif %}
@@ -399,16 +425,14 @@
 
 <div class="offcanvas offcanvas-bottom shadow-2xl" tabindex="-1" id="workspaceMenu">
     <div class="offcanvas-header pb-0 justify-center">
-        <div class="w-12 h-1.5 bg-slate-200 rounded-full mt-2"></div>
+        <div class="w-12 h-1.5 bg-slate-200 rounded-full mt-1.5"></div>
     </div>
-    <div class="offcanvas-body p-0 pt-4">
-        <div class="px-6 pb-4 border-b border-slate-50">
-            <h5 class="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace</h5>
+    <div class="offcanvas-body p-0 pt-2"> <div class="px-6 pb-2 border-b border-slate-50"> <h5 class="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace</h5>
         </div>
 
         <div class="flex flex-col">
             {% if user.business or user.staff_profile %}
-                <a href="{% url 'owner_dashboard' user.staff_profile.business.id %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+                <a href="{% url 'owner_dashboard' user.staff_profile.business.id %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white shadow-md shadow-slate-200">
                             <i class="fa-solid fa-store text-sm"></i>
@@ -420,32 +444,47 @@
                     </div>
                     <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
                 </a>
-                <a href="{% url 'analytics_dashboard' %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+
+                <a href="{% url 'analytics_dashboard' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary">
                             <i class="fa-solid fa-chart-pie text-sm"></i>
                         </div>
                         <div>
-                            <div class="font-bold text-sm text-slate-900">Analytics</div>
-                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Reports & Insights</div>
+                            <div class="font-bold text-sm text-slate-900">Insights</div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Reports & Analytics</div>
                         </div>
                     </div>
                     <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
                 </a>
-                <a href="{% url 'staff_dashboard' %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+
+                <a href="{% url 'staff_dashboard' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary">
                             <i class="fa-regular fa-calendar-check text-sm"></i>
                         </div>
                         <div>
-                            <div class="font-bold text-sm text-slate-900">My Schedule</div>
-                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Upcoming Bookings</div>
+                            <div class="font-bold text-sm text-slate-900">My Services</div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Staff Dashboard</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
+                </a>
+
+                <a href="{% url 'client-list' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary">
+                            <i class="fa-solid fa-users text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-900">All Clients</div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Client Dashboard</div>
                         </div>
                     </div>
                     <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
                 </a>
             {% else %}
-            <a href="{% url 'business_onboarding' %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group">
+                <a href="{% url 'business_onboarding' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 border border-slate-100">
                             <i class="fa fa-scissors text-sm"></i>
@@ -456,7 +495,7 @@
                     </div>
                     <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-slate-900 transition-colors"></i>
                 </a>
-            <a href="{% url 'join_staff' %}" class="flex items-center justify-between px-6 py-5 hover:bg-slate-50 border-b border-slate-50 group">
+                <a href="{% url 'join_staff' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 border border-slate-100">
                             <i class="fa fa-user-plus text-sm"></i>
@@ -468,7 +507,6 @@
                     <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-slate-900 transition-colors"></i>
                 </a>
             {% endif %}
-
         </div>
     </div>
 </div>
@@ -560,6 +598,49 @@
                 {% block content %}{% endblock %}
             </div>
         </div>
+        <footer class="bg-white border-t border-brand-slate200 py-8">
+    <div class="max-w-[1400px] mx-auto px-6">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+
+            <div class="flex flex-col gap-2">
+                <a href="{% url 'home' %}" class="flex items-center gap-2 no-underline">
+                    <div class="w-7 h-7 bg-brand-primary rounded-lg flex items-center justify-center text-white shadow-sm">
+                        <i class="fa fa-calendar text-[10px]"></i>
+                    </div>
+                    <span class="font-brand font-bold text-lg tracking-tight text-brand-dark">
+                        Get<span class="text-brand-primary">Me</span>Booked
+                    </span>
+                </a>
+                <p class="text-[12px] text-brand-text font-medium max-w-xs">
+                    The appointment operating system for South Africa.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-x-10 gap-y-4">
+
+
+                <div class="flex flex-col gap-3">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-brand-dark opacity-40">Company</span>
+                    <div class="flex gap-4 text-[13px] font-bold">
+                        <a href="{% url 'terms' %}" class="text-brand-text hover:text-brand-primary no-underline transition-colors">Terms</a>
+                        <a href="{% url 'privacy' %}" class="text-brand-text hover:text-brand-primary no-underline transition-colors">Privacy</a>
+                        <a href="mailto:getmebookedinfo@gmail.com" class="text-brand-text hover:text-brand-primary no-underline transition-colors">Support</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-brand-slate50 flex flex-col md:flex-row justify-between gap-2">
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                &copy; 2026 GetMeBooked (Pty) Ltd.
+            </p>
+            <p class="text-[10px] text-slate-400 font-medium">
+                Built in Pretoria <span class="mx-1 text-slate-300">•</span> South Africa's dedicated booking partner.
+            </p>
+        </div>
+    </div>
+</footer>
     </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
@@ -643,6 +724,48 @@
         setInterval(updateNotificationBadges, 60000); // Poll every 60 seconds
     });
     {% endif %}
+
+    // Add this to your global scripts (e.g., base.html)
+window.handleStatusUpdate = function(newStatus, appointmentId) {
+    if(!confirm(`Update status to ${newStatus.toUpperCase()}?`)) return;
+
+    // Support both standard clicks and AJAX-loaded clicks
+    const btn = window.event.target.closest('button');
+    const originalText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+    const formData = new FormData();
+    formData.append('status', newStatus);
+
+    // Get CSRF from the cookie or a global hidden input
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+    fetch(`/appointments/${appointmentId}/update-status/`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            window.location.reload();
+        } else {
+            alert("Error: " + (data.message || "Update failed"));
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    })
+    .catch(err => {
+        console.error("Fetch error:", err);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+};
 </script>
 </body>
 </html>

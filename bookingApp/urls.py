@@ -20,7 +20,8 @@ urlpatterns = [
     path('business/<int:business_id>/owner/dashboard/', views.owner_dashboard, name='owner_dashboard'),
     path('business/<int:business_id>/owner/bookingform/create/', views.booking_form_create, name='booking_form_create'),
     path('business/<int:business_id>/owner/bookingform/<int:booking_form_id>/edit/', views.booking_form_edit, name='booking_form_edit'),
-    path('bookingform/<int:booking_form_id>/book/', views.book_appointment, name='book_appointment'),
+    # urls.py
+    path('book/<slug:business_slug>/', views.book_appointment, name='book_appointment'),
     path('booking/success/<int:appointment_id>/', views.booking_success, name='booking_success'),
     path('analytics/', AnalyticsDashboardView.as_view(), name='analytics_dashboard'),
     path('ajax/get-staff-for-service/', views.get_staff_for_service, name='get_staff_for_service'),
@@ -30,6 +31,7 @@ urlpatterns = [
     path('appointments/<int:pk>/update-status/', views.update_appointment_status, name='update_appointment_status'),
     path('dashboard/clients/', ClientListView.as_view(), name='client-list'),
     path('toggle-exemption/<int:client_id>/', views.toggle_client_exemption, name='toggle_client_exemption'),
+    path('business/<int:business_id>/service/<int:service_id>/delete/', views.service_delete, name='service_delete'),
 
 
 
@@ -49,6 +51,10 @@ urlpatterns = [
     # urls.py
     path('appointment/reschedule/<str:token>/', views.appointment_reschedule, name='appointment_reschedule'),
     path('appointment/<int:pk>/cancel/', views.appointment_cancel, name='appointment_cancel'),
+    # urls.py
+    path('appointment/cancel/<str:token>/', views.appointment_cancel_guest, name='appointment_cancel_guest'),
+    # urls.py
+    path('appointments/update-status/<int:pk>/', views.update_appointment_status, name='update_appointment_status'),
     path('appointment/<int:pk>/decision/<str:action>/', views.appointment_email_decision, name='appointment_email_decision'),
     path('contact/', views.contact_view, name='contact_view_url_name'),
     # urls.py
@@ -76,8 +82,12 @@ urlpatterns = [
     path('privacy/', views.privacy_policy, name='privacy'),
     path('api/notifications/count/', views.get_notification_counts, name='notification_count'),
 
+
     path('business/onboarding/', views.business_onboarding, name='business_onboarding'),
+    path('setup-choice/', views.business_setup_choice, name='business_setup_choice'),
     path('business/<int:business_id>/appointments/master/', views.master_appointments_view, name='master_appointments'),
+    # urls.py
+    path('appointments/<int:pk>/', views.appointment_detail, name='appointment_detail'),
 
 
     # Registration & Auth

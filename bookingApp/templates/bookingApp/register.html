@@ -1,125 +1,93 @@
 {% extends 'bookingApp/base.html' %}
 {% load socialaccount %}
 
-{% block title %}Establish Workspace | GetMeBooked South Africa{% endblock %}
+{% block title %}Establish Workspace | GetMeBooked{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex bg-white font-sans text-slate-900 selection:bg-indigo-100">
-    
-    <div class="hidden lg:flex w-1/2 bg-[#F9FAFB] border-r border-slate-100 flex-col justify-between p-16 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-[0.4]" style="background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px); background-size: 40px 40px;"></div>
-        
+<div class="min-h-[100dvh] flex flex-col lg:flex-row bg-white font-sans text-slate-900 selection:bg-indigo-100 antialiased">
+
+    <div class="hidden lg:flex w-1/2 h-screen sticky top-0 bg-[#fdfdfd] border-r border-slate-100 flex-col justify-between p-16 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-[0.4]" style="background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px); background-size: 60px 60px;"></div>
+
         <div class="relative z-10">
             <a href="/" class="flex items-center gap-3 no-underline">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
-                    <i class="fa-solid fa-plus text-white text-lg"></i>
-                </div>
-                <span class="text-xl font-bold tracking-tighter uppercase">GET<span class="text-indigo-600">ME</span>BOOKED</span>
+                <span class="text-sm font-black tracking-[0.3em] uppercase">Get<span class="text-indigo-600">Me</span>Booked <span class="text-indigo-600">STUDIO</span></span>
             </a>
         </div>
 
         <div class="relative z-10">
-            <h2 class="text-5xl font-extrabold tracking-tight leading-[1.1] mb-6">
-                Empowering <br/>
-                <span class="text-indigo-600">SA Businesses.</span>
+            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-600 mb-4 block">The Global Standard</span>
+            <h2 class="text-6xl font-black tracking-tighter leading-[0.9] mb-8">
+                DESIGN YOUR<br/>
+                <span class="text-slate-300">WORKSPACE.</span>
             </h2>
-            <p class="text-lg text-slate-500 font-medium leading-relaxed max-w-md">
-                Join the network of South African professionals automating their growth with local precision and global standards.
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-loose max-w-xs">
+                Join the network of elite professionals automating growth with luxury precision.
             </p>
-            
-            <div class="flex items-center gap-8 mt-12">
-                <div>
-                    <p class="text-2xl font-bold">100%</p>
-                    <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">SA Support</p>
-                </div>
-                <div class="h-8 w-[1px] bg-slate-200"></div>
-                <div>
-                    <p class="text-2xl font-bold">ZAR</p>
-                    <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">Ready Billing</p>
-                </div>
-                <div class="h-8 w-[1px] bg-slate-200"></div>
-                <div>
-                    <p class="text-2xl font-bold">POPIA</p>
-                    <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">Compliant</p>
-                </div>
-            </div>
         </div>
 
-        <div class="relative z-10 flex gap-6">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">v4.2.0-stable</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">© 2026 GETMEBOOKED.CO.ZA</span>
+        <div class="relative z-10 flex gap-8">
+            <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300">V4.2.0</span>
+            <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300">© 2026 GetMeBooked</span>
         </div>
     </div>
 
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 lg:p-24 bg-white">
+    <div class="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 md:p-12 lg:p-24 bg-white">
         <div class="w-full max-w-[440px]">
-            
-            <div class="mb-10 lg:hidden text-center">
-                 <span class="text-xl font-bold tracking-tighter uppercase">GET<span class="text-indigo-600">ME</span>BOOKED</span>
+
+            <div class="mb-10 text-center lg:text-left">
+                <span class="text-[9px] font-black uppercase tracking-[0.4em] text-indigo-600 mb-2 block lg:hidden">GetMeBooked</span>
+                <h1 class="text-5xl font-black tracking-tighter text-slate-900 uppercase">New <span class="text-slate-300">Studio.</span></h1>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2">Establish your professional identity</p>
             </div>
 
-            <div class="mb-10">
-                <h1 class="text-3xl font-bold tracking-tight text-slate-900">Create your workspace</h1>
-                <p class="text-slate-500 mt-2 font-medium">Establish your professional identity on the platform.</p>
-            </div>
-
-            <div id="google-signup-btn" class="mb-8">
+            <div id="google-signup-btn" class="transition-opacity duration-300">
                 <a href="{% provider_login_url 'google' process='signup' %}"
-                   class="w-full h-[52px] flex items-center justify-center gap-3 px-4 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm active:scale-[0.98]">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"/>
-                    </svg>
+                   class="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all active:scale-[0.98] shadow-lg shadow-slate-200">
+                    <i class="fa-brands fa-google text-base"></i>
                     Fast-Track with Google
                 </a>
 
                 <div class="relative flex items-center my-8">
                     <div class="flex-grow border-t border-slate-100"></div>
-                    <span class="mx-4 text-[10px] font-bold text-slate-300 uppercase tracking-widest">Manual Record</span>
+                    <span class="mx-4 text-[8px] font-black text-slate-300 uppercase tracking-[0.3em]">OR MANUAL</span>
                     <div class="flex-grow border-t border-slate-100"></div>
                 </div>
             </div>
 
-            <form method="POST" class="space-y-6">
+            <form method="POST" class="space-y-5">
                 {% csrf_token %}
-                
+
                 {% for field in form %}
-                <div class="space-y-2">
-                    <label class="text-sm font-bold text-slate-700 tracking-tight">{{ field.label }}</label>
-                    <div class="relative group">
-                        {{ field }}
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none opacity-20 group-focus-within:opacity-100 transition-opacity">
-                            {% if field.name == 'username' %}<i class="fa-solid fa-user-plus text-xs"></i>
-                            {% elif field.name == 'email' %}<i class="fa-solid fa-envelope text-xs"></i>
-                            {% elif 'password' in field.name %}<i class="fa-solid fa-key text-xs"></i>
-                            {% endif %}
-                        </div>
-                    </div>
+                <div class="relative group">
+                    <label class="absolute -top-2 left-5 bg-white px-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest transition-all group-focus-within:text-indigo-600 z-10">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+
                     {% if field.errors %}
                         {% for error in field.errors %}
-                        <div class="flex items-center gap-2 text-rose-600 mt-1.5 bg-rose-50 p-2 rounded-lg border border-rose-100">
-                            <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
-                            <p class="text-xs font-bold leading-none">{{ error }}</p>
+                        <div class="flex items-center gap-1.5 text-rose-600 mt-1.5 px-4">
+                            <i class="fa-solid fa-circle-exclamation text-[9px]"></i>
+                            <p class="text-[9px] font-bold uppercase tracking-tight">{{ error }}</p>
                         </div>
                         {% endfor %}
                     {% endif %}
                 </div>
                 {% endfor %}
 
-                <div class="pt-2">
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-black text-white py-4 rounded-xl text-sm font-bold shadow-lg shadow-indigo-100 transition-all active:scale-[0.99] group">
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-white border-2 border-slate-900 text-slate-900 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-900 hover:text-indigo-500 transition-all active:scale-95 shadow-md group">
                         Create Workspace
-                        <i class="fa-solid fa-arrow-right text-[10px] transition-transform group-hover:translate-x-1"></i>
+                        <i class="fa-solid fa-arrow-right ml-2 text-[9px] transition-transform group-hover:translate-x-1"></i>
                     </button>
                 </div>
             </form>
 
-            <div class="mt-12 pt-8 border-t border-slate-100 text-center">
-                <p class="text-sm font-medium text-slate-500">
-                    Already have a workspace?
-                    <a href="{% url 'login' %}" class="text-indigo-600 font-bold hover:text-black ml-1 transition-colors">Sign in here</a>
+            <div class="mt-10 pt-6 border-t border-slate-50 text-center">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Already registered?
+                    <a href="{% url 'login' %}" class="text-indigo-600 font-black ml-1 border-b border-indigo-100 pb-0.5">Sign In</a>
                 </p>
             </div>
         </div>
@@ -127,66 +95,50 @@
 </div>
 
 <style>
-    /* Professional Inter Font Family */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-    
-    body { font-family: 'Inter', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
-    /* Production-Grade Form Styling */
-    input[type="text"], 
-    input[type="password"], 
-    input[type="email"],
-    select {
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* REFINED INPUT SIZE: 0.85rem padding instead of 1.2rem */
+    input[type="text"], input[type="password"], input[type="email"], select {
         width: 100%;
-        padding: 0.875rem 1rem;
-        background: #FFFFFF;
-        border: 1.5px solid #E2E8F0;
-        border-radius: 0.75rem;
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: #1E293B;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        padding: 0.85rem 1.5rem;
+        background: #f8fafc;
+        border: 2px solid #f1f5f9;
+        border-radius: 9999px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #0f172a;
+        transition: all 0.3s ease;
     }
 
     input:focus {
         outline: none;
-        border-color: #6366F1;
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 6px -1px rgba(0,0,0,0.05);
+        background: white;
+        border-color: #0f172a;
+        padding-left: 1.8rem;
     }
 
-    /* Animation for the trust pane */
-    @keyframes subtle-drift-reg {
-        0% { background-position: 0 0; }
-        100% { background-position: 40px 40px; }
+    @media screen and (max-width: 768px) {
+        input[type="text"], input[type="password"], input[type="email"] { font-size: 16px; }
     }
-    .lg\:flex { animation: subtle-drift-reg 25s linear infinite; }
 
-    /* Clean UI Overrides */
-    nav, footer { display: none !important; }
-
-    button:focus-visible {
-        outline: 2px solid #6366F1;
-        outline-offset: 2px;
-    }
+    nav, footer:not(.lg\:flex footer) { display: none !important; }
 </style>
 
 <script>
-    /** * PWA and UI Logic 
-     */
     document.addEventListener('DOMContentLoaded', () => {
         const isPWA = () => {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone === true || 
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true ||
                    /median/i.test(navigator.userAgent);
         };
 
-        // Clean up social auth if in standalone/app mode
         if (isPWA()) {
             const googleBtn = document.getElementById('google-signup-btn');
             if (googleBtn) {
                 googleBtn.style.opacity = '0';
-                setTimeout(() => googleBtn.remove(), 200);
+                setTimeout(() => googleBtn.remove(), 300);
             }
         }
     });

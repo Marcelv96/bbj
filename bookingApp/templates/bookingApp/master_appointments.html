@@ -1,366 +1,828 @@
 {% extends "bookingApp/base.html" %}
+{% load custom_filters %}
+{% load static %}
+
+{% block title %}Master Schedule | {{ business.name }}{% endblock %}
+
 {% block content %}
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
 <style>
     :root {
-        --brand-indigo: #6366f1;
+        --brand-blue: #037aff;
+        --brand-slate: #0f172a;
         --bg-main: #f8fafc;
-        --card-bg: #ffffff;
-        --text-dark: #0f172a;
-        --text-muted: #64748b;
+        --border-color: #e2e8f0;
     }
 
     body {
-        font-family: 'Inter', sans-serif;
         background-color: var(--bg-main);
-        color: var(--text-dark);
-        -webkit-font-smoothing: antialiased;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--brand-slate);
+        letter-spacing: -0.025em;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    .spa-width { max-width: 1400px; margin: 0 auto; padding: 0 1rem; }
+    body.modal-open { overflow: hidden !important; }
 
-    /* Glass Header */
-    .sticky-nav {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    /* --- App Tabs --- */
+    .tab-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 800;
+        color: #94a3b8;
+        text-transform: uppercase;
+        border: none;
+        background: none;
+        position: relative;
     }
+    .tab-btn.tab-active { color: var(--brand-blue); }
 
-    /* Modern Mobile Card */
-    .mobile-booking-card {
-        background: var(--card-bg);
-        border-radius: 1rem;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
+    /* --- Matrix Layout --- */
+    .matrix-wrapper {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding: 16px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+    .staff-col { flex: 0 0 85%; scroll-snap-align: center; min-width: 0; }
+    @media (min-width: 768px) { .staff-col { flex: 0 0 45%; } }
+    @media (min-width: 1024px) { .staff-col { flex: 0 0 calc(33.333% - 12px); } }
+
+    /* --- Appointments Cards --- */
+    .appt-card {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        cursor: pointer;
         box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        border: 1px solid #f1f5f9;
-        transition: transform 0.1s active;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+    .appt-card:hover { transform: translateY(-1px); shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+    .status-confirmed { border-left: 4px solid #10b981; }
+    .status-pending   { border-left: 4px solid #f59e0b; }
+    .status-completed { border-left: 4px solid #3b82f6; }
+    .status-cancelled { border-left: 4px solid #ef4444; background: #fff1f2; opacity: 0.7; }
+
+    .badge { font-size: 8px; font-weight: 900; padding: 2px 4px; border-radius: 4px; text-transform: uppercase; }
+    .badge-confirmed { background: #ecfdf5; color: #065f46; }
+    .badge-pending   { background: #fffbeb; color: #92400e; }
+
+    /* --- Timeline --- */
+    .time-strip {
+        position: relative;
+        height: 1px;
+        background: #e2e8f0;
+        margin: 24px 0 12px 0;
+    }
+    .time-strip::before {
+        content: attr(data-time);
+        position: absolute;
+        top: -9px; left: 0;
+        background: var(--bg-main);
+        padding-right: 8px;
+        font-size: 10px;
+        font-weight: 900;
+        color: #94a3b8;
     }
 
-    .mobile-booking-card:active { transform: scale(0.98); }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 99px;
-        display: inline-block;
-        margin-right: 6px;
+    /* --- Modal --- */
+    #detail-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(8px);
+        align-items: center;
+        justify-content: center;
     }
-
-    /* Custom Scrollbar for Filters */
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    #content-layer.loading { opacity: 0.5; pointer-events: none; }
-
-    /* Desktop Table Styles */
-    @media (min-width: 769px) {
-        .desktop-view { display: table; width: 100%; }
-        .mobile-view { display: none; }
+    #detail-modal.open { display: flex; }
+    #detail-modal-panel {
+        background: white;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: transform 0.3s;
+        transform: translateY(100%);
     }
-    @media (max-width: 768px) {
-        .desktop-view { display: none; }
-        .mobile-view { display: block; }
+    #detail-modal.open #detail-modal-panel { transform: translateY(0); }
+    @media (min-width: 640px) {
+        #detail-modal-panel {
+            width: 100%; max-width: 550px; height: auto; max-height: 85vh;
+            border-radius: 5px; transform: scale(0.95) translateY(10px); opacity: 0;
+        }
+        #detail-modal.open #detail-modal-panel { transform: scale(1) translateY(0); opacity: 1; }
     }
+    .modal-scroll-area { flex: 1; overflow-y: auto; padding: 24px; padding-bottom: 100px; }
+
+    .loader-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.7); z-index: 100; align-items: center; justify-content: center; }
+    .is-loading .loader-overlay { display: flex; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
 </style>
 
-<div class="min-h-screen">
-    <header class="bg-white pt-8 pb-4">
-        <div class="spa-width">
+<div class="min-h-screen flex flex-col">
+    <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
+        <div class="max-w-[1400px] mx-auto px-4 py-3 lg:px-6">
+            <div class="flex items-center justify-between mb-3 mt-3">
+                <div class="flex flex-col">
+                    <div class="flex items-baseline gap-2 mb-1">
+                        <h1 class="text-3xl font-extrabold text-slate-900 leading-none uppercase tracking-tight">
+                            Calendar<span class="text-indigo-600">.</span>
+                        </h1>
+                        <button onclick="toggleMasterHelp()" class="text-slate-300 hover:text-indigo-600 transition-colors" title="View Page Guide">
+                            <i class="fa-regular fa-circle-question text-xl"></i>
+                        </button>
+                    </div>
 
-                <span class="px-2 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-wider rounded-md">Master Registry</span>
-            <div class="flex items-center justify-between mb-2">
-                <h1 class="text-4xl font-black tracking-tight text-slate-900">All Bookings</h1>
-                <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
-                    {{ appointments.paginator.count }} Total
-                </span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ business.name }}</span>
+                    </div>
+                </div>
+
+                <a href="{% url 'manual_booking' business.id %}" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden md:inline">Quick Booking</span>
+                    <span class="md:hidden">New</span>
+                </a>
             </div>
-            <a href="{% url 'manual_booking' business.id %}" class="inline-flex items-center gap-2 mt-3 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-all shadow-sm shadow-indigo-100">
-                        <i class="fa-solid fa-plus text-xs"></i>
-                        <span>Booking</span>
-                    </a>
-        </div>
-    </header>
 
-    <div class="sticky-nav py-3 mb-5">
-        <div class="spa-width">
-            <form id="master-filter-form" class="flex flex-col gap-3">
-                <div class="relative group">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" name="q" placeholder="Search customer name..."
-                           class="w-full pl-10 pr-4 py-2.5 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
-                           id="search-box">
-                </div>
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    <div class="flex bg-slate-100 p-1 rounded-md border border-slate-200/50 shrink-0">
+                        <button onclick="handleTabSwitch('my')" id="tab-my" class="px-4 py-1.5 rounded-sm text-[11px] font-bold transition-all">Personal</button>
+                        <button onclick="handleTabSwitch('all')" id="tab-all" class="px-4 py-1.5 rounded-sm text-[11px] font-bold transition-all">Team</button>
+                    </div>
 
-                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-                    <select name="status" class="auto-submit flex-shrink-0 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none">
-                        <option value="">Status: All</option>
-                        {% for code, label in status_choices %}
-                        <option value="{{ code }}">{{ label }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="hidden md:flex bg-slate-100 p-1 rounded-lg border border-slate-200/50 shrink-0">
+                        <button onclick="handleScaleSwitch('day')" id="scale-day" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Day</button>
+                        <button onclick="handleScaleSwitch('week')" id="scale-week" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Week</button>
+                        <button onclick="handleScaleSwitch('month')" id="scale-month" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Month</button>
+                    </div>
 
-                    <select name="staff" class="auto-submit flex-shrink-0 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none">
-                        <option value="">Staff: All</option>
-                        {% for s in staff_members %}
-                        <option value="{{ s.id }}">{{ s.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-md p-0.5 shadow-sm shrink-0">
+    <button onclick="adjDate(-1)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900">
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+    </button>
 
-                    <input type="date" name="date" class="auto-submit flex-shrink-0 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700">
+    <div class="px-2 flex flex-col items-center min-w-[80px]">
+        <input type="date" id="main-date-input"
+           value="{{ current_date|default:today_date }}"
+           class="absolute opacity-0 pointer-events-none"
+           onchange="handleDateChange(this.value)">
 
-                    <button type="button" id="reset-filters" class="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg">
-                        <i class="fa-solid fa-arrow-rotate-left text-xs"></i>
-                    </button>
-                </div>
-                <input type="hidden" name="page" id="page-input" value="1">
-            </form>
-        </div>
+        <label for="main-date-input" class="cursor-pointer text-center" onclick="openPicker()">
+            <span id="date-display" class="block text-[11px] font-black text-slate-700 uppercase">
+                {{ current_date|default:today_date }}
+            </span>
+        </label>
     </div>
 
-    <main class="spa-width mt-6 pb-24" id="content-layer">
-
-        <div id="pagination-target" class="mt-8 mb-8 flex justify-between items-center px-2">
-            {% if appointments.has_other_pages %}
-                <div class="flex gap-1">
-                    {% if appointments.has_previous %}
-                    <button data-page="{{ appointments.previous_page_number }}" class="page-link w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600">
-                        <i class="fa-solid fa-chevron-left text-xs"></i>
-                    </button>
-                    {% endif %}
-
-                    <span class="h-10 px-4 flex items-center justify-center rounded-xl bg-indigo-600 text-white text-xs font-bold">
-                        {{ appointments.number }}
-                    </span>
-
-                    {% if appointments.has_next %}
-                    <button data-page="{{ appointments.next_page_number }}" class="page-link w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600">
-                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                    </button>
-                    {% endif %}
-                </div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total {{ appointments.paginator.num_pages }} Pages</p>
-            {% endif %}
-        </div>
-
-        <div class="hidden md:block bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Customer</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Service</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Schedule</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Status</th>
-
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase">Contact</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="desktop-target" class="divide-y divide-slate-100">
-                    {% for appt in appointments %}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs uppercase">
-    {{ appt.guest_name|slice:":1"|upper }}
-</div>
-
-                                <div>
-                                    <p class="font-bold text-sm text-slate-900">{{ appt.customer.get_full_name|default:appt.guest_name }}</p>
-                                    <p class="text-xs text-slate-500">{{ appt.customer.email|default:appt.guest_email }}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <p class="text-sm font-semibold text-slate-800">{{ appt.service.name }}</p>
-                            <p class="text-xs text-indigo-600 font-medium">with {{ appt.staff.name }}</p>
-                        </td>
-                        <td class="px-6 py-4">
-                            <p class="text-sm font-medium text-slate-900">{{ appt.appointment_date|date:"D, d M" }}</p>
-                            <p class="text-xs text-slate-500">{{ appt.appointment_start_time|time:"H:i" }}</p>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tight
-                                {% if appt.status == 'confirmed' %} bg-emerald-100 text-emerald-700
-                                {% elif appt.status == 'pending' %} bg-amber-100 text-amber-700
-                                {% elif appt.status == 'completed' %} bg-slate-100 text-slate-700
-                                {% else %} bg-slate-50 text-slate-400 {% endif %}">
-                                {{ appt.get_status_display }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            {% if appt.whatsapp_link %}
-                        <a href="{{ appt.whatsapp_link }}" target="_blank" class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-100">
-                            <i class="fa-brands fa-whatsapp text-lg"></i>
-                        </a>
-                        {% endif %}
-                        </td>
-                        <td class="px-6 py-4 text-right">
-
-                            <a href="{% url 'appointment_detail' appt.pk %}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white transition-all">
-                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div id="mobile-target" class="md:hidden">
-            {% for appt in appointments %}
-            <div class="mobile-booking-card">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-lg font-black shadow-lg shadow-slate-200">
-                            {{ appt.customer.first_name|default:appt.guest_name|slice:":1"|upper }}
-                        </div>
-                        <div>
-                            <h3 class="font-extrabold text-slate-900 text-base leading-tight">{{ appt.customer.get_full_name|default:appt.guest_name }}</h3>
-                            <div class="flex items-center mt-1">
-                                <span class="status-dot
-                                    {% if appt.status == 'confirmed' %} bg-emerald-500
-                                    {% elif appt.status == 'pending' %} bg-amber-500
-                                    {% else %} bg-slate-300 {% endif %}"></span>
-                                <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wide">{{ appt.get_status_display }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[13px] font-black text-slate-900">{{ appt.appointment_start_time|time:"H:i" }}</p>
-                        <p class="text-[11px] font-bold text-slate-400">{{ appt.appointment_date|date:"d M" }}</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 rounded-xl p-3 flex justify-between items-center mb-4">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Service & Staff</p>
-                        <p class="text-sm font-bold text-slate-800">{{ appt.service.name|truncatechars:25 }}</p>
-                        <p class="text-xs font-semibold text-indigo-600">w/ {{ appt.staff.name }}</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                         {% if appt.whatsapp_link %}
-                        <a href="{{ appt.whatsapp_link }}" target="_blank" class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-100">
-                            <i class="fa-brands fa-whatsapp text-lg"></i>
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="flex gap-2">
-                    <a href="{% url 'appointment_detail' appt.pk %}" class="flex-1 bg-white border border-slate-200 text-slate-700 py-2.5 rounded-xl font-bold text-xs text-center">
-                        View Details
-                    </a>
-
-                    {% if appt.status == 'confirmed' %}
-                    <form action="{% url 'update_appointment_status' appt.pk %}" method="POST" class="flex-1">
-                        {% csrf_token %}
-                        <input type="hidden" name="status" value="completed">
-                        <button type="submit" class="w-full bg-slate-900 text-white py-2.5 rounded-xl font-bold text-xs">
-                            Complete
-                        </button>
-                    </form>
-                    {% endif %}
-                </div>
-            </div>
-            {% empty %}
-            <div class="py-20 text-center">
-                <i class="fa-solid fa-calendar-xmark text-4xl text-slate-200 mb-4"></i>
-                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">No matching bookings</p>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div id="pagination-target" class="mt-8 mb-8 flex justify-between items-center px-2">
-            {% if appointments.has_other_pages %}
-                <div class="flex gap-1">
-                    {% if appointments.has_previous %}
-                    <button data-page="{{ appointments.previous_page_number }}" class="page-link w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600">
-                        <i class="fa-solid fa-chevron-left text-xs"></i>
-                    </button>
-                    {% endif %}
-
-                    <span class="h-10 px-4 flex items-center justify-center rounded-xl bg-indigo-600 text-white text-xs font-bold">
-                        {{ appointments.number }}
-                    </span>
-
-                    {% if appointments.has_next %}
-                    <button data-page="{{ appointments.next_page_number }}" class="page-link w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600">
-                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                    </button>
-                    {% endif %}
-                </div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total {{ appointments.paginator.num_pages }} Pages</p>
-            {% endif %}
-        </div>
-    </main>
+    <button onclick="adjDate(1)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900">
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+    </button>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const filterForm = document.getElementById('master-filter-form');
-    const contentLayer = document.getElementById('content-layer');
-    const pageInput = document.getElementById('page-input');
+// 1. Function to open the desktop date picker programmatically
+function openPicker() {
+    try {
+        document.getElementById('main-date-input').showPicker();
+    } catch (error) {
+        document.getElementById('main-date-input').focus();
+    }
+}
 
-    function updateResults() {
-        const formData = new FormData(filterForm);
-        const params = new URLSearchParams(formData);
+// 2. Unified function to update text, sync hidden form, and refresh data
+function handleDateChange(val) {
+    if(!val) return;
 
-        contentLayer.classList.add('loading');
+    // Update the visual text display
+    const display = document.getElementById('date-display');
+    const dateObj = new Date(val + "T00:00:00");
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    display.innerText = dateObj.toLocaleDateString('en-US', options).toUpperCase();
 
+    // Sync the hidden logic form used for AJAX
+    const logicDate = document.getElementById('logic-date');
+    if(logicDate) logicDate.value = val;
+
+    // Trigger the actual data refresh (if defined)
+    if (typeof updateSchedule === 'function') {
+        updateSchedule();
+    }
+}
+
+// 3. Updated Chevron buttons to use the unified handler
+function adjDate(days) {
+    const dateInput = document.getElementById('main-date-input');
+    const scale = document.getElementById('logic-scale').value;
+    const date = new Date(dateInput.value + "T00:00:00");
+
+    if (scale === 'week') date.setDate(date.getDate() + (days * 7));
+    else if (scale === 'month') date.setMonth(date.getMonth() + days);
+    else date.setDate(date.getDate() + days);
+
+    const newValue = date.toISOString().split('T')[0];
+    dateInput.value = newValue;
+    handleDateChange(newValue);
+}
+
+// Initialize display on load
+window.addEventListener('load', () => {
+    const initialVal = document.getElementById('main-date-input').value;
+    if(initialVal) {
+        // Initial visual update without triggering a double fetch
+        const display = document.getElementById('date-display');
+        const dateObj = new Date(initialVal + "T00:00:00");
+        const options = { month: 'short', day: 'numeric', year: 'numeric' };
+        display.innerText = dateObj.toLocaleDateString('en-US', options).toUpperCase();
+    }
+});
+</script>
+                </div>
+
+                <div class="hidden lg:block relative group">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
+                    <input type="text" id="search-input" placeholder="Find customer..."
+                        class="w-64 h-10 bg-slate-50 rounded-md pl-9 pr-4 text-[11px] font-bold outline-none border border-slate-200 focus:bg-white focus:border-indigo-500 transition-all">
+                </div>
+            </div>
+        </div>
+    </div>
+
+<main class="flex-grow relative" id="content-container">
+    <div class="loader-overlay"><div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>
+
+    <form id="master-logic-form" class="hidden">
+        <input type="date" name="date" id="logic-date" value="{{ current_date|default:today_date }}">
+        <input type="hidden" name="view_mode" id="view_mode" value="{{ request.GET.view_mode|default:'my' }}">
+        <input type="hidden" name="scale" id="logic-scale" value="{{ request.GET.scale|default:'day' }}">
+        <input type="hidden" name="q" id="logic-q" value="{{ request.GET.q }}">
+    </form>
+
+    <div id="dynamic-content">
+
+        {% if not request.GET.scale or request.GET.scale == 'day' %}
+            {% if request.GET.view_mode == 'all' %}
+                <button id="team-scroll-left" type="button"
+                        class="fixed top-1/2 -translate-y-1/2 z-[100] w-12 h-12 bg-white border border-slate-200 text-slate-500 rounded-full shadow-lg flex items-center justify-center hover:text-blue-600 hover:border-blue-600 transition-all cursor-pointer lg:flex hidden">
+                    <i class="fa-solid fa-chevron-left text-lg"></i>
+                </button>
+
+                <button id="team-scroll-right" type="button"
+                        class="fixed right-4 top-1/2 -translate-y-1/2 z-[100] w-12 h-12 bg-white border border-slate-200 text-slate-500 rounded-full shadow-lg flex items-center justify-center hover:text-blue-600 hover:border-blue-600 transition-all cursor-pointer lg:flex hidden">
+                    <i class="fa-solid fa-chevron-right text-lg"></i>
+                </button>
+
+                <div class="matrix-wrapper no-scrollbar scroll-smooth overflow-x-auto" id="matrix-scroll-area">
+                    {% for staff in staff_members %}
+                    <div class="staff-col">
+                        <div class="bg-white border border-slate-200 rounded-lg p-3 mb-4 flex items-center gap-3 shadow-sm">
+                            <div class="staff-avatar w-8 h-8 rounded-sm flex items-center justify-center font-black text-[10px] bg-slate-100 uppercase" data-name="{{ staff.name }}">{{ staff.name|slice:":2" }}</div>
+                            <h3 class="text-xs font-black text-slate-900 truncate">{{ staff.name }}</h3>
+                        </div>
+                        {% for hour in "08,09,10,11,12,13,14,15,16,17,18,19,20"|split:"," %}
+                            <div class="time-strip" data-time="{{ hour }}:00"></div>
+                            {% for appt in appointments %}
+                                {% if appt.staff.id == staff.id and appt.appointment_start_time|time:"H" == hour %}
+                                <div onclick="openAppointmentModal('{% url 'appointment_detail' appt.pk %}')"
+                                     class="appt-card border-l-4 shadow-sm mb-2 p-2 bg-white rounded-md cursor-pointer transition-all hover:shadow-md
+                                     {% if appt.status == 'confirmed' %}border-blue-500{% elif appt.status == 'completed' %}border-emerald-500{% elif appt.status == 'cancelled' %}border-red-500{% else %}border-amber-500{% endif %}">
+                                    <div class="flex-grow min-w-0">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-[10px] font-black text-slate-900">{{ appt.appointment_start_time|time:"H:i" }}</span>
+                                            <span class="text-[8px] font-black uppercase px-1.5 py-0.5 rounded
+                                                {% if appt.status == 'confirmed' %}bg-blue-100 text-blue-700
+                                                {% elif appt.status == 'completed' %}bg-emerald-100 text-emerald-700
+                                                {% elif appt.status == 'cancelled' %}bg-red-100 text-red-700
+                                                {% else %}bg-amber-100 text-amber-700{% endif %}">
+                                                {{ appt.status }}
+                                            </span>
+                                        </div>
+                                        <h4 class="text-[11px] font-black text-slate-900 truncate">{{ appt.customer.get_full_name|default:appt.guest_name }}</h4>
+                                        <p class="text-[9px] font-bold text-slate-400 truncate">{{ appt.service.name }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="p-4 max-w-2xl">
+                    {% for hour in "08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23"|split:"," %}
+                    <div class="time-strip" data-time="{{ hour }}:00"></div>
+                    {% for appt in appointments %}
+                        {% if appt.appointment_start_time|time:"H" == hour %}
+                        <div onclick="openAppointmentModal('{% url 'appointment_detail' appt.pk %}')"
+                             class="appt-card mb-2 flex items-center justify-between border-l-4 p-3 bg-white rounded shadow-sm
+                             {% if appt.status == 'confirmed' %}border-blue-500{% elif appt.status == 'completed' %}border-emerald-500{% elif appt.status == 'cancelled' %}border-red-500{% else %}border-amber-500{% endif %}">
+                            <div class="flex items-center">
+                                <div class="w-14 text-center border-r border-slate-100 pr-3 mr-3">
+                                    <span class="block text-sm font-black text-slate-900">{{ appt.appointment_start_time|time:"H:i" }}</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-black text-slate-900">{{ appt.customer.get_full_name|default:appt.guest_name }}</h4>
+                                    <p class="text-[10px] text-slate-500 font-bold">{{ appt.service.name }}</p>
+                                </div>
+                            </div>
+                            <div class="px-3 py-1 rounded-full text-[10px] font-black uppercase
+                                {% if appt.status == 'confirmed' %}bg-blue-100 text-blue-700
+                                {% elif appt.status == 'completed' %}bg-emerald-100 text-emerald-700
+                                {% elif appt.status == 'cancelled' %}bg-red-100 text-red-700
+                                {% else %}bg-amber-100 text-amber-700{% endif %}">
+                                {{ appt.status }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        {% elif request.GET.scale == 'week' %}
+            <div class="p-4 overflow-x-auto">
+                <div class="min-w-[1000px]">
+                    <div class="grid grid-cols-8 gap-2 mb-2 sticky top-0 bg-gray-50 z-10 py-2 border-b">
+                        <div class="text-[10px] font-black text-slate-300 uppercase py-2 text-center">Time</div>
+                        {% for day_date in week_dates %}
+                        <div class="text-center {% if day_date|date:'Y-m-d' == today_date %}bg-blue-50 rounded-sm{% endif %}">
+                            <span class="block text-[10px] font-bold text-slate-400 uppercase">{{ day_date|date:"D" }}</span>
+                            <span class="block text-sm font-black text-slate-900">{{ day_date|date:"d M" }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% for hour in "08,09,10,11,12,13,14,15,16,17,18,19,20"|split:"," %}
+                    <div class="grid grid-cols-8 gap-2 border-t border-slate-100 py-2">
+                        <div class="text-[10px] font-bold text-slate-400 pt-1 text-center">{{ hour }}:00</div>
+                        {% for day_date in week_dates %}
+                        <div class="relative min-h-[80px] rounded-sm border border-dashed border-slate-200 p-1 group">
+                            {% for appt in appointments %}
+                                {% if appt.appointment_date == day_date and appt.appointment_start_time|time:"H" == hour %}
+                                    <div onclick="openAppointmentModal('{% url 'appointment_detail' appt.pk %}')"
+                                         class="mb-1 p-2 rounded bg-white border-l-4 border shadow-sm cursor-pointer
+                                         {% if appt.status == 'confirmed' %}border-blue-500{% elif appt.status == 'completed' %}border-emerald-500{% elif appt.status == 'cancelled' %}border-red-500{% else %}border-amber-500{% endif %}">
+                                        <div class="text-[10px] font-black text-slate-900 truncate">{{ appt.customer.get_full_name|default:appt.guest_name }}</div>
+                                        <div class="mt-1 flex justify-between items-center">
+                                            <span class="text-[8px] font-bold text-slate-400">{{ appt.appointment_start_time|time:"H:i" }}</span>
+                                            <span class="text-[8px] font-black uppercase
+                                                {% if appt.status == 'confirmed' %}text-blue-600
+                                                {% elif appt.status == 'completed' %}text-emerald-600
+                                                {% elif appt.status == 'cancelled' %}text-red-600
+                                                {% else %}text-amber-600{% endif %}">
+                                                {{ appt.status }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        {% elif request.GET.scale == 'month' %}
+            <div class="p-4">
+                <div class="grid grid-cols-7 gap-px bg-slate-200 border border-slate-200 rounded-md overflow-hidden">
+                    {% for day in "Mon,Tue,Wed,Thu,Fri,Sat,Sun"|split:"," %}
+                        <div class="bg-slate-50 p-2 text-center text-[10px] font-black text-slate-500 uppercase">{{ day }}</div>
+                    {% endfor %}
+                    {% for day_date in calendar_days %}
+                        {% if day_date %}
+                            <div class="bg-white min-h-[100px] p-2 relative group flex flex-col gap-1">
+                                <span class="text-[10px] font-bold {% if day_date|date:'Y-m-d' == today_date %}text-blue-600 bg-blue-50 px-1.5 rounded-full inline-block{% else %}text-slate-400{% endif %}">{{ day_date.day }}</span>
+                                <div class="flex flex-col gap-1 mt-1 overflow-y-auto max-h-[80px] no-scrollbar">
+                                    {% for appt in appointments %}
+                                        {% if appt.appointment_date == day_date %}
+                                            <div onclick="openAppointmentModal('{% url 'appointment_detail' appt.pk %}')"
+                                                 class="flex flex-col px-1.5 py-1 rounded text-[9px] font-bold border-l-2 mb-0.5
+                                                 {% if appt.status == 'confirmed' %}bg-blue-50 border-blue-500 text-blue-800
+                                                 {% elif appt.status == 'completed' %}bg-emerald-50 border-emerald-500 text-emerald-800
+                                                 {% elif appt.status == 'cancelled' %}bg-red-50 border-red-500 text-red-800
+                                                 {% else %}bg-amber-50 border-amber-500 text-amber-800{% endif %}">
+                                                <span class="truncate">{{ appt.customer.get_full_name|default:appt.guest_name }}</span>
+                                                <span class="text-[7px] uppercase font-black opacity-90">{{ appt.status }}</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="bg-slate-50/50 min-h-[100px]"></div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</main>
+
+<script>
+    document.addEventListener('click', function(e) {
+        const matrix = document.getElementById('matrix-scroll-area');
+        if (!matrix) return;
+
+        if (e.target.closest('#team-scroll-left')) {
+            matrix.scrollBy({ left: -400, behavior: 'smooth' });
+        }
+
+        if (e.target.closest('#team-scroll-right')) {
+            matrix.scrollBy({ left: 400, behavior: 'smooth' });
+        }
+    });
+</script>
+</div>
+
+<div id="detail-modal" onclick="if(event.target === this) closeAppointmentModal()">
+    <div id="detail-modal-panel">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <div>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Detail View</h3>
+                <h2 class="text-sm font-black text-slate-900 uppercase">Appointment Info</h2>
+            </div>
+            <button onclick="closeAppointmentModal()" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-all"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <div class="modal-scroll-area">
+            <div id="detail-modal-content"></div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="masterHelpModal" class="fixed inset-0 z-[60] hidden items-center justify-center p-0 md:p-4 font-sans">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="toggleMasterHelp()"></div>
+
+    <div class="relative bg-white w-full max-w-3xl h-full md:max-h-[75vh] animate-fade-up flex flex-col overflow-hidden md:rounded-xl shadow-2xl">
+
+        <div class="px-6 md:px-8 py-3 md:py-6 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+            <div>
+                <span class="text-indigo-600 text-[10px] font-bold uppercase tracking-wider mb-1 block">Staff & Owner Guide</span>
+                <h2 class="text-xl md:text-2xl font-bold text-slate-900">Master Schedule Guide</h2>
+            </div>
+            <button onclick="toggleMasterHelp()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <div class="overflow-y-auto flex-1 bg-slate-50/50 p-6 md:p-10 space-y-8">
+
+            <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-3">
+                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-lg">View Modes & Navigation</h3>
+                        <p class="text-xs text-slate-500">Understanding the 3 distinct timeline views</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase text-slate-400">Default</span>
+                            <i class="fa-solid fa-list text-indigo-500"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">Day View (List)</h4>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">
+                            Best for daily operations. It shows a detailed chronological list of bookings for a single day.
+                            <br><br>
+                            <span class="text-indigo-600 font-bold">Feature:</span> Only the Day view supports pagination (page 1, 2, etc.) for high-volume days.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase text-slate-400">Overview</span>
+                            <i class="fa-solid fa-calendar-week text-emerald-500"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">Week View</h4>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">
+                            Visualizes 7 days (Mon-Sun). Ideal for seeing gaps in your schedule or spotting busy days at a glance.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase text-slate-400">Planning</span>
+                            <i class="fa-solid fa-calendar-days text-amber-500"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">Month View</h4>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">
+                            A traditional calendar grid. Use this to spot long-term availability or check bookings spread across the entire month.
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-3">
+                    <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-lg">Deposits & Confirmations</h3>
+                        <p class="text-xs text-slate-500">How bookings transition from pending to confirmed</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800 mb-2">If Deposits are Required:</h4>
+                        <ul class="space-y-3">
+                            <li class="flex gap-3 text-[11px] text-slate-600">
+                                <i class="fa-solid fa-bolt text-amber-500 mt-0.5"></i>
+                                <span><strong>Auto-Confirmation:</strong> Appointments are confirmed automatically once the PayFast payment is successful.</span>
+                            </li>
+                            <li class="flex gap-3 text-[11px] text-slate-600">
+                                <i class="fa-solid fa-envelope-open-text text-amber-500 mt-0.5"></i>
+                                <span><strong>Payment Links:</strong> Clients are redirected to PayFast immediately. A backup link is also emailed if the redirect fails.</span>
+                            </li>
+                            <li class="flex gap-3 text-[11px] text-slate-600">
+                                <i class="fa-solid fa-clock-rotate-left text-amber-500 mt-0.5"></i>
+                                <span><strong>Rescheduling:</strong> Clients can reschedule themselves within the time window set in your <strong>Dashboard Settings</strong>.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                        <h4 class="text-sm font-bold text-slate-800 mb-2">No Deposit / Exemptions:</h4>
+                        <ul class="space-y-3">
+                            <li class="flex gap-3 text-[11px] text-slate-600">
+                                <i class="fa-solid fa-user-check text-emerald-500 mt-0.5"></i>
+                                <span><strong>Exempt Clients:</strong> If a client is marked as exempt from deposits, their booking is <strong>always</strong> auto-confirmed.</span>
+                            </li>
+                            <li class="flex gap-3 text-[11px] text-slate-600">
+                                <i class="fa-solid fa-hand text-indigo-500 mt-0.5"></i>
+                                <span><strong>Manual Approval:</strong> If you don't require deposits, bookings stay "Pending" until you manually confirm/decline them to prevent spam.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid md:grid-cols-2 gap-6">
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-sky-100 text-sky-600 rounded flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900">Smart Search</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                        The search bar filters appointments in real-time. It checks across multiple data points simultaneously:
+                    </p>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-xs text-slate-500">
+                            <i class="fa-solid fa-check text-emerald-500"></i> Client Name
+                        </li>
+                        <li class="flex items-center gap-2 text-xs text-slate-500">
+                            <i class="fa-solid fa-check text-emerald-500"></i> Client Email
+                        </li>
+                        <li class="flex items-center gap-2 text-xs text-slate-500">
+                            <i class="fa-solid fa-check text-emerald-500"></i> Guest details (for unregistered bookings)
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900">Team Filters</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-xs font-bold uppercase text-slate-400 mb-1">For Owners/Admins</h4>
+                            <p class="text-[11px] text-slate-600">
+                                You see <strong>All</strong> bookings by default. Use the "Staff" dropdown to filter the calendar to see only one specific employee's schedule.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase text-slate-400 mb-1">For Staff</h4>
+                            <p class="text-[11px] text-slate-600">
+                                Toggle between <strong>"My Schedule"</strong> (only your jobs) and <strong>"Team View"</strong> (everyone's jobs) using the view switcher at the top.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="bg-slate-900 p-6 rounded-xl text-white shadow-lg">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fa-solid fa-traffic-light text-yellow-400 text-lg"></i>
+                    <h3 class="font-bold text-lg">Appointment Status Guide</h3>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded border border-white/10">
+                        <span class="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]"></span>
+                        <span class="text-xs font-medium text-slate-300">Pending</span>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded border border-white/10">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span>
+                        <span class="text-xs font-medium text-slate-300">Confirmed</span>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded border border-white/10">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
+                        <span class="text-xs font-medium text-slate-300">Completed</span>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded border border-white/10">
+                        <span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
+                        <span class="text-xs font-medium text-slate-300">Cancelled</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="p-4 border-t border-slate-100 bg-white flex justify-between items-center shrink-0">
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleMasterHelp() {
+        const modal = document.getElementById('masterHelpModal');
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        } else {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+    }
+</script>
+
+<script>
+    // --- UI State Management ---
+    function applyUI() {
+        const mode = document.getElementById('view_mode').value;
+        const scale = document.getElementById('logic-scale').value;
+
+        // Tab Styles
+        const myTab = document.getElementById('tab-my');
+        const allTab = document.getElementById('tab-all');
+        const activeClass = ['bg-white', 'text-slate-900', 'shadow-sm'];
+        const inactiveClass = ['text-slate-500', 'hover:text-slate-700'];
+
+        myTab.className = 'px-4 py-1.5 rounded-md text-[11px] font-bold transition-all';
+        allTab.className = 'px-4 py-1.5 rounded-md text-[11px] font-bold transition-all';
+
+        if (mode === 'all') {
+            allTab.classList.add(...activeClass);
+            myTab.classList.add(...inactiveClass);
+        } else {
+            myTab.classList.add(...activeClass);
+            allTab.classList.add(...inactiveClass);
+        }
+
+        // Scale Styles
+        ['day', 'week', 'month'].forEach(s => {
+            const btn = document.getElementById(`scale-${s}`);
+            if(btn) {
+                btn.className = 'px-3 py-1.5 rounded-md text-[11px] font-bold transition-all';
+                if(scale === s) btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+                else btn.classList.add('text-slate-500', 'hover:text-slate-700');
+            }
+        });
+
+        // Avatar Coloring logic
+        document.querySelectorAll('[data-name]').forEach(el => {
+            const name = el.getAttribute('data-name') || '?';
+            const colors = [
+                {bg:'#eff6ff',t:'#1d4ed8'}, {bg:'#fdf2f8',t:'#be185d'},
+                {bg:'#f0fdf4',t:'#15803d'}, {bg:'#fff7ed',t:'#c2410c'}
+            ];
+            let hash = 0;
+            for(let i=0; i<name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            const c = colors[Math.abs(hash) % colors.length];
+            if(el.classList.contains('staff-avatar')) { el.style.background=c.bg; el.style.color=c.t; }
+            else { el.style.color=c.t; }
+        });
+    }
+
+    // --- Data Loading (AJAX) ---
+    function updateSchedule() {
+        const container = document.getElementById('content-container');
+        const form = document.getElementById('master-logic-form');
+        const params = new URLSearchParams(new FormData(form));
+
+        container.classList.add('is-loading');
         fetch(`${window.location.pathname}?${params.toString()}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
         .then(res => res.json())
         .then(data => {
-            if(data.html) {
+            if (data.html) {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(data.html, 'text/html');
-
-                ['desktop-target', 'mobile-target', 'pagination-target'].forEach(id => {
-                    const newEl = doc.getElementById(id);
-                    const oldEl = document.getElementById(id);
-                    if (newEl && oldEl) oldEl.innerHTML = newEl.innerHTML;
-                });
-                bindPagination();
+                document.getElementById('dynamic-content').innerHTML = doc.getElementById('dynamic-content').innerHTML;
+                applyUI();
             }
         })
-        .catch(err => console.error('Error:', err))
-        .finally(() => contentLayer.classList.remove('loading'));
+        .catch(err => console.error(err))
+        .finally(() => container.classList.remove('is-loading'));
     }
 
-    function bindPagination() {
-        document.querySelectorAll('.page-link').forEach(link => {
-            link.onclick = function(e) {
-                e.preventDefault();
-                pageInput.value = this.dataset.page;
-                updateResults();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-        });
+    // --- Interaction Handlers ---
+    function handleTabSwitch(mode) {
+        document.getElementById('view_mode').value = mode;
+        updateSchedule();
+    }
+    function handleScaleSwitch(scale) {
+        document.getElementById('logic-scale').value = scale;
+        updateSchedule();
+    }
+    function updateDateFromInput(val) {
+        document.getElementById('date-display').innerText = val;
+        document.getElementById('logic-date').value = val;
+        updateSchedule();
+    }
+    function adjDate(offset) {
+        const picker = document.getElementById('main-date-input');
+        const d = new Date(picker.value);
+        const scale = document.getElementById('logic-scale').value;
+
+        if (scale === 'week') d.setDate(d.getDate() + (offset * 7));
+        else if (scale === 'month') d.setMonth(d.getMonth() + offset);
+        else d.setDate(d.getDate() + offset);
+
+        const iso = d.toISOString().split('T')[0];
+        picker.value = iso;
+        updateDateFromInput(iso);
     }
 
-    document.querySelectorAll('.auto-submit').forEach(el => {
-        el.addEventListener('change', () => { pageInput.value = 1; updateResults(); });
+    // --- Modal Logic ---
+    function openAppointmentModal(url) {
+        const modal = document.getElementById('detail-modal');
+        const content = document.getElementById('detail-modal-content');
+        document.body.classList.add('modal-open');
+        modal.classList.add('open');
+        content.innerHTML = '<div class="py-20 text-center animate-pulse text-xs font-bold text-slate-400">LOADING...</div>';
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.text())
+            .then(html => content.innerHTML = html);
+    }
+
+    function closeAppointmentModal() {
+        document.getElementById('detail-modal').classList.remove('open');
+        document.body.classList.remove('modal-open');
+    }
+
+    // Event Delegation for Search and Actions
+    let searchTimer;
+    document.getElementById('search-input').addEventListener('input', (e) => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            document.getElementById('logic-q').value = e.target.value;
+            updateSchedule();
+        }, 400);
     });
 
-    document.getElementById('reset-filters').addEventListener('click', () => {
-        filterForm.reset();
-        pageInput.value = 1;
-        updateResults();
+    document.getElementById('detail-modal-content').addEventListener('click', function(e) {
+        const confirmBtn = e.target.closest('.confirm-appointment-btn');
+        if (confirmBtn) {
+            e.preventDefault();
+            fetch(confirmBtn.dataset.url, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(res => {
+                if(res.ok) { closeAppointmentModal(); updateSchedule(); }
+                else alert("Error confirming.");
+            });
+        }
     });
 
-    let searchTimeout;
-    document.getElementById('search-box').addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => { pageInput.value = 1; updateResults(); }, 400);
-    });
-
-    bindPagination();
-});
+    document.addEventListener('DOMContentLoaded', applyUI);
 </script>
 {% endblock %}

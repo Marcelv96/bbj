@@ -19,9 +19,9 @@
                                         GetMeBooked
                                     </td>
                                     <td align="right">
-                                        <div style="width: 12px; height: 12px; background-color: #be123c; border-radius: 50%; display: inline-block;"></div>
-                                        <span style="font-size: 12px; font-weight: 700; color: #be123c; text-transform: uppercase; margin-left: 4px;">
-                                            Cancelled
+                                        <div style="width: 12px; height: 12px; background-color: #f59e0b; border-radius: 50%; display: inline-block;"></div>
+                                        <span style="font-size: 12px; font-weight: 700; color: #f59e0b; text-transform: uppercase; margin-left: 4px;">
+                                            New Request
                                         </span>
                                     </td>
                                 </tr>
@@ -32,10 +32,10 @@
                     <tr>
                         <td style="padding: 80px 0 60px 0;">
                             <h1 style="font-size: 84px; font-weight: 900; line-height: 0.85; margin: 0; color: #000000; letter-spacing: -4px;">
-                                Booking<br/>Cancelled.
+                                New<br/>Booking.
                             </h1>
                             <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
-                                Hi, we are just letting you know that <strong>{{ appointment.guest_name }}</strong>'s appointment is marked as cancelled.
+                                You have received a new booking request for <span style="color: #000000; font-weight: 600;">{{ business.name }}</span>.
                             </p>
                         </td>
                     </tr>
@@ -45,15 +45,15 @@
                             <table width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td width="33%" valign="top">
-                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Booking ID</div>
-                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">#{{ appointment.id }}</div>
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Customer</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ customer_name }}</div>
                                     </td>
                                     <td width="33%" valign="top">
                                         <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Service</div>
                                         <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ appointment.service.name }}</div>
                                     </td>
                                     <td width="34%" valign="top">
-                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Original Slot</div>
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Date & Time</div>
                                         <div style="font-size: 20px; font-weight: 600; color: #000000;">
                                             {{ appointment.appointment_date|date:"l, F j" }}<br/>@ {{ appointment.appointment_start_time|time:"H:i" }}
                                         </div>
@@ -66,13 +66,20 @@
                     <tr>
                         <td style="padding-top: 60px;">
                             <div style="background-color: #000000; padding: 60px; border-radius: 4px; text-align: left;">
-                                <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px;">Slot now available</div>
+                                <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 16px; letter-spacing: -1px;">Manage this appointment</div>
                                 <p style="color: #94a3b8; font-size: 18px; line-height: 1.6; margin: 0 0 32px 0; max-width: 500px;">
-                                    This time slot has been automatically released and is now open for other clients to book on your calendar.
+                                    View full customer details, history, and manage your schedule directly from your owner dashboard.
                                 </p>
-                                <a href="{{ site_url }}{% url 'owner_dashboard' appointment.booking_form.business.id %}" style="display: inline-block; background-color: #ffffff; color: #000000; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-                                    View Dashboard
-                                </a>
+                                
+                                <table cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <a href="{{ site_url }}/owner/dashboard/{{ business.id }}/" style="display: inline-block; background-color: #ffffff; color: #000000; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                                Open Dashboard
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </td>
                     </tr>
@@ -82,12 +89,12 @@
                             <table width="100%">
                                 <tr>
                                     <td>
-                                        <a href="{{ site_url }}{% url 'owner_dashboard' appointment.booking_form.business.id %}" style="font-size: 14px; color: #000000; text-decoration: none; font-weight: 700; border-bottom: 2px solid #000000; padding-bottom: 2px;">
-                                            Manage Calendar &rarr;
-                                        </a>
+                                        <div style="font-size: 14px; color: #64748b; font-weight: 400;">
+                                            This is an automated notification from GetMeBooked.
+                                        </div>
                                     </td>
                                     <td align="right" style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                                        GetMeBooked &copy; 2026
+                                        &copy; 2026 GetMeBooked
                                     </td>
                                 </tr>
                             </table>

@@ -79,6 +79,13 @@
                                                 Reschedule
                                             </a>
                                         </td>
+                                        <td style="padding-left: 12px;">
+    <a href="https://www.getmebooked.co.za/appointment/cancel/{{ appointment.reschedule_token }}/"
+       target="_blank"
+       style="display: block; background-color: #ef4444; color: #ffffff; padding: 18px 30px; text-decoration: none; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; text-align: center;">
+        Cancel Booking
+    </a>
+</td>
                                     </tr>
                                 </table>
                             </div>
@@ -95,6 +102,20 @@
                                             Add to Google Calendar
                                         </a>
                                     </td>
+                                    <td style="padding-left: 12px;">
+                                        <a href="https://www.getmebooked.co.za/appointment/reschedule/{{ appointment.reschedule_token }}/"
+                                           target="_blank"
+                                           style="display: block; background-color: #64748b; color: #ffffff; padding: 18px 30px; text-decoration: none; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; text-align: center;">
+                                            Reschedule
+                                        </a>
+                                    </td>
+                                    <td style="padding-left: 12px;">
+    <a href="https://www.getmebooked.co.za/appointment/cancel/{{ appointment.reschedule_token }}/"
+       target="_blank"
+       style="display: block; background-color: #ef4444; color: #ffffff; padding: 18px 30px; text-decoration: none; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; text-align: center;">
+        Cancel Booking
+    </a>
+</td>
                                     <td align="right" style="font-size: 13px; color: #94a3b8; font-weight: 600;">
                                         Order ID: #{{ appointment.id|default:"10024" }}
                                     </td>
