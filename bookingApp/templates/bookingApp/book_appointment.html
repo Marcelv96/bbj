@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -46,12 +46,12 @@
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 4px; }
-        
+
         /* Time slot animation */
         .time-slot { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .time-slot:hover:not(.disabled) { border-color: #4f46e5; transform: translateY(-1px); color: #4f46e5; }
         .time-slot.selected { background-color: #4f46e5; color: white; border-color: #4f46e5; box-shadow: 0 4px 10px -2px rgba(79, 70, 229, 0.3); }
-        
+
         /* Step visibility */
         .step-content { display: none; }
         .step-content.active { display: block; animation: enter 0.4s ease-out; }
@@ -72,7 +72,7 @@
 <body class="bg-gray-50 text-primary h-[100dvh] w-full flex items-center justify-center p-0 sm:p-4 overflow-hidden">
 
     <div class="w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-md bg-surface sm:rounded-3xl shadow-xl flex flex-col relative overflow-hidden border border-border">
-        
+
         <div class="px-6 pt-6 pb-4 border-b border-border z-20 bg-surface/80 backdrop-blur-md sticky top-0">
             <div class="flex justify-between items-center mb-4">
                 <div>
@@ -93,11 +93,11 @@
             <input type="hidden" name="appointment_start_time" id="hidden-time">
 
             <div class="p-6 flex-1">
-                
+
                 <div id="step-1" class="step-content active space-y-6">
                     <div class="space-y-4">
                         <h2 class="text-xl font-semibold tracking-tight">Select Experience</h2>
-                        
+
                         <div class="space-y-1.5">
                             <label class="text-xs font-semibold uppercase tracking-wider text-secondary ml-1">Treatment</label>
                             <div class="relative">
@@ -130,7 +130,7 @@
 
                 <div id="step-2" class="step-content space-y-6">
                     <h2 class="text-xl font-semibold tracking-tight">Availability</h2>
-                    
+
                     <div class="sticky top-0 bg-surface z-10 pb-2">
                         <div class="relative group">
                             <input type="date" name="appointment_date" id="date-pick" class="w-full h-14 pl-12 pr-4 bg-white border border-border rounded-xl text-sm font-medium focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all uppercase tracking-wide cursor-pointer text-primary">
@@ -162,9 +162,9 @@
 
                     <div class="relative mt-6">
                         <div class="absolute -top-2 left-0 w-full h-4 bg-surface receipt-jagged"></div>
-                        
+
                         <div class="bg-subtle p-6 pt-8 rounded-b-xl space-y-5 border-l border-r border-b border-border/50">
-                            
+
                             <div class="flex justify-between items-start border-b border-dashed border-secondary/20 pb-4">
                                 <div>
                                     <span class="text-[10px] uppercase tracking-widest text-secondary block mb-1">Service</span>
@@ -175,9 +175,9 @@
                                     <span id="summary-total" class="font-bold text-lg text-primary">R0</span>
                                 </div>
                             </div>
-
+                            {% if business.deposit_enabled %}
                             <div id="deposit-section" class="hidden flex-col gap-3">
-                                
+
                                 <div class="flex justify-between items-center bg-white p-3 rounded-lg border border-border shadow-sm">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs">
@@ -189,11 +189,13 @@
                                                 <img src="{% static 'img/Payfast.png' %}" alt="PayFast" class="h-3 w-auto opacity-80">
                                             </div>
                                             <span id="deposit-label-detail" class="text-[10px] text-secondary font-medium uppercase tracking-tight">
+
                                                 {% if business.deposit_type == 'percentage' %}
                                                     {{ business.deposit_percentage }}% of total
                                                 {% else %}
                                                     Fixed Booking Fee
                                                 {% endif %}
+
                                             </span>
                                         </div>
                                     </div>
@@ -204,7 +206,7 @@
                                     <div class="flex gap-2 text-[11px] text-secondary">
                                         <i class="fas fa-history mt-0.5 text-accent"></i>
                                         <p>
-                                            <span class="font-semibold text-primary">Reschedule Policy:</span> 
+                                            <span class="font-semibold text-primary">Reschedule Policy:</span>
                                             Free changes allowed up to <span class="font-bold text-primary">{{ business.reschedule_window_hours }} hours</span> before appointment.
                                         </p>
                                     </div>
@@ -213,23 +215,34 @@
                                     <div class="flex gap-2 text-[11px] text-secondary">
                                         <i class="fas fa-info-circle mt-0.5 text-accent"></i>
                                         <p>
-                                            <span class="font-semibold text-primary">Terms:</span> 
+                                            <span class="font-semibold text-primary">Terms:</span>
                                             {{ business.deposit_policy }}
                                         </p>
                                     </div>
                                     {% endif %}
                                 </div>
+
+                                <div class="flex items-start gap-3 px-1 py-2">
+    <div class="flex items-center h-5">
+        <input id="policy-agree" type="checkbox" class="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent cursor-pointer" required>
+    </div>
+    <label for="policy-agree" class="text-[11px] text-secondary leading-tight cursor-pointer">
+        I agree to the <span class="text-primary font-semibold">booking & reschedule policies</span> listed above and confirm my details are correct.
+    </label>
+</div>
                             </div>
 
+                            {% else %}
                             <div id="no-deposit-msg" class="hidden text-center text-xs text-secondary py-2">
                                 <i class="fas fa-check-circle text-green-500 mr-1"></i> No prepayment required. Pay at venue.
                             </div>
+                            {% endif %}
 
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="h-4"></div>
         </form>
 
@@ -254,11 +267,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             let step = 1;
             const maxSteps = 3;
-            
+
             const els = {
                 next: document.getElementById('nextBtn'),
                 back: document.getElementById('backBtn'),
                 submit: document.getElementById('subBtn'),
+                policy: document.getElementById('policy-agree'),
                 svc: document.getElementById('svc'),
                 stf: document.getElementById('stf'),
                 date: document.getElementById('date-pick'),
@@ -266,7 +280,7 @@
                 hiddenTime: document.getElementById('hidden-time'),
                 bars: [document.getElementById('pb-1'), document.getElementById('pb-2'), document.getElementById('pb-3')],
                 panels: [document.getElementById('step-1'), document.getElementById('step-2'), document.getElementById('step-3')],
-                
+
                 sumService: document.getElementById('summary-service'),
                 sumTotal: document.getElementById('summary-total'),
                 sumDeposit: document.getElementById('summary-deposit'),
@@ -280,7 +294,7 @@
                 depType: "{{ business.deposit_type }}",
                 depFixed: parseFloat("{{ business.deposit_amount|default:0 }}"),
                 depPercent: parseFloat("{{ business.deposit_percentage|default:0 }}"),
-                hasPayfast: "{{ business.payfast_merchant_id }}" !== "None" && "{{ business.payfast_merchant_id }}" !== ""
+                depositEnabled: {% if business.deposit_enabled %}true{% else %}false{% endif %}
             };
 
             els.date.min = new Date().toISOString().split("T")[0];
@@ -327,17 +341,17 @@
             els.svc.addEventListener('change', async () => {
                 const svcId = els.svc.value;
                 if (!svcId) return;
-                
-                els.date.value = ''; 
+
+                els.date.value = '';
                 els.grid.innerHTML = '<div class="col-span-3 text-center py-10 text-secondary"><i class="far fa-clock text-2xl mb-2 opacity-50"></i><span class="text-sm block">Select a date</span></div>';
 
                 const oldText = els.stf.options[els.stf.selectedIndex].text;
                 els.stf.innerHTML = '<option>Loading...</option>';
-                
+
                 try {
                     const res = await fetch(`{% url 'get_staff_for_service' %}?service_id=${svcId}`);
                     const data = await res.json();
-                    
+
                     els.stf.innerHTML = '<option value="">Any Available Specialist</option>';
                     data.staff_list.forEach(s => {
                         const opt = document.createElement('option');
@@ -400,7 +414,7 @@
                 els.sumTotal.innerText = `R${price.toFixed(0)}`;
 
                 let depositAmount = 0;
-                if (config.hasPayfast) {
+                if (config.depositEnabled) {
                     if (config.depType === 'percentage') {
                         depositAmount = (config.depPercent / 100) * price;
                     } else {
@@ -408,18 +422,18 @@
                     }
                 }
 
+                // Crucial fix: always update the summary text
+                els.sumDeposit.innerText = `R${depositAmount.toFixed(0)}`;
+
                 if (depositAmount > 0) {
                     els.depSection.classList.remove('hidden');
                     els.depSection.classList.add('flex');
                     els.noDepMsg.classList.add('hidden');
-                    
-                    els.sumDeposit.innerText = `R${depositAmount.toFixed(0)}`;
                     els.subText.innerText = `Pay R${depositAmount.toFixed(0)} & Book`;
                 } else {
                     els.depSection.classList.add('hidden');
                     els.depSection.classList.remove('flex');
                     els.noDepMsg.classList.remove('hidden');
-                    
                     els.subText.innerText = "Confirm Appointment";
                 }
             };
@@ -431,6 +445,24 @@
                 els.loader.classList.add('inline-block');
             };
         });
+
+        // Function to toggle submit button based on checkbox
+const validatePolicy = () => {
+    els.submit.disabled = !els.policy.checked;
+};
+
+// Listen for checkbox changes
+els.policy.addEventListener('change', validatePolicy);
+
+// Update updateUI to check policy whenever moving to step 3
+const updateUI = () => {
+    // ... your existing logic ...
+
+    if (step === 3) {
+        calculateSummary();
+        validatePolicy(); // Check state when landing on the final step
+    }
+};
     </script>
 </body>
 </html>

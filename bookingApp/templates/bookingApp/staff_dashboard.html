@@ -6,20 +6,20 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-    /* --- 1. PROFESSIONAL THEME VARIABLES (MATCHING OWNER DASHBOARD) --- */
+    /* --- 1. PROFESSIONAL THEME VARIABLES --- */
     :root {
-        --primary: #4f46e5; /* Indigo 600 */
-        --primary-dark: #4338ca; /* Indigo 700 */
-        --secondary: #64748b; /* Slate 500 */
-        --bg-body: #f8fafc; /* Slate 50 */
+        --primary: #4f46e5;
+        --primary-dark: #4338ca;
+        --secondary: #64748b;
+        --bg-body: #f8fafc;
         --bg-card: #ffffff;
-        --border-subtle: #e2e8f0; /* Slate 200 */
-        --text-main: #0f172a; /* Slate 900 */
+        --border-subtle: #e2e8f0;
+        --text-main: #0f172a;
     }
 
     body {
         background-color: var(--bg-body);
-        font-family: 'Plus Jakarta Sans', sans-serif; /* Kept font from staff dash or switch to Inter if preferred */
+        font-family: 'Plus Jakarta Sans', sans-serif;
         color: var(--text-main);
         -webkit-font-smoothing: antialiased;
     }
@@ -28,14 +28,13 @@
     .app-container {
         max-width: 1280px;
         margin: 0 auto;
-        padding: 0 1.5rem;
+        padding: 0 1rem; /* Slightly tighter for mobile */
     }
 
-    @media (max-width: 640px) {
-        .app-container { padding: 0 0.75rem; }
+    @media (min-width: 640px) {
+        .app-container { padding: 0 1.5rem; }
     }
 
-    /* Cards */
     .feature-card {
         background: var(--bg-card);
         border: 1px solid var(--border-subtle);
@@ -43,12 +42,6 @@
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         transition: all 0.2s ease-in-out;
         overflow: hidden;
-    }
-
-    .feature-card:hover {
-        border-color: var(--primary);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        transform: translateY(-2px);
     }
 
     /* --- 3. NAVIGATION TABS --- */
@@ -63,7 +56,7 @@
 
     .nav-tab {
         position: relative;
-        padding: 1rem 0.5rem;
+        padding: 1rem 0.25rem;
         font-size: 0.875rem;
         font-weight: 600;
         color: var(--secondary);
@@ -74,9 +67,7 @@
         cursor: pointer;
     }
 
-    .nav-tab:hover { color: var(--primary); }
     .nav-tab.active { color: var(--primary); }
-
     .nav-tab.active::after {
         content: '';
         position: absolute;
@@ -94,55 +85,36 @@
         border: 1px solid #cbd5e1;
         border-radius: 0.5rem;
         padding: 0.625rem 0.875rem;
-        font-size: 0.875rem;
+        font-size: 16px; /* Prevents iOS auto-zoom */
         color: #334155;
         outline: none;
-        transition: border-color 0.15s;
     }
 
-    .input-std:focus { border-color: var(--primary); ring: 2px solid #e0e7ff; }
+    @media (min-width: 640px) {
+        .input-std { font-size: 0.875rem; }
+    }
 
     .btn-main {
         background-color: var(--primary);
         color: white;
         font-weight: 600;
-        padding: 0.625rem 1.25rem;
-        border-radius: 0.5rem;
+        padding: 0.75rem 1.25rem; /* Larger touch target for mobile */
+        border-radius: 0.2rem;
         font-size: 0.875rem;
-        transition: background-color 0.2s;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
         cursor: pointer;
     }
-    .btn-main:hover { background-color: var(--primary-dark); }
 
-    .btn-outline {
-        background-color: white;
-        border: 1px solid #cbd5e1;
-        color: #475569;
-        font-weight: 600;
-        padding: 0.625rem 1.25rem;
-        border-radius: 0.5rem;
-        font-size: 0.875rem;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        cursor: pointer;
-    }
-    .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: #f8fafc; }
-
-    /* --- 5. UTILS --- */
     .mini-heading {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--secondary);
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.35rem;
     }
 
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -154,23 +126,23 @@
 
 <div class="min-h-screen pb-10">
 
-    <header class="bg-white pt-6 md:pt-8 pb-2">
+    <header class="bg-white pt-4 md:pt-8 pb-2">
         <div class="app-container">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div class="flex items-center gap-3 md:gap-4">
-                    <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-lg shadow-slate-200">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 md:w-14 md:h-14 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-lg md:text-2xl font-bold shadow-lg shadow-indigo-100">
                         {{ user.username|slice:":1"|upper }}
                     </div>
                     <div>
-                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 leading-tight">{{ user.username }}'s Hub<span class="text-indigo-600">.</span></h1>
-                        <p class="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Staff Portal & Availability</p>
+                        <h1 class="text-lg md:text-2xl font-bold text-slate-900 leading-tight">{{ user.username }}'s Hub<span class="text-indigo-600">.</span></h1>
+                        <p class="text-[9px] md:text-xs text-slate-500 font-bold uppercase tracking-widest">Staff Portal</p>
                     </div>
                 </div>
 
-                <a href="{% url 'manual_booking' business.id %}" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">
+                <a href="{% url 'manual_booking' business.id %}" class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-indigo-600 text-white rounded-sm text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">
                     <i class="fa-solid fa-plus"></i>
-                    <span class="hidden md:inline">Quick Booking</span>
-                    <span class="md:hidden">New</span>
+                    <span class="hidden sm:inline">Quick Booking</span>
+                    <span class="sm:hidden">New</span>
                 </a>
             </div>
         </div>
@@ -178,7 +150,7 @@
 
     <nav class="sticky-nav mt-3">
         <div class="app-container">
-            <div class="flex gap-4 md:gap-6 overflow-x-auto hide-scrollbar">
+            <div class="flex gap-6 md:gap-8 overflow-x-auto hide-scrollbar">
                 <button class="nav-tab active" onclick="switchTab(event, 'tab-services')">Services</button>
                 <button class="nav-tab" onclick="switchTab(event, 'tab-hours')">Hours</button>
                 <button class="nav-tab" onclick="switchTab(event, 'tab-off')">Time Off</button>
@@ -186,33 +158,31 @@
         </div>
     </nav>
 
-    <main class="py-6 md:py-8">
+    <main class="py-4 md:py-8">
         <div class="app-container">
 
             <section id="tab-services" class="tab-content animate-fade-in">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="font-bold text-slate-900">Authorized Services</h3>
-                        <p class="text-sm text-slate-500">Select the services you are qualified to perform.</p>
-                    </div>
+                <div class="mb-4">
+                    <h3 class="font-bold text-slate-900">Authorized Services</h3>
+                    <p class="text-xs md:text-sm text-slate-500">Select the services you are qualified to perform.</p>
                 </div>
 
-                <div class="bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm">
+                <div class="bg-white border border-slate-200 rounded-xl p-4 md:p-8 shadow-sm">
                     <form method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="update_services" value="true">
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                             {% for checkbox in service_form.services %}
-                            <label class="feature-card p-4 cursor-pointer flex items-center justify-between group hover:bg-slate-50 transition-colors">
+                            <label class="feature-card p-4 cursor-pointer flex items-center justify-between group active:bg-slate-50 md:hover:bg-slate-50 transition-colors">
                                 <span class="text-sm font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">{{ checkbox.choice_label }}</span>
-                                <div class="scale-110 accent-indigo-600">{{ checkbox.tag }}</div>
+                                <div class="scale-125 accent-indigo-600">{{ checkbox.tag }}</div>
                             </label>
                             {% endfor %}
                         </div>
 
-                        <div class="mt-8 pt-6 border-t border-slate-100 flex justify-end">
-                            <button type="submit" class="btn-main px-8">
+                        <div class="mt-6 pt-6 border-t border-slate-100">
+                            <button type="submit" class="btn-main w-full md:w-auto md:px-8">
                                 Save Changes
                             </button>
                         </div>
@@ -223,7 +193,7 @@
             <section id="tab-hours" class="tab-content hidden animate-fade-in">
                 <div class="grid lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1">
-                        <div class="feature-card p-6 bg-indigo-50 border-indigo-100 h-full">
+                        <div class="feature-card p-5 bg-indigo-50 border-indigo-100">
                             <div class="w-10 h-10 rounded-lg bg-white text-indigo-600 flex items-center justify-center text-lg mb-4 shadow-sm">
                                 <i class="fa-regular fa-clock"></i>
                             </div>
@@ -231,49 +201,44 @@
                             <p class="text-sm text-slate-600 leading-relaxed">
                                 Set your standard weekly availability here. Clients will only be able to book you during these windows.
                             </p>
-                            <div class="mt-6 p-4 bg-white rounded-lg border border-indigo-100">
-                                <p class="text-xs font-bold text-indigo-800 uppercase tracking-wide mb-1">Note</p>
-                                <p class="text-xs text-slate-500">Leaving a time blank or equal (e.g. 09:00 - 09:00) will mark you as unavailable for that day.</p>
-                            </div>
                         </div>
                     </div>
 
                     <div class="lg:col-span-2">
-                        <div class="feature-card p-0">
+                        <div class="feature-card overflow-hidden">
                             <form method="POST">
                                 {% csrf_token %}
-                                <table class="w-full text-left">
-                                    <thead class="bg-slate-50 border-b border-slate-100">
-                                        <tr>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Day</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Availability Window</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100">
-                                        {% for day_val, day_label in day_choices %}
-                                        <tr class="hover:bg-slate-50 transition-colors">
-                                            <td class="px-6 py-4">
-                                                <p class="text-sm font-bold text-slate-900">{{ day_label }}</p>
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                <div class="flex justify-end items-center gap-3">
-                                                    <div class="relative">
-                                                        <input type="time" name="{{ day_val }}_open" class="input-std !py-1.5 !px-2 w-28 text-center" value="{{ hours|get_item:day_val|get_attr:'open_time'|time:'H:i' }}">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead class="bg-slate-50 border-b border-slate-100">
+                                            <tr>
+                                                <th class="px-4 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Day</th>
+                                                <th class="px-4 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Availability Window</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100">
+                                            {% for day_val, day_label in day_choices %}
+                                            <tr class="hover:bg-slate-50 transition-colors">
+                                                <td class="px-4 py-4">
+                                                    <p class="text-sm font-bold text-slate-900">{{ day_label|slice:":3" }}<span class="hidden sm:inline">{{ day_label|slice:"3:" }}</span></p>
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <div class="flex justify-end items-center gap-2">
+                                                        <input type="time" name="{{ day_val }}_open" class="input-std !py-1.5 !px-2 w-[85px] md:w-28 text-center text-xs md:text-sm" value="{{ hours|get_item:day_val|get_attr:'open_time'|time:'H:i' }}">
+                                                        <span class="text-slate-300">/</span>
+                                                        <input type="time" name="{{ day_val }}_close" class="input-std !py-1.5 !px-2 w-[85px] md:w-28 text-center text-xs md:text-sm" value="{{ hours|get_item:day_val|get_attr:'close_time'|time:'H:i' }}">
                                                     </div>
-                                                    <span class="text-slate-300 font-light text-xl">/</span>
-                                                    <div class="relative">
-                                                        <input type="time" name="{{ day_val }}_close" class="input-std !py-1.5 !px-2 w-28 text-center" value="{{ hours|get_item:day_val|get_attr:'close_time'|time:'H:i' }}">
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                                <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
-                                    <button type="submit" name="update_hours" class="btn-main px-6">
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="p-4 bg-slate-50 border-t border-slate-100">
+                                    <button type="submit" name="update_hours" class="btn-main w-full md:w-auto md:px-6 md:float-right">
                                         Update Schedule
                                     </button>
+                                    <div class="clear-both"></div>
                                 </div>
                             </form>
                         </div>
@@ -282,10 +247,9 @@
             </section>
 
             <section id="tab-off" class="tab-content hidden animate-fade-in">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
                     <div class="lg:col-span-1">
-                        <div class="feature-card p-6 sticky top-24">
+                        <div class="feature-card p-5 md:sticky md:top-24">
                             <div class="flex items-center gap-3 mb-6">
                                 <div class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center">
                                     <i class="fa-solid fa-mug-hot"></i>
@@ -301,42 +265,41 @@
                                 </div>
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="mini-heading block">Start Time</label>
+                                        <label class="mini-heading block">Start</label>
                                         <input type="time" name="start_time" class="input-std" required>
                                     </div>
                                     <div>
-                                        <label class="mini-heading block">End Time</label>
+                                        <label class="mini-heading block">End</label>
                                         <input type="time" name="end_time" class="input-std" required>
                                     </div>
                                 </div>
 
                                 <div class="pt-2">
-                                    <button type="submit" name="add_block" class="btn-main w-full justify-center">
+                                    <button type="submit" name="add_block" class="btn-main w-full">
                                         Block Time
                                     </button>
-                                    <p class="text-[10px] text-slate-400 mt-3 text-center">This will prevent clients from booking you during this period.</p>
                                 </div>
                             </form>
                         </div>
                     </div>
 
                     <div class="lg:col-span-2">
-                        <div class="feature-card min-h-full p-0">
-                            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                                <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Upcoming Blocks</h3>
-                                <span class="bg-slate-200 text-slate-600 text-xs font-bold px-2 py-1 rounded-full">{{ blocks|length }}</span>
+                        <div class="feature-card min-h-full">
+                            <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                                <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wide">Upcoming Blocks</h3>
+                                <span class="bg-indigo-100 text-indigo-600 text-[10px] font-black px-2 py-0.5 rounded-full">{{ blocks|length }}</span>
                             </div>
 
                             <div class="divide-y divide-slate-100">
                                 {% for block in blocks %}
-                                <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-indigo-600 group-hover:shadow-sm border border-transparent group-hover:border-slate-200 flex items-center justify-center transition-all">
+                                <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-3 md:gap-4">
+                                        <div class="w-10 h-10 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100">
                                             <i class="fa-solid fa-calendar-day"></i>
                                         </div>
                                         <div>
-                                            <h4 class="font-bold text-slate-900 text-sm">{{ block.block_date|date:"l, d M Y" }}</h4>
-                                            <p class="text-xs font-medium text-slate-500 flex items-center gap-2 mt-0.5">
+                                            <h4 class="font-bold text-slate-900 text-sm">{{ block.block_date|date:"D, d M" }}</h4>
+                                            <p class="text-[11px] font-medium text-slate-500 flex items-center gap-1.5 mt-0.5">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
                                                 {{ block.start_time|time:"H:i" }} - {{ block.end_time|time:"H:i" }}
                                             </p>
@@ -346,18 +309,18 @@
                                     <form method="POST" class="m-0">
                                         {% csrf_token %}
                                         <input type="hidden" name="block_id" value="{{ block.id }}">
-                                        <button type="submit" name="delete_block" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Remove Block">
+                                        <button type="submit" name="delete_block" class="w-9 h-9 flex items-center justify-center text-slate-400 active:text-red-500 active:bg-red-50 md:hover:text-red-500 md:hover:bg-red-50 rounded-sm transition-all">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </form>
                                 </div>
                                 {% empty %}
-                                <div class="p-12 text-center">
-                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-                                        <i class="fa-regular fa-calendar-check text-2xl"></i>
+                                <div class="p-10 text-center">
+                                    <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-300">
+                                        <i class="fa-regular fa-calendar-check text-xl"></i>
                                     </div>
-                                    <h3 class="text-slate-900 font-bold text-sm">No Time Off Scheduled</h3>
-                                    <p class="text-xs text-slate-500 mt-1">You are fully available according to your standard hours.</p>
+                                    <h3 class="text-slate-900 font-bold text-sm">No Time Off</h3>
+                                    <p class="text-[11px] text-slate-500 mt-1">You're fully available.</p>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -371,15 +334,14 @@
 
 <script>
     function switchTab(evt, tabId) {
-        // Hide all contents
         document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-        // Show target content
         document.getElementById(tabId).classList.remove('hidden');
-
-        // Reset nav buttons
         document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
-        // Activate clicked button
         evt.currentTarget.classList.add('active');
+        // Scroll to top of tabs on mobile for better UX when switching
+        if (window.innerWidth < 768) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 </script>
 {% endblock %}

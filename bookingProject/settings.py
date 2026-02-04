@@ -52,6 +52,8 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'bookingApp.middleware.StaffActiveMiddleware',
+    'bookingApp.middleware.VisitorTrackingMiddleware',
 ]
 
 ROOT_URLCONF = 'bookingProject.urls'
@@ -84,7 +86,7 @@ DATABASES = {
         'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'", # Removed innodb_strict_mode
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
             'charset': 'utf8mb4',
         },
     }

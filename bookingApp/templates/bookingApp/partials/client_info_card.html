@@ -1,0 +1,102 @@
+<div id="client-info-card" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300">
+    {% if editing %}
+    <form hx-post="{% url 'client_update_details' client.id %}"
+          hx-target="#client-info-card"
+          hx-swap="outerHTML"
+          class="p-6 sm:p-8">
+
+        {% csrf_token %}
+
+        <div class="flex flex-col gap-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Edit Details</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-1 md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Full Name</label>
+                    <input type="text" name="name" value="{{ client.name }}" required
+                           class="w-full text-lg font-bold text-slate-900 border-b-2 border-slate-200 focus:border-indigo-600 outline-none py-1 transition-colors placeholder:text-slate-300">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Phone Number</label>
+                    <input type="tel" name="phone" value="{{ client.phone|default:'' }}"
+                           class="w-full text-sm font-medium text-slate-700 border-b-2 border-slate-200 focus:border-indigo-600 outline-none py-1 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email Address</label>
+                    <input type="email" name="email" value="{{ client.email|default:'' }}"
+                           class="w-full text-sm font-medium text-slate-700 border-b-2 border-slate-200 focus:border-indigo-600 outline-none py-1 transition-colors">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase rounded shadow-sm transition-colors">
+                    <i class="fa-solid fa-check mr-1"></i> Save Changes
+                </button>
+                <button type="button"
+                        hx-get="{% url 'client_detail' client.id %}"
+                        hx-select="#client-info-card"
+                        hx-target="#client-info-card"
+                        hx-swap="outerHTML"
+                        class="px-6 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 text-xs font-bold uppercase rounded transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {% else %}
+    <div class="p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative group">
+
+        <button hx-get="{% url 'client_update_details' client.id %}"
+                hx-target="#client-info-card"
+                hx-swap="outerHTML"
+                class="absolute top-4 right-4 text-slate-300 hover:text-indigo-600 transition-colors p-2"
+                title="Edit Details">
+            <i class="fa-solid fa-pen-to-square text-lg"></i>
+        </button>
+
+        <div class="flex items-center gap-6 w-full md:w-auto">
+
+
+            <div class="min-w-0 flex-1">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2 truncate pr-8">{{ client.name }}</h2>
+
+                <div class="flex flex-col gap-1.5">
+                    {% if client.phone %}
+                    <div class="flex items-center gap-2 text-sm font-medium text-slate-600">
+                        <i class="fa-solid fa-phone text-indigo-400 w-4 text-xs"></i>
+                        <span>{{ client.phone }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if client.email %}
+                    <div class="flex items-center gap-2 text-sm font-medium text-slate-600">
+                        <i class="fa-solid fa-envelope text-indigo-400 w-4 text-xs"></i>
+                        <span class="truncate">{{ client.email }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if not client.phone and not client.email %}
+                    <span class="text-xs italic text-slate-400">No contact details provided.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full md:w-auto flex flex-row md:flex-col gap-4 md:gap-1 text-right border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 mt-2 md:mt-0">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Joined</p>
+                <p class="text-sm font-bold text-slate-800">{{ client.created_at|date:"d M Y" }}</p>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Last Visit</p>
+                <p class="text-sm font-bold text-slate-800">{{ client.last_visit_display }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>

@@ -32,10 +32,15 @@
                             <h1 style="font-size: 84px; font-weight: 900; line-height: 0.85; margin: 0; color: #000000; letter-spacing: -4px;">
                                 See you<br/>soon.
                             </h1>
-                            <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
-                                Your appointment at <span style="color: #000000; font-weight: 600;">{{ business.name }}</span> is officially scheduled and confirmed.
-                            </p>
-                        </td>
+                            
+                            {% load email_extras %} <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
+    {% if business.custom_confirmation_message %}
+        {{ business.custom_confirmation_message|render_email_placeholders:appointment|linebreaksbr }}
+    {% else %}
+        Your appointment at <span style="color: #000000; font-weight: 600;">{{ business.name }}</span> is officially scheduled and confirmed.
+    {% endif %}
+</p>
+                            </td>
                     </tr>
 
                     <tr>
@@ -49,7 +54,6 @@
                                     <td width="50%" valign="top">
                                         <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Time</div>
                                         <div style="font-size: 24px; font-weight: 600; color: #000000;">
-                                            {# Use the time filter to format the TimeField #}
                                             {{ appointment.appointment_start_time|time:"H:i" }}
                                         </div>
                                     </td>
@@ -80,12 +84,12 @@
                                             </a>
                                         </td>
                                         <td style="padding-left: 12px;">
-    <a href="https://www.getmebooked.co.za/appointment/cancel/{{ appointment.reschedule_token }}/"
-       target="_blank"
-       style="display: block; background-color: #ef4444; color: #ffffff; padding: 18px 30px; text-decoration: none; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; text-align: center;">
-        Cancel Booking
-    </a>
-</td>
+                                            <a href="https://www.getmebooked.co.za/appointment/cancel/{{ appointment.reschedule_token }}/"
+                                               target="_blank"
+                                               style="display: block; background-color: #ef4444; color: #ffffff; padding: 18px 30px; text-decoration: none; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; text-align: center;">
+                                                Cancel Booking
+                                            </a>
+                                        </td>
                                     </tr>
                                 </table>
                             </div>
@@ -110,12 +114,12 @@
                                         </a>
                                     </td>
                                     <td style="padding-left: 12px;">
-    <a href="https://www.getmebooked.co.za/appointment/cancel/{{ appointment.reschedule_token }}/"
-       target="_blank"
-       style="display: block; background-color: #ef4444; color: #ffffff; padding: 18px 30px; text-decoration: none; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; text-align: center;">
-        Cancel Booking
-    </a>
-</td>
+                                        <a href="https://www.getmebooked.co.za/appointment/cancel/{{ appointment.reschedule_token }}/"
+                                           target="_blank"
+                                           style="display: block; background-color: #ef4444; color: #ffffff; padding: 18px 30px; text-decoration: none; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; text-align: center;">
+                                            Cancel Booking
+                                        </a>
+                                    </td>
                                     <td align="right" style="font-size: 13px; color: #94a3b8; font-weight: 600;">
                                         Order ID: #{{ appointment.id|default:"10024" }}
                                     </td>
@@ -123,7 +127,6 @@
                             </table>
                         </td>
                     </tr>
-
                 </table>
             </td>
         </tr>

@@ -2,64 +2,136 @@
 <!DOCTYPE html>
 <html lang="en-ZA" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=0.9">
-<link rel="icon" type="image/x-icon" href="/media/landing/f.png">
-<title>GetMeBooked | Salon & Barber Booking App South Africa</title>
-<meta name="description" content="The easiest booking app for South African salons, barbers, and nail studios. Reduce no-shows with PayFast deposits.">
-<meta name="theme-color" content="#4f46e5">
+<!-- =========================
+ CORE TECHNICAL META
+========================= -->
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
+<title>Salon & Barber Online Booking System South Africa | GetMeBooked</title>
+
+<meta name="description" content="GetMeBooked is South Africa’s leading online booking system for salons, barbers, nail bars and beauty studios. Accept online bookings, collect PayFast deposits, reduce no-shows, and send automated WhatsApp & email reminders.">
+
+<meta name="keywords" content="
+online booking system south africa,
+salon booking system south africa,
+barber booking system south africa,
+beauty booking software sa,
+online appointment booking salon,
+reduce no shows salon,
+payfast booking deposits,
+whatsapp booking reminders salon,
+barber appointment system sa,
+hair salon booking software south africa
+">
+
 <meta name="author" content="GetMeBooked Technologies">
-<link rel="canonical" href="{{ request.build_absolute_uri }}" />
+<meta name="publisher" content="GetMeBooked">
+<meta name="theme-color" content="#4F46E5">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
-<!-- Open Graph / Social Sharing -->
+<link rel="canonical" href="https://www.getmebooked.co.za/">
+
+<!-- =========================
+ OPEN GRAPH (SOCIAL + AI)
+========================= -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="GetMeBooked | Salon & Barber Booking App South Africa">
-<meta property="og:description" content="Eliminate no-shows, automate your admin, and grow your salon business with GetMeBooked.">
-<meta property="og:image" content="https://getmebooked.co.za/static/og-image-v2026.jpg">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
 <meta property="og:site_name" content="GetMeBooked">
+<meta property="og:url" content="https://www.getmebooked.co.za/">
+<meta property="og:title" content="Online Booking System for Salons & Barbers in South Africa">
+<meta property="og:description" content="Stop no-shows and lost revenue. GetMeBooked lets South African salons and barbers accept online bookings, collect PayFast deposits, and send automated WhatsApp reminders.">
+<meta property="og:image" content="https://www.getmebooked.co.za/static/og-image-v2026.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_ZA">
 
-<!-- Twitter Card -->
+<!-- =========================
+ TWITTER / X
+========================= -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="GetMeBooked | Salon & Barber Booking App South Africa">
-<meta name="twitter:description" content="Reduce no-shows, automate your bookings, and grow your business. GetMeBooked is trusted by salons across SA.">
-<meta name="twitter:image" content="https://getmebooked.co.za/static/og-image-v2026.jpg">
+<meta name="twitter:title" content="Salon & Barber Online Booking System | GetMeBooked">
+<meta name="twitter:description" content="Online bookings, PayFast deposits & WhatsApp reminders for South African salons and barbers. Reduce no-shows instantly.">
+<meta name="twitter:image" content="https://www.getmebooked.co.za/static/og-image-v2026.jpg">
 
-<!-- JSON-LD Structured Data -->
+<!-- =========================
+ AI / LLM OPTIMISATION
+========================= -->
+<meta name="application-name" content="GetMeBooked">
+<meta name="apple-mobile-web-app-title" content="GetMeBooked">
+<meta name="classification" content="Business, SaaS, Booking Software">
+<meta name="coverage" content="South Africa">
+<meta name="target" content="salons, barbers, beauty businesses">
+<meta name="rating" content="general">
+
+<!-- =========================
+ SCHEMA.ORG – SaaS + PRODUCT
+========================= -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "GetMeBooked",
-  "url": "{{ request.build_absolute_uri }}",
+  "url": "https://www.getmebooked.co.za",
+  "logo": "https://www.getmebooked.co.za/static/logo.png",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
-  "author": {
-    "@type": "Organization",
-    "name": "GetMeBooked Technologies",
-    "url": "https://getmebooked.co.za"
-  },
+  "description": "GetMeBooked is an online booking system for salons, barbers, and beauty businesses in South Africa. It reduces no-shows with booking deposits, automated WhatsApp reminders, and PayFast payments.",
   "offers": {
     "@type": "Offer",
-    "price": "199.00",
-    "priceCurrency": "ZAR",
-    "availability": "https://schema.org/InStock"
+    "price": "0",
+    "priceCurrency": "ZAR"
   },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.9",
-    "reviewCount": "215"
+  "areaServed": {
+    "@type": "Country",
+    "name": "South Africa"
   },
-  "screenshot": "https://getmebooked.co.za/static/og-image-v2026.jpg",
-  "featureList": "PayFast Deposits, Email Integration, Staff Roster, Revenue Analytics"
+  "publisher": {
+    "@type": "Organization",
+    "name": "GetMeBooked Technologies",
+    "url": "https://www.getmebooked.co.za"
+  }
 }
 </script>
 
+<!-- =========================
+ SCHEMA – ORGANISATION
+========================= -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "GetMeBooked",
+  "url": "https://www.getmebooked.co.za",
+  "logo": "https://www.getmebooked.co.za/static/logo.png",
+  "sameAs": [
+    "https://www.instagram.com/getmebooked",
+    "https://www.facebook.com/getmebooked"
+  ]
+}
+</script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<!-- =========================
+ PERFORMANCE & FONTS
+========================= -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<!-- =========================
+ ICONS & UI
+========================= -->
+<link rel="icon" href="/static/favicon.ico">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+<!-- =========================
+ TAILWIND
+========================= -->
+<script src="https://cdn.tailwindcss.com"></script>
+
 
     <script>
         tailwind.config = {
@@ -73,10 +145,20 @@
                         brand: {
                             50: '#eef2ff',
                             100: '#e0e7ff',
-                            500: '#4F46E5',
-                            600: '#4f46e5',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4F46E5', // Primary Indigo
+                            700: '#4338ca',
+                            800: '#3730a3',
                             900: '#312e81',
+                            950: '#1e1b4b',
                         }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 20px rgba(79, 70, 229, 0.3)',
                     }
                 }
             }
@@ -84,246 +166,1118 @@
     </script>
 
     <style>
-        body { -webkit-font-smoothing: antialiased; }
+        body {
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            background-color: #F8FAFC; /* Slate-50 equivalent for that "app" feel */
+        }
+
+        /* Smooth Reveal Animation */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Animations */
-        @keyframes float-y { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        .animate-float { animation: float-y 6s ease-in-out infinite; }
-
-        @keyframes pulse-ring {
-            0% { transform: scale(0.33); opacity: 1; }
-            80%, 100% { opacity: 0; }
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
         }
-        .pulse-ring::before {
-            content: '';
-            position: absolute;
-            left: -4px; top: -4px; right: -4px; bottom: -4px;
-            border-radius: 50%;
-            border: 2px solid #4f46e5;
-            animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-        }
-
-        /* Range Slider */
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 28px; width: 28px;
-            border-radius: 50%; background: #4f46e5; cursor: pointer;
-            margin-top: -12px;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);
-            border: 2px solid #fff;
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #4F46E5;
+            margin-top: -10px;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+            border: 3px solid #ffffff;
+            cursor: pointer;
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 6px; cursor: pointer;
-            background: #e2e8f0; border-radius: 999px;
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #E2E8F0;
+            border-radius: 99px;
         }
 
-        /* The starting state */
-.reveal-on-scroll {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s ease-out;
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+        }
+
+        /* This allows the grid to animate from 0 height to the content's height */
+.faq-item.active .faq-answer {
+    grid-template-rows: 1fr;
+    margin-top: 4px;
 }
 
-/* The state when visible */
-.reveal-on-scroll.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+/* Optional: Slight shadow on the active item to make it pop */
+.faq-item.active {
+    border-color: #4f46e5; /* indigo-600 */
+    background-color: #f8fafc; /* slate-50 */
+    shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
     </style>
 </head>
-<body class="bg-white text-slate-900 selection:bg-brand-600 selection:text-white overflow-x-hidden">
 
-<div class="fixed top-0 left-0 right-0 z-50 px-4 pt-4 lg:pt-6 transition-all duration-300" id="navbarContainer">
-    <nav class="bg-white/70 backdrop-blur-xl border border-white/60 shadow-lg shadow-slate-200/40 rounded-full px-5 py-3 lg:px-8 lg:py-4 w-full max-w-6xl mx-auto flex justify-between items-center transition-all" id="navbar">
+<body class="text-slate-900 selection:bg-brand-600 selection:text-white">
+
+<div class="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
+    <nav class="bg-white/80 backdrop-blur-xl border border-white/60 shadow-lg shadow-slate-200/40 rounded-full pl-6 pr-2 py-2 w-full max-w-5xl flex justify-between items-center transition-all duration-300" id="navbar">
 
         <a href="/" class="flex items-center gap-2.5 group">
-            <div class="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-200 group-hover:rotate-6 transition-transform">
-                <i class="fa fa-calendar-check text-sm"></i>
+            <div class="w-8 h-8 bg-brand-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-brand-500/30 group-hover:scale-110 transition-transform">
+                <i class="fa fa-calendar-check text-xs"></i>
             </div>
-            <span class="font-display font-extrabold text-xl tracking-tight text-slate-900">
+            <span class="font-display font-bold text-lg tracking-tight text-slate-900">
                 Get<span class="text-brand-600">Me</span>Booked
-
             </span>
         </a>
 
-        <div class="hidden lg:flex items-center gap-8">
-            <a href="#how-it-works" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">How it Works</a>
-            <a href="#features" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">Features</a>
-            <a href="#roi" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">Revenue</a>
-            <a href="#pricing" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-brand-600 transition-colors">Pricing</a>
+        <div class="hidden lg:flex items-center gap-1 bg-slate-100/50 p-1 rounded-full border border-slate-200/50">
+            <a href="#features" class="px-5 py-2 text-xs font-bold text-slate-600 rounded-full hover:bg-white hover:text-brand-600 hover:shadow-sm transition-all">Features</a>
+            <a href="#roi" class="px-5 py-2 text-xs font-bold text-slate-600 rounded-full hover:bg-white hover:text-brand-600 hover:shadow-sm transition-all">Revenue</a>
+            <a href="#pricing" class="px-5 py-2 text-xs font-bold text-slate-600 rounded-full hover:bg-white hover:text-brand-600 hover:shadow-sm transition-all">Pricing</a>
         </div>
 
-        <div class="hidden lg:flex items-center gap-4">
+        <div class="hidden lg:flex items-center gap-3">
             {% if user.is_authenticated %}
-                <a href="{% url 'login_dispatch' %}" class="text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-brand-600 transition-colors">Dashboard</a>
-                <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
-                    {% csrf_token %}
-                </form>
-
-                <a href="javascript:void(0)"
-                   onclick="document.getElementById('logout-form').submit();"
-                   class="bg-slate-100 text-slate-600 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-slate-200 transition-all">
-                    Sign Out
-                </a>
+                <a href="{% url 'login_dispatch' %}" class="text-xs font-bold text-slate-900 hover:text-brand-600 px-4">Dashboard</a>
+                <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">{% csrf_token %}</form>
+                <a href="javascript:void(0)" onclick="document.getElementById('logout-form').submit();" class="bg-slate-100 text-slate-900 px-5 py-2.5 rounded-full text-xs font-bold hover:bg-slate-200 transition-colors">Sign Out</a>
             {% else %}
-                <a href="{% url 'login' %}" class="text-xs font-bold uppercase tracking-widest text-slate-900 hover:text-brand-600 transition-colors">Log In</a>
-                <a href="{% url 'register' %}" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-brand-600 hover:scale-105 transition-all shadow-lg shadow-slate-300/50">
-                    Get Started!
+                <a href="{% url 'login' %}" class="text-xs font-bold text-slate-900 hover:text-brand-600 px-4">Log In</a>
+                <a href="{% url 'register' %}" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-xs font-bold hover:bg-brand-600 hover:shadow-lg hover:shadow-brand-500/20 transition-all transform hover:-translate-y-0.5">
+                    Get Started
                 </a>
             {% endif %}
         </div>
 
-        <button id="mobileMenuBtn" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 border border-slate-100 text-slate-900 transition-all active:scale-95">
-            <i class="fa-solid fa-bars-staggered" id="menuIcon"></i>
+        <button id="mobileMenuBtn" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-900">
+            <i class="fa-solid fa-bars" id="menuIcon"></i>
         </button>
     </nav>
 </div>
 
 <div id="mobileMenu" class="fixed inset-0 z-[100] pointer-events-none opacity-0 transition-opacity duration-300">
-    <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-md" onclick="toggleMenu()"></div>
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="toggleMenu()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white shadow-2xl translate-x-full transition-transform duration-500 pointer-events-auto flex flex-col p-6" id="mobileDrawer">
+        <div class="flex justify-between items-center mb-8">
+            <span class="font-display font-bold text-lg">Get<span class="text-brand-600">Me</span>Booked</span>
+            <button onclick="toggleMenu()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div class="space-y-2">
+            <a href="#features" onclick="toggleMenu()" class="block p-4 bg-slate-50 rounded-xl font-bold text-slate-700">Features</a>
+            <a href="#roi" onclick="toggleMenu()" class="block p-4 bg-slate-50 rounded-xl font-bold text-slate-700">Revenue Calculator</a>
+            <a href="#pricing" onclick="toggleMenu()" class="block p-4 bg-slate-50 rounded-xl font-bold text-slate-700">Pricing</a>
+        </div>
+        <div class="mt-auto space-y-3">
+             <a href="{% url 'register' %}" class="block w-full py-4 bg-brand-600 text-white text-center font-bold rounded-xl shadow-lg shadow-brand-200">Get Started</a>
+             <a href="{% url 'login' %}" class="block w-full py-4 border border-slate-200 text-slate-700 text-center font-bold rounded-xl">Log In</a>
+        </div>
+    </div>
+</div>
 
-    <div class="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.2)] translate-x-full transition-transform duration-500 pointer-events-auto flex flex-col" id="mobileDrawer">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        <div class="flex justify-between items-center p-6 border-b border-slate-50">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-brand-200">
-                    <i class="fa fa-calendar-check text-[10px]"></i>
+<style>
+    /* Depth Entrance: Scales from front to back */
+    @keyframes smoothFlyIn {
+        0% {
+            opacity: 0;
+            transform: scale(1.3) translateY(30px) translateZ(0);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0) translateZ(0);
+        }
+    }
+
+    /* Floating card animation */
+    @keyframes glassFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* Hardware Accelerated Entrance */
+    .animate-fluid {
+        opacity: 0;
+        will-change: transform, opacity;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        animation: smoothFlyIn 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    .glass-card {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Optimized Orbs */
+    .bg-orb {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(70px);
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.2;
+        will-change: transform;
+    }
+
+    .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+</style>
+
+<section class="relative min-h-screen flex items-center justify-center bg-slate-50 pt-40 pb-40 overflow-hidden font-display">
+
+    <div class="bg-orb w-[550px] h-[550px] bg-indigo-400 -top-20 -right-20"></div>
+    <div class="bg-orb w-[650px] h-[650px] bg-indigo-500 -bottom-32 -left-32"></div>
+
+    <div class="relative max-w-6xl mx-auto px-6 text-center z-10">
+
+        <div class="animate-fluid inline-flex items-center gap-2 px-4 py-1.5 mb-10 rounded-full bg-indigo-600 text-white text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-indigo-200/50">
+            <i class="fa-solid fa-crown text-[#FFD43B]"></i> Effortless Bookings
+        </div>
+
+        <h1 class="animate-fluid delay-1 font-extrabold text-6xl sm:text-8xl text-slate-900 tracking-tight leading-[1.0] mb-10">
+            Never Miss a Booking. <br>
+            <span class="bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent">Protect Your Revenue.</span>
+        </h1>
+
+        <p class="animate-fluid delay-2 max-w-2xl mx-auto text-xl sm:text-2xl text-slate-500 font-medium leading-relaxed mb-10">
+            Keep clients committed with flexible deposits and automatic reminders that fill your calendar and protect your earnings.
+        </p>
+
+        <div class="animate-fluid delay-3 flex flex-col sm:flex-row items-center justify-center gap-6">
+            <a href="{% url 'register' %}"
+               class="group relative w-full sm:w-auto px-12 py-5 rounded-full bg-indigo-600 text-white text-lg font-bold transition-all hover:scale-100 hover:shadow-[0_20px_40px_rgba(79,70,229,0.3)] active:scale-95 text-center">
+                Start Your Free Trial
+            </a>
+
+            <button onclick="openDemoModal()"
+                    class="glass-card w-full sm:w-auto px-12 py-5 rounded-full text-slate-900 text-lg font-bold flex items-center justify-center gap-3 hover:scale-100 hover:shadow-[0_20px_40px_rgba(79,70,229,0.3)] active:scale-95 text-center">
+                <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
+                    <i class="fa-solid fa-play text-white text-[10px] ml-0.5"></i>
                 </div>
-                <span class="font-display font-black text-lg tracking-tight text-slate-900">Get<span class="text-brand-600">Me</span>Booked</span>
-            </div>
-            <button onclick="toggleMenu()" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">
-                <i class="fa-solid fa-xmark text-lg"></i>
+                Quick Demo
             </button>
         </div>
 
-        <div class="flex flex-col gap-1 p-4 flex-1 overflow-y-auto">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-4 mb-2">Main Navigation</p>
+        <div class="animate-fluid delay-3 mt-12 grid grid-cols-2 lg:grid-cols-4 gap-12 max-w-5xl mx-auto border-t border-slate-200/60 pt-16">
 
-
-
-            <a href="#how-it-works" onclick="toggleMenu()" class="flex items-center justify-between p-4 rounded-2xl hover:bg-brand-50 group transition-all">
-                <span class="text-lg font-bold text-slate-700 group-hover:text-brand-600">How it Works</span>
-                <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i>
-            </a>
-
-            <a href="#features" onclick="toggleMenu()" class="flex items-center justify-between p-4 rounded-2xl hover:bg-brand-50 group transition-all">
-                <span class="text-lg font-bold text-slate-700 group-hover:text-brand-600">Features</span>
-                <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i>
-            </a>
-
-            <a href="#roi" onclick="toggleMenu()" class="flex items-center justify-between p-4 rounded-2xl hover:bg-brand-50 group transition-all">
-                <span class="text-lg font-bold text-slate-700 group-hover:text-brand-600">Revenue Calculator</span>
-                <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i>
-            </a>
-        </div>
-
-        <div class="p-6 bg-slate-50/50 border-t border-slate-100 space-y-3">
-            {% if user.is_authenticated %}
-                <a href="{% url 'login_dispatch' %}" class="w-full bg-brand-600 text-white text-center py-4 rounded-2xl font-bold shadow-lg shadow-brand-200 block">
-                    Go to Dashboard
-                </a>
-            {% else %}
-                <div class="grid grid-cols-2 gap-3">
-                    <a href="{% url 'login' %}" class="flex items-center justify-center border border-slate-200 text-slate-700 py-4 rounded-2xl font-bold text-sm bg-white">
-                        Log In
-                    </a>
-                    <a href="{% url 'register' %}" class="flex items-center justify-center bg-slate-950 text-white py-4 rounded-2xl font-bold text-sm shadow-xl">
-                        Join Now
-                    </a>
-                </div>
-            {% endif %}
-            <p class="text-[9px] text-center text-slate-400 font-medium uppercase tracking-widest pt-2">
-                <i class="fa-solid fa-lock mr-1"></i> Secure Access
+    <div class="relative text-center lg:text-left px-4">
+        <div class="flex flex-col">
+            <span class="text-5xl font-extrabold text-slate-900 tracking-tight mb-3">98%</span>
+            <div class="h-1 w-8 bg-indigo-600 mb-4 mx-auto lg:mx-0 rounded-full"></div>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] leading-relaxed">
+                Attendance <br> Rate
             </p>
         </div>
     </div>
-</div>
 
-<div class="relative overflow-hidden bg-[#0f172a]">
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-[500px] lg:w-[800px] h-[500px] lg:h-[800px] bg-brand-600/20 blur-[100px] rounded-full"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] lg:w-[900px] h-[600px] lg:h-[900px] bg-purple-600/20 blur-[120px] rounded-full"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-500/5 blur-[120px] rounded-full"></div>
+    <div class="relative text-center lg:text-left px-4">
+        <div class="flex flex-col">
+            <span class="text-5xl font-extrabold text-slate-900 tracking-tight mb-3">Secure</span>
+            <div class="h-1 w-8 bg-indigo-600 mb-4 mx-auto lg:mx-0 rounded-full"></div>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] leading-relaxed">
+                Integrated <br> Payments
+            </p>
+        </div>
     </div>
 
-<div class="relative bg-slate-950 overflow-hidden border-y border-white/5">
+    <div class="relative text-center lg:text-left px-4">
+        <div class="flex flex-col">
+            <span class="text-5xl font-extrabold text-slate-900 tracking-tight mb-3">24/7</span>
+            <div class="h-1 w-8 bg-indigo-600 mb-4 mx-auto lg:mx-0 rounded-full"></div>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] leading-relaxed">
+                Client <br> Self-Service
+            </p>
+        </div>
+    </div>
 
-    <div class="absolute inset-0 z-0 pointer-events-none h-[120%] -top-[10%] w-full">
+    <div class="relative text-center lg:text-left px-4">
+        <div class="flex flex-col">
+            <span class="text-5xl font-extrabold text-slate-900 tracking-tight mb-3">Auto</span>
+            <div class="h-1 w-8 bg-indigo-600 mb-4 mx-auto lg:mx-0 rounded-full"></div>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] leading-relaxed">
+                Smart <br> Reminders
+            </p>
+        </div>
+    </div>
 
-    <img
-        id="hero-parallax-img"
-        src="/media/landing/000.jpg"
-        alt="Background"
-        class="block w-full h-full object-cover opacity-60 will-change-transform"
-        fetchpriority="high"
-        loading="eager"
-    >
-
-
-
-    <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-transparent to-slate-950"></div>
 </div>
 
-    <section id="hero" class="relative pt-40 pb-20 lg:pt-36 lg:pb-32 z-10 top-0">
-        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+    </div>
+</section>
 
-            <div class="text-center lg:text-left">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600/20 text-white border-2 border-indigo-600 text-[9px] font-lighter mb-8 uppercase tracking-[0.2em] shadow-lg shadow-indigo-500/20">
-                    <i class="fa-solid fa-star text-yellow-500"></i> Pretoria, South Africa
+
+<section id="features" class="py-16 lg:py-24 bg-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="text-center max-w-3xl mx-auto mb-20 lg:mb-24">
+            <p class="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-6">Securing bookings for South Africa's Top Studios</p>
+            <h2 class="font-display font-black text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tighter mb-6">
+                Built for owners who want to <span class="text-indigo-600">stay in control.</span>
+            </h2>
+            <p class="text-slate-500 text-lg md:text-xl leading-relaxed">
+                Stop juggling spreadsheets and manual follow-ups. Our system acts as your digital floor manager, protecting your time and your revenue 24/7.
+            </p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 mb-24 lg:mb-32">
+            <div class="lg:w-1/2">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-6 border border-indigo-100 shadow-sm">
+                    <i class="fa-regular fa-calendar-check"></i>
                 </div>
-
-                <h2 class="font-display text-4xl sm:text-5xl font-extrabold text-white leading-tight mb-6 tracking-tight">
-                    Stop Chasing Clients.<br/>
-                    <span class="bg-gradient-to-r from-indigo-400 to-violet-500 bg-clip-text text-transparent">
-                        Fill Your Chair on Autopilot.
-                    </span>
-                </h2>
-
-
-                <p class="text-lg text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto">
-                    Clients book online, pay a deposit, and get automatic confirmations and reminders. You control who pays, how much they pay, and when exceptions apply. Protect your time while keeping loyal clients happy.
+                <h3 class="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">
+                    Scheduling that enforces your rules
+                </h3>
+                <p class="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
+                    Your calendar shouldn't be a free-for-all. Configure exactly how you work, and let the system handle the rest. No more overlapping bookings or forgotten cleaning gaps.
                 </p>
-                <div class="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start animate__animated animate__fadeInUp animate__delay-1s">
-                    <a href="{% url 'register' %}" class="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-indigo-400 via-indigo-500 to-violet-500 text-white font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-3 rounded-2xl shadow-xl shadow-indigo-900/40 group">
-                        Start 14 Day Trial <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                    <button onclick="openDemoModal()"
-                    class="w-full sm:w-auto px-10 py-5 bg-indigo-500/20 text-white border border-indigo-700 font-bold hover:bg-slate-700/20 transition-all rounded-2xl">
-                    <span>Quick Demo</span>
-                    <i class="fa-solid fa-envelope-circle-check text-white text-sm"></i>
-                </button>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="flex items-start gap-4 p-4 rounded-2xl bg-indigo-50/30 border border-indigo-100/50">
+                        <i class="fa-solid fa-clock-rotate-left text-indigo-600 mt-1"></i>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">Dynamic Buffer Management</p>
+                            <p class="text-slate-500 text-xs md:text-sm">Automatically inject 15, 30, or 60-minute windows between services for sanitization or staff breaks.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 p-4 rounded-2xl bg-indigo-50/30 border border-indigo-100/50">
+                        <i class="fa-solid fa-users-gears text-indigo-600 mt-1"></i>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">Multi-Staff Coordination</p>
+                            <p class="text-slate-500 text-xs md:text-sm">View and manage multiple stylists or rooms on one screen with real-time availability syncing.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-
+            <div class="lg:w-1/2 w-full">
+                <div class="bg-slate-50 rounded-[2.5rem] p-4 shadow-xl border border-slate-200">
+                    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-black text-slate-900 text-base">Friday, Oct 24</h4>
+                                <p class="text-[10px] text-indigo-600 font-bold uppercase tracking-widest">Peak Demand Day</p>
+                            </div>
+                            <span class="bg-indigo-600 text-white text-[10px] font-black px-3 py-1 rounded-full">92% OCCUPANCY</span>
+                        </div>
+                        <div class="p-5 space-y-3">
+                            <div class="flex items-center bg-indigo-50/50 rounded-xl p-3 border border-indigo-100">
+                                <div class="w-12 text-center border-r border-indigo-200 mr-4">
+                                    <p class="text-[10px] font-black text-indigo-400">09:00</p>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-black text-slate-900">Balayage + Blowout</p>
+                                    <p class="text-[10px] text-indigo-600 uppercase font-bold tracking-tight">Lerato M. • Sarah</p>
+                                </div>
+                                <i class="fa-solid fa-circle-check text-indigo-600"></i>
+                            </div>
+                            <div class="flex items-center justify-center py-2 border-2 border-dashed border-slate-200 rounded-xl">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">15m Sanitization Buffer</span>
+                            </div>
+                            <div class="flex items-center bg-white rounded-xl p-3 border border-slate-200 opacity-60">
+                                <div class="w-12 text-center border-r border-slate-200 mr-4">
+                                    <p class="text-[10px] font-black text-slate-400">11:15</p>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-black text-slate-900">Silk Press</p>
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold">Tanya K. • Kevin</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
 
+        <div class="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-20 mb-24 lg:mb-32">
+            <div class="lg:w-1/2">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-6 border border-indigo-100 shadow-sm">
+                    <i class="fa-solid fa-shield"></i>
+                </div>
+                <h3 class="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">
+                    Flexible deposits, <span class="text-indigo-600">zero ghosting.</span>
+                </h3>
+                <p class="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
+                    Your time is your inventory. We ensure every booking is backed by a financial commitment that suits your business model. Whether you prefer a flat booking fee or a percentage of the service, the system enforces your rules automatically.
+                </p>
 
+                <ul class="space-y-5">
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <div>
+                            <p class="text-slate-900 font-bold text-base">Custom Deposit Types</p>
+                            <p class="text-slate-500 text-sm">Set a Flat Rate (e.g., R150) for simple services or a Percentage (e.g., 50%) for high-value treatments like Balayage.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <div>
+                            <p class="text-slate-900 font-bold text-base">Automated Policy Consent</p>
+                            <p class="text-slate-500 text-sm">Clients must agree to your cancellation and "No-Show" policies before the PayFast gateway even opens.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <div>
+                            <p class="text-slate-900 font-bold text-base">Instant Slot Re-opening</p>
+                            <p class="text-slate-500 text-sm">If a deposit isn't completed, the system automatically expires the pending session and re-opens your calendar slot.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
-    <div class="max-w-7xl mb-8 mx-auto px-6">
-        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-10 text-center">Powering South Africa's Top Studios</p>
+            <div class="lg:w-1/2 w-full flex justify-center items-center py-6 lg:py-10">
+                <div class="relative w-full max-w-[320px]">
+                    <div class="absolute -inset-8 bg-indigo-100/30 rounded-full blur-[60px]"></div>
 
-        <div class="relative flex overflow-x-hidden">
-            <div class="animate-marquee flex items-center gap-12 md:gap-24 whitespace-nowrap px-4">
-                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-spa"></i> HAIR SALONS</div>
-                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-scissors"></i> BARBERS</div>
-                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-gem"></i> NAIL STUDIOS</div>
-                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-pen-nib"></i> TATTOO STUDIOS</div>
-                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-spa"></i> HAIR SALONS</div>
-                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-scissors"></i> BARBERS</div>
-                <div class="flex items-center gap-3 font-display font-extrabold text-2xl text-slate-300 hover:text-brand-600 transition-colors cursor-default"><i class="fa-solid fa-pen-nib"></i> TATTOO STUDIO</div>
+                    <div class="relative bg-white rounded-[2.5rem] p-2.5 border-[5px] border-slate-900 shadow-xl">
+
+                        <div class="flex justify-between items-center px-6 py-2 mb-1">
+                            <span class="text-[9px] font-black text-slate-900">9:41</span>
+                            <div class="w-14 h-3.5 bg-slate-900 rounded-full"></div>
+                            <div class="flex gap-1 items-center opacity-40">
+                                <i class="fas fa-signal text-[8px]"></i>
+                                <i class="fas fa-battery-full text-[8px]"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50/50 rounded-[2rem] overflow-hidden border border-slate-100 flex flex-col">
+
+                            <div class="bg-white px-6 py-4 border-b border-slate-100 flex flex-col items-center">
+                                <img src="{% static 'img/Payfast.png' %}" alt="PayFast" class="h-4 mb-1 opacity-80">
+                                <p class="text-[7px] font-black uppercase tracking-widest text-slate-400">Secure Checkout</p>
+                            </div>
+
+                            <div class="p-5">
+                                <div class="flex justify-center gap-1 mb-5">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
+                                    <div class="w-4 h-1.5 rounded-full bg-indigo-600"></div>
+                                </div>
+
+                                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-5 text-center">
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Deposit Due Now</p>
+                                    <h4 class="text-3xl font-black text-slate-900">R900.00</h4>
+                                    <span class="text-[9px] font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full mt-2 inline-block">50% Commitment</span>
+                                </div>
+
+                                <div class="space-y-3 mb-6 px-1">
+                                    <div class="flex justify-between items-center text-[10px]">
+                                        <span class="font-bold text-slate-400">Service</span>
+                                        <span class="font-black text-slate-800">Full Balayage</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-[10px]">
+                                        <span class="font-bold text-slate-400">Time</span>
+                                        <span class="font-black text-slate-800">Oct 24, 09:00</span>
+                                    </div>
+
+                                    <div class="pt-2">
+                                        <div class="flex items-start gap-2.5 p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+                                            <div class="w-4 h-4 rounded bg-indigo-600 flex items-center justify-center text-white flex-shrink-0 mt-0.5">
+                                                <i class="fa-solid fa-check text-[8px]"></i>
+                                            </div>
+                                            <p class="text-[9px] text-slate-500 leading-snug">
+                                                I agree to the <span class="font-bold text-indigo-600 underline">Cancellation Policy</span>.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="w-full py-3.5 bg-[#ED1C24] text-white rounded-xl font-black text-xs shadow-lg shadow-red-100 flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+                                    COMPLETE BOOKING
+                                    <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                                </button>
+
+                                <div class="mt-5 flex justify-center items-center gap-2 opacity-30 grayscale">
+                                    <i class="fa-brands fa-cc-visa text-sm"></i>
+                                    <i class="fa-brands fa-cc-mastercard text-sm"></i>
+                                    <span class="text-[7px] font-black tracking-widest uppercase">PCI Secure</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 mb-24 lg:mb-32">
+            <div class="w-full lg:w-1/2">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-6 border border-indigo-100 shadow-sm">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <h3 class="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">
+                    Reliable reminders, <span class="text-indigo-600">zero manual effort</span>
+                </h3>
+                <p class="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
+                    No-shows cost the South African beauty industry millions annually. We bridge the gap between your booking calendar and your client's pocket.
+                </p>
+
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-400 flex items-center justify-center text-white shadow-md">
+                            <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-black text-slate-900 uppercase tracking-wide mb-1">Instant Confirmation</p>
+                            <p class="text-xs text-slate-500 leading-relaxed">The second a deposit is paid via PayFast, an official receipt is dispatched.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-md">
+                            <i class="fa-solid fa-bell text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-black text-slate-900 uppercase tracking-wide mb-1">24h Proactive Alert</p>
+                            <p class="text-xs text-slate-500 leading-relaxed">Automated emails act as your digital receptionist, reminding clients 1 day before.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center text-white shadow-md">
+                            <i class="fa-brands fa-whatsapp text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-black text-slate-900 uppercase tracking-wide mb-1">WhatsApp Concierge</p>
+                            <p class="text-xs text-slate-500 leading-relaxed">Access pre-filled WhatsApp templates for one-tap personal follow-ups.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/2">
+                <div class="relative w-full">
+                    <div class="bg-slate-50 rounded-[2rem] p-6 border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 class="font-black text-slate-900 text-xs md:text-sm uppercase tracking-widest">Live Activity Log</h4>
+                            <span class="flex items-center gap-2 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> System Active
+                            </span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                        <i class="fa-solid fa-envelope text-[10px]"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] font-black text-slate-900">Email Reminder Sent</p>
+                                        <p class="text-[10px] text-slate-400">lerato@example.co.za</p>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">2m ago</span>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                        <i class="fa-brands fa-whatsapp text-[10px]"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] font-black text-slate-900">WhatsApp Ready</p>
+                                        <p class="text-[10px] text-slate-400">Sarah Mthembu</p>
+                                    </div>
+                                </div>
+                                <button class="px-3 py-1.5 bg-emerald-500 text-white text-[9px] font-black rounded-lg uppercase">Open Chat</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-5 bg-indigo-600 rounded-2xl text-white relative overflow-hidden">
+                            <i class="fa-solid fa-quote-left absolute top-4 right-4 text-white/10 text-5xl"></i>
+                            <p class="text-xs font-bold leading-relaxed relative z-10">
+                                "Persistence is only annoying when it’s manual. When it’s automated, it’s just good business."
+                            </p>
+                            <p class="text-[9px] font-black uppercase mt-3 tracking-widest text-indigo-200">— Founder, GetMeBooked</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-20 mb-24 lg:mb-32">
+            <div class="lg:w-1/2">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-6 border border-indigo-100 shadow-sm">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3 class="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">
+                    Intelligence for the modern owner
+                </h3>
+                <p class="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
+                    Knowledge is power. Identify your busiest hours, track your highest-grossing staff members, and watch your business grow through clean, visual data.
+                </p>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Daily Average</p>
+                        <p class="text-2xl font-black text-slate-900">R3,490</p>
+                        <div class="mt-2 text-emerald-600 text-xs font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-up"></i> 12%
+                        </div>
+                    </div>
+                    <div class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">New Clients</p>
+                        <p class="text-2xl font-black text-slate-900">28</p>
+                        <div class="mt-2 text-emerald-600 text-xs font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-up"></i> 8%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:w-1/2 w-full">
+                <div class="bg-slate-50 rounded-[2.5rem] p-6 border border-slate-200 shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h4 class="font-black text-slate-900 text-base">Revenue Performance</h4>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Reporting Period: Oct 2023</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 cursor-pointer transition-colors">
+                            <i class="fa-solid fa-print text-xs"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm">
+                        <div class="relative h-40 w-full flex items-end justify-between gap-2 border-b border-slate-100 pb-2">
+                            <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                                <div class="border-t border-slate-50 w-full"></div>
+                                <div class="border-t border-slate-50 w-full"></div>
+                                <div class="border-t border-slate-50 w-full"></div>
+                            </div>
+
+                            <div class="flex-1 bg-slate-100 rounded-t-lg h-[40%] transition-all hover:bg-indigo-100"></div>
+                            <div class="flex-1 bg-slate-100 rounded-t-lg h-[55%] transition-all hover:bg-indigo-100"></div>
+                            <div class="flex-1 bg-slate-100 rounded-t-lg h-[45%] transition-all hover:bg-indigo-100"></div>
+                            <div class="flex-1 bg-indigo-600 rounded-t-lg h-[90%] relative group shadow-lg shadow-indigo-200">
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] px-2 py-1 rounded font-bold">R5,200</div>
+                            </div>
+                            <div class="flex-1 bg-slate-100 rounded-t-lg h-[60%] transition-all hover:bg-indigo-100"></div>
+                            <div class="flex-1 bg-slate-100 rounded-t-lg h-[75%] transition-all hover:bg-indigo-100"></div>
+                            <div class="flex-1 bg-slate-100 rounded-t-lg h-[30%] transition-all hover:bg-indigo-100"></div>
+                        </div>
+                        <div class="flex justify-between mt-3 px-1">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Mon</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Tue</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Wed</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Thu</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Fri</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Sat</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Sun</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-3">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Top Stylists</p>
+                        <div class="bg-white p-3 rounded-2xl border border-slate-200 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-[10px] font-bold border border-indigo-100">SM</div>
+                                <span class="text-xs font-black text-slate-900">Sarah Mthembu</span>
+                            </div>
+                            <span class="text-xs font-black text-emerald-600">R12,400</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl border border-slate-200 flex items-center justify-between opacity-60">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 text-[10px] font-bold border border-slate-100">JD</div>
+                                <span class="text-xs font-black text-slate-900">John Doe</span>
+                            </div>
+                            <span class="text-xs font-black text-slate-900">R8,200</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 max-w-6xl mx-auto">
+            <div class="lg:w-5/12 text-left">
+                <div class="inline-block px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-wider mb-4">
+                    Customer CRM
+                </div>
+                <h3 class="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
+                    Loyalty built on <span class="text-indigo-600">better data.</span>
+                </h3>
+                <p class="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
+                    Stop guessing. Our CRM tracks visit frequency, average spend, and specific service formulas, allowing you to offer a truly personalized experience that keeps clients coming back.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3">
+                        <i class="fa-solid fa-message text-indigo-600 text-sm"></i>
+                        <span class="text-xs font-bold text-slate-700">Detailed Preferences</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3">
+                        <i class="fa-solid fa-address-book text-indigo-600 text-sm"></i>
+                        <span class="text-xs font-bold text-slate-700">Full History Log</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:w-7/12 w-full">
+    <div class="bg-slate-900 rounded-[2.2rem]  shadow-2xl">
+        <div class="bg-white rounded-[2.1rem] overflow-hidden">
+            <div class="p-4 md:p-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-base md:text-lg font-black shadow-lg">
+                        LM
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <p class="text-base md:text-lg font-black text-slate-900">Lerato Molefe</p>
+                            <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[8px] font-black uppercase tracking-tighter">VIP</span>
+                        </div>
+                        <p class="text-slate-400 text-[10px] font-medium">Customer since Nov 2024 • Pretoria</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 border-b border-slate-100 bg-slate-50/30">
+                <div class="p-4 border-r border-slate-100">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Spent</p>
+                    <p class="text-sm font-black text-slate-900">R6,420</p>
+                </div>
+                <div class="p-4 md:border-r border-slate-100">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Visits</p>
+                    <p class="text-sm font-black text-slate-900">12</p>
+                </div>
+                <div class="p-4 border-t md:border-t-0 border-r border-slate-100">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Avg</p>
+                    <p class="text-sm font-black text-slate-900">R535</p>
+                </div>
+                <div class="p-4 border-t md:border-t-0">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Last</p>
+                    <p class="text-sm font-black text-indigo-600">14 Days</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 p-5 border-r border-slate-100 bg-slate-50/50">
+                    <h5 class="text-[10px] font-black text-slate-900 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-flask text-indigo-500"></i> Preferences
+                    </h5>
+                    <div class="space-y-2">
+                        <div class="p-2.5 bg-white rounded-lg border border-slate-200 text-[11px]">
+                            <p class="font-bold text-slate-700">Formula</p>
+                            <p class="text-slate-500 font-mono">6.1 Ash Blonde + 20vol</p>
+                        </div>
+                        <div class="p-2.5 bg-white rounded-lg border border-slate-200 text-[11px]">
+                            <p class="font-bold text-slate-700">Notes</p>
+                            <p class="text-slate-500 italic">"Prefers sparkling water."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:w-1/2 p-5">
+                    <h5 class="text-[10px] font-black text-slate-900 uppercase tracking-widest mb-3 text-nowrap">Recent History</h5>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-2">
+                            <div class="w-1.5 h-1.5 rounded-full bg-green-500 mt-1"></div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-800">Full Balayage</p>
+                                <p class="text-[9px] text-slate-400">18 Jan 2026 • Sarah</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1"></div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-800">Blowout</p>
+                                <p class="text-[9px] text-slate-400">04 Dec 2025 • Sarah</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 md:p-4 bg-slate-50 flex flex-col sm:flex-row gap-2">
+                <button class="flex-1 py-3 bg-[#25D366] text-white rounded-xl font-black text-[10px] shadow-md flex items-center justify-center gap-2 hover:brightness-105 transition-all">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    WHATSAPP REBOOK
+                </button>
+                <div class="flex items-center gap-3 px-4 py-2 bg-white border border-slate-200 rounded-xl w-full sm:w-auto">
+                    <span class="text-[9px] font-black text-slate-700 uppercase tracking-tight">Deposit Required</span>
+                    <div class="w-8 h-4 bg-indigo-600 rounded-full relative">
+                        <div class="absolute right-1 top-1 w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
+        </div>
 
+    </div>
+</section>
+
+<section id="roi" class="py-24 bg-slate-50 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-40"></div>
+
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+
+            <div class="reveal-on-scroll">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-[10px] font-bold uppercase tracking-widest mb-6">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-600"></span>
+                    </span>
+                    Revenue Protection
+                </div>
+
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-[1.1]">
+                    Stop losing money to <span class="text-brand-600">empty chairs.</span>
+                </h2>
+                <p class="text-slate-500 text-lg md:text-xl mb-10 leading-relaxed max-w-lg">
+                    No-shows are a hidden leak in your cash flow. Use our calculator to see exactly how much revenue you can protect with automated deposits.
+                </p>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-bolt text-brand-600 mb-3 block"></i>
+                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">PayFast Integration</span>
+                        <span class="block text-slate-900 font-bold text-lg">3.2% + R2.00</span>
+                    </div>
+                    <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-calendar-check text-brand-600 mb-3 block"></i>
+                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Payout Speed</span>
+                        <span class="block text-slate-900 font-bold text-lg">Up to you</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div class="absolute -inset-4 bg-gradient-to-tr from-brand-500/10 to-indigo-500/10 blur-3xl rounded-[3rem]"></div>
+
+                <div class="relative bg-white rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-100 p-8 md:p-12">
+                    <div class="mb-10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Estimated Recovery</span>
+                            <div class="h-px flex-grow mx-4 bg-slate-100"></div>
+                            <i class="fa-solid fa-circle-info text-slate-300"></i>
+                        </div>
+                        <h3 class="text-6xl font-black text-slate-900 tracking-tighter" id="roiTotal">R1,500</h3>
+                        <p class="text-slate-400 text-sm mt-2">Additional revenue protected per month</p>
+                    </div>
+
+                    <div class="space-y-10">
+                        <div class="group">
+                            <div class="flex justify-between items-end mb-4">
+                                <div>
+                                    <label class="block font-black text-slate-900 text-sm uppercase tracking-wide">Monthly No-Shows</label>
+                                    <p class="text-xs text-slate-400">Clients who book but don't show up</p>
+                                </div>
+                                <span class="text-2xl font-black text-brand-600" id="apptVal">10</span>
+                            </div>
+                            <input type="range" id="apptRange" min="5" max="50" value="10" step="1"
+                                class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        </div>
+
+                        <div class="group">
+                            <div class="flex justify-between items-end mb-4">
+                                <div>
+                                    <label class="block font-black text-slate-900 text-sm uppercase tracking-wide">Deposit Amount</label>
+                                    <p class="text-xs text-slate-400">Required financial commitment</p>
+                                </div>
+                                <span class="text-2xl font-black text-brand-600" id="priceVal">R150</span>
+                            </div>
+                            <input type="range" id="priceRange" min="50" max="1000" value="150" step="50"
+                                class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        </div>
+                    </div>
+
+                    <div class="mt-12 pt-8 border-t border-slate-50">
+                        <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                <i class="fa-solid fa-shield-halved text-brand-600 text-xs"></i>
+                            </div>
+                            <p class="text-[11px] text-slate-500 leading-tight">
+                                <strong>Secure by Design:</strong> This calculation accounts for a 100% recovery rate on no-show slots through your PayFast merchant account.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Professional styling for the range slider */
+    input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        background: #ffffff;
+        border: 4px solid #4f46e5; /* Replace with your brand-600 color */
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        transition: all 0.2s ease;
+    }
+    input[type='range']::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+        border-width: 6px;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<style>
+    /* Customizing Swiper pagination to match your slate/brand theme */
+    .testimonialSwiper .swiper-pagination-bullet-active {
+        background: #0f172a; /* slate-900 */
+    }
+    .testimonialSwiper {
+        padding-bottom: 3rem !important;
+    }
+</style>
+
+<section class="bg-slate-50 py-20 px-4">
+    <div class="max-w-7xl mx-auto">
+
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-4">Trusted by SA's <span class="text-brand-600">Finest Studios</span></h2>
+            <p class="text-slate-600 max-w-2xl mx-auto">See why local businesses are switching to GetMeBooked to manage their schedules and secure their revenue.</p>
+        </div>
+
+        <div class="swiper testimonialSwiper">
+            <div class="swiper-wrapper">
+
+                <div class="swiper-slide">
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-1 text-amber-400 mb-6">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-slate-600 font-medium leading-relaxed mb-8">
+                                "Since switching to GetMeBooked, our weekend no-shows dropped to zero. The PayFast deposit system is a game changer for us."
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600">AB</div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm">Anne Brooks</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">The Glam Studio, Rosebank</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-1 text-amber-400 mb-6">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-slate-600 font-medium leading-relaxed mb-8">
+                                "Very easy to set up and very handy that it allows payments for South Africans. Very responsive support too."
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600">JL</div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm">Jaz Lopez</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Redlight Studio, Cape Saint Francis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-1 text-amber-400 mb-6">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-slate-600 font-medium leading-relaxed mb-8">
+                                "I was still on a trial just testing the system and everything is good. I'm going to start using it properly this coming month. I know it will be a good addition to my waxing business and I love that it takes deposit using payfast"
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600">L</div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm">Lerato</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Boikgathollo Massages, Bloemfontein</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const swiper = new Swiper('.testimonialSwiper', {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            loop: true,
+            centeredSlides: false,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                // Desktop
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                },
+                // Tablet
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                }
+            }
+        });
+    });
+</script>
+
+<section id="pricing" class="py-32 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="mb-16">
+            <span class="text-indigo-600 text-xs font-black uppercase tracking-[0.2em] bg-indigo-50 px-4 py-2 rounded-full border border-indigo-100">Simple Pricing</span>
+            <h2 class="text-5xl font-black text-slate-900 mt-6 mb-4 tracking-tight">One plan. <span class="text-brand-600">Everything included.</span></h2>
+            <p class="text-slate-500 text-lg max-w-2xl">Cut through the confusion. Every feature you need, one straightforward monthly price.</p>
+        </div>
+
+        <div class="bg-white rounded-[3rem] border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-hidden">
+            <div class="flex flex-col lg:flex-row">
+
+                <div class="lg:w-1/3 p-12 lg:p-16 bg-slate-50 border-r border-slate-100 flex flex-col justify-center text-center lg:text-left">
+                    <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-4">Professional Access</p>
+                    <div class="flex items-baseline justify-center lg:justify-start gap-1 mb-2">
+                        <span class="text-3xl font-black text-slate-900">R</span>
+                        <span class="text-8xl font-black text-slate-900 tracking-tighter">349</span>
+                        <span class="text-slate-400 font-bold ml-2">/mo</span>
+                    </div>
+                    <p class="text-slate-500 text-sm font-medium mb-10">Billed monthly. Cancel whenever you want.</p>
+
+                    <div class="space-y-4">
+                        <a href="{% url 'register' %}" class="block w-full py-5 bg-indigo-600 text-white text-center font-black rounded-2xl hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition-all uppercase tracking-widest text-xs">
+                            Start 14-Day Free Trial
+                        </a>
+                        <p class="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest">Zero risk, just results.</p>
+                    </div>
+                </div>
+
+                <div class="lg:w-2/3 p-12 lg:p-16">
+                    <h3 class="text-xl font-black text-slate-900 mb-10">Included in your subscription:</h3>
+
+                    <div class="grid md:grid-cols-2 gap-x-12 gap-y-8">
+                        <div class="flex items-start gap-4">
+                            <div class="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-emerald-600 text-[10px]"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm mb-1">Unlimited Everything</p>
+                                <p class="text-xs text-slate-500 leading-relaxed font-medium">No limits on the number of staff members, services, or bookings.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-emerald-600 text-[10px]"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm mb-1">PayFast Integration</p>
+                                <p class="text-xs text-slate-500 leading-relaxed font-medium">Secure deposit collection through SA's leading payment gateway.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-emerald-600 text-[10px]"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm mb-1">Automated Reminders</p>
+                                <p class="text-xs text-slate-500 leading-relaxed font-medium">WhatsApp and Email notifications to slash your no-show rates.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-emerald-600 text-[10px]"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm mb-1">Business Analytics</p>
+                                <p class="text-xs text-slate-500 leading-relaxed font-medium">Real-time revenue tracking and staff performance insights.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-emerald-600 text-[10px]"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm mb-1">Custom Booking Link</p>
+                                <p class="text-xs text-slate-500 leading-relaxed font-medium">A unique, branded URL for your business to share on social media.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-emerald-600 text-[10px]"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-900 text-sm mb-1">Client CRM</p>
+                                <p class="text-xs text-slate-500 leading-relaxed font-medium">Complete history of every client visit and payment record.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</section>
 
 <style>
     @keyframes marquee {
@@ -331,953 +1285,553 @@
         100% { transform: translateX(-50%); }
     }
     .animate-marquee {
-        animation: marquee 25s linear infinite;
+        animation: marquee 30s linear infinite;
+    }
+    /* Gradient Masks */
+    .marquee-mask::before,
+    .marquee-mask::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 100px;
+        height: 100%;
+        z-index: 10;
+        pointer-events: none;
+    }
+    .marquee-mask::before {
+        left: 0;
+        background: linear-gradient(to right, white, transparent);
+    }
+    .marquee-mask::after {
+        right: 0;
+        background: linear-gradient(to left, white, transparent);
     }
 </style>
+
+<div class=" bg-white py-6 overflow-hidden">
+    <p class="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-10">
+        Seamlessly Integrated With
+    </p>
+
+    <div class="relative marquee-mask">
+        <div class="flex w-max animate-marquee">
+
+            <div class="flex items-center gap-16 px-8">
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/PayFast_logo.svg/2560px-PayFast_logo.svg.png"
+                         alt="PayFast" class="h-8 w-auto object-contain grayscale hover:grayscale-0 transition-all duration-300">
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                         alt="WhatsApp" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">WhatsApp</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" class="h-8 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Gmail</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg"
+                         alt="Google Calendar" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Calendar</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg"
+                         alt="Android" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Android App</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-16 px-8">
+                <div class="flex items-center gap-3">
+                    <img src="{% static 'img/Payfast.png' %}"
+                         alt="PayFast" class="h-8 w-auto object-contain">
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                         alt="WhatsApp" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">WhatsApp</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" class="h-8 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Gmail</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg"
+                         alt="Google Calendar" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Calendar</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg"
+                         alt="Android" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Android App</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <img src="{% static 'img/Payfast.png' %}"
+                         alt="PayFast" class="h-8 w-auto object-contain">
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                         alt="WhatsApp" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">WhatsApp</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" class="h-8 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Gmail</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg"
+                         alt="Google Calendar" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Calendar</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="{% static 'img/Payfast.png' %}"
+                         alt="PayFast" class="h-8 w-auto object-contain">
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                         alt="WhatsApp" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">WhatsApp</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" class="h-8 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Gmail</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg"
+                         alt="Google Calendar" class="h-10 w-auto object-contain">
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">Calendar</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 </div>
 
-<style>
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-12px); }
-    }
-    .animate-float { animation: float 6s ease-in-out infinite; }
-    .animate-float-delayed { animation: float 6s ease-in-out infinite 3s; }
-</style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const parallaxImg = document.getElementById('hero-parallax-img');
-        const heroSection = document.getElementById('hero');
-
-        // Optimization: Use requestAnimationFrame for smooth 60fps scrolling
-        let ticking = false;
-
-        function updateParallax() {
-            const scrollY = window.scrollY;
-
-            // Only animate if we are within the hero section's visibility range
-            // This prevents wasted calculations when the user is at the bottom of the page
-            if (scrollY <= (heroSection.offsetHeight + 400)) {
-                // The factor (0.4) determines the speed.
-                // 0.4 means the image moves at 40% of the scroll speed (slower than foreground)
-                const translateY = scrollY * 0.4;
-                parallaxImg.style.transform = `translate3d(0, ${translateY}px, 0)`;
-            }
-            ticking = false;
-        }
-
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                window.requestAnimationFrame(updateParallax);
-                ticking = true;
-            }
-        }, { passive: true });
-    });
-</script>
-</div>
-
-
-
-<section class="py-20 md:py-32 bg-slate-50 overflow-hidden">
+<section class="py-32 bg-white border-t border-slate-100">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-16 md:mb-24">
-            <span id="how-it-works" class="px-4 py-1.5 bg-brand-100 text-white rounded-full text-[10px] font-black uppercase tracking-[0.3em]">The Process</span>
-            <h2 class="text-4xl md:text-6xl font-display font-black text-slate-900 mt-6 tracking-tight">
-                Simple. <span class="text-brand-600">Powerful.</span> Fast.
-            </h2>
-        </div>
-
-        <div class="relative">
-            <div class="absolute left-10 top-0 bottom-0 w-[2px] bg-gradient-to-b from-brand-600 via-slate-200 to-transparent md:hidden"></div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-
-                <div class="relative pl-20 md:pl-0 md:text-center group">
-                    <div class="absolute left-4 md:left-1/2 md:-translate-x-1/2 top-0 z-10 w-12 h-12 md:w-20 md:h-20 bg-white border-4 border-slate-50 rounded-2xl flex items-center justify-center shadow-xl group-hover:border-brand-100 transition-colors duration-500">
-                        <i class="fa-solid fa-list-check text-brand-600 text-lg md:text-2xl"></i>
-                    </div>
-
-                    <div class="pt-1 md:pt-24">
-                        <span class="text-[10px] font-black text-brand-600 tracking-[0.2em] uppercase">Step One</span>
-                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-2 mb-3">Set Your Menu</h3>
-                        <p class="text-slate-500 text-sm md:text-base leading-relaxed">Add services and staff. Your calendar is ready in seconds.</p>
-                    </div>
-                </div>
-
-                <div class="relative pl-20 md:pl-0 md:text-center group">
-                    <div class="absolute left-4 md:left-1/2 md:-translate-x-1/2 top-0 z-10 w-12 h-12 md:w-20 md:h-20 bg-white border-4 border-slate-50 rounded-2xl flex items-center justify-center shadow-xl group-hover:border-brand-100 transition-colors duration-500">
-                        <i class="fa-solid fa-credit-card text-brand-600 text-lg md:text-2xl"></i>
-                    </div>
-
-                    <div class="pt-1 md:pt-24">
-                        <span class="text-[10px] font-black text-brand-600 tracking-[0.2em] uppercase">Step Two</span>
-                        <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-2 mb-3">Link PayFast</h3>
-                        <p class="text-slate-500 text-sm md:text-base leading-relaxed">Secure your income with automated deposit collection.</p>
-                    </div>
-                </div>
-
-                <div class="relative pl-20 md:pl-0 md:text-center group">
-                    <div class="absolute left-4 md:left-1/2 md:-translate-x-1/2 top-0 z-10 w-12 h-12 md:w-20 md:h-20 bg-brand-600 border-4 border-brand-50 rounded-2xl flex items-center justify-center shadow-xl shadow-brand-200">
-                        <i class="fa-solid fa-rocket text-white text-lg md:text-2xl"></i>
-                    </div>
-
-                   <div class="pt-1 md:pt-24">
-                    <span class="text-[10px] font-black text-brand-600 tracking-[0.2em] uppercase">Live</span>
-                    <h3 class="text-xl md:text-2xl font-black text-slate-900 mt-2 mb-3">Launch Your Booking Link</h3>
-                    <p class="text-slate-500 text-sm md:text-base leading-relaxed">
-                        Drop this link anywhere and let clients book you instantly, no back-and-forth, no hassle.
-                    </p>
-                </div>
-
-                </div>
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div class="max-w-2xl">
+                <span class="text-indigo-600 text-xs font-black uppercase tracking-[0.2em]">Support Centre</span>
+                <h2 class="text-5xl font-black text-slate-900 mt-4 tracking-tight">Got questions? <br>We’ve got answers.</h2>
             </div>
-        </div>
-
-        <div class="mt-16 flex justify-center md:hidden">
-            <div class="bg-white px-6 py-3 rounded-full shadow-2xl border border-slate-100 flex items-center gap-3 animate-bounce">
-                <div class="flex -space-x-2">
-                    <div class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center text-[10px] text-white font-bold border-2 border-white">1</div>
-                    <div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[10px] text-white font-bold border-2 border-white">2</div>
-                    <div class="w-6 h-6 rounded-full bg-slate-400 flex items-center justify-center text-[10px] text-white font-bold border-2 border-white">3</div>
-                </div>
-                <span class="text-xs font-bold text-slate-600 uppercase tracking-tighter">See how easy it is</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-
-<section class="relative py-20 md:py-32 bg-slate-50 overflow-hidden" id="features">
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-
-    <div class="relative max-w-7xl mx-auto px-6">
-
-        <div class="max-w-3xl mx-auto text-center mb-16 md:mb-24">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-brand-600 text-xs font-bold uppercase tracking-widest shadow-sm mb-6">
-                <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
-                The Full Suite
-            </div>
-            <h2 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-6">
-                Your entire business in a <br class="hidden md:block">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600">digital goodie bag.</span>
-            </h2>
-            <p class="text-lg text-slate-500 font-medium max-w-xl mx-auto leading-relaxed">
-                Everything you need to accept bookings, secure deposits, and manage your team—without the technical headache.
+            <p class="text-slate-500 font-medium max-w-xs">
+                Everything you need to know about the platform. Can't find what you're looking for?
+                <a href="https://wa.me/27624216712" target="_blank" class="text-indigo-600 font-bold underline decoration-2 underline-offset-4">Chat to us.</a>
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+        <div class="grid lg:grid-cols-2 gap-x-12 gap-y-6">
 
-            <div class="group col-span-1 md:col-span-4 bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-brand-900/5 transition-all duration-500 overflow-hidden relative">
-                <div class="relative z-10 mb-8 md:mb-0 md:max-w-xs">
-                    <div class="w-10 h-10 bg-brand-100 text-white rounded-xl flex items-center justify-center text-lg mb-6">
-                        <i class="fa-solid fa-calendar-check"></i>
+            <div class="space-y-4">
+                <div class="faq-item group border border-slate-200 rounded-[2rem] p-2 transition-all hover:border-indigo-200 hover:bg-slate-50/50">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <span class="font-black text-slate-900 pr-8">Do I need my own website to use this?</span>
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 transition-all group-[.active]:bg-indigo-600">
+                            <i class="fa-solid fa-plus text-slate-400 text-xs transition-transform duration-300 group-[.active]:rotate-45 group-[.active]:text-white"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                        <div class="overflow-hidden">
+                            <p class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
+                                Not at all. We provide a custom-branded booking engine at a unique link (e.g., getmebooked.co.za/your-business) that you can paste directly into your Instagram Bio, WhatsApp Business profile, or Facebook page.
+                            </p>
+                        </div>
                     </div>
-                    <h3 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">Instant Booking Experience</h3>
-                    <p class="text-slate-500 font-medium">Clients book in seconds via a custom link or website popup. No login required for them, total control for you.</p>
                 </div>
 
-                <div class="relative mt-8 md:mt-0 md:absolute md:top-12 md:-right-12 md:w-[60%] transition-transform duration-500 md:group-hover:-translate-x-4">
-                    <div class="bg-white border border-slate-200 shadow-2xl shadow-slate-200 rounded-xl p-6 w-full max-w-md ml-auto rotate-1 md:rotate-0 md:group-hover:rotate-0 transition-all">
-                        <div class="flex justify-between items-center mb-6">
-                            <div>
-                                <div class="h-2 w-20 bg-slate-200 rounded mb-2"></div>
-                                <div class="h-4 w-32 bg-slate-900 rounded"></div>
-                            </div>
-                            <div class="h-8 w-8 bg-slate-100 rounded-full"></div>
+                <div class="faq-item group border border-slate-200 rounded-[2rem] p-2 transition-all hover:border-indigo-200 hover:bg-slate-50/50">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <span class="font-black text-slate-900 pr-8">How exactly do I get my money?</span>
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 transition-all group-[.active]:bg-indigo-600">
+                            <i class="fa-solid fa-plus text-slate-400 text-xs transition-transform duration-300 group-[.active]:rotate-45 group-[.active]:text-white"></i>
                         </div>
-                        <div class="grid grid-cols-3 gap-3 mb-6">
-                            <div class="p-3 rounded-lg border border-slate-100 text-center opacity-50">
-                                <div class="text-[10px] font-bold text-slate-400">09:00</div>
-                            </div>
-                            <div class="p-3 rounded-lg bg-brand-600 text-center shadow-lg shadow-brand-200 transform scale-105">
-                                <div class="text-[10px] font-bold text-white">10:30</div>
-                            </div>
-                            <div class="p-3 rounded-lg border border-slate-100 text-center">
-                                <div class="text-[10px] font-bold text-slate-600">11:00</div>
-                            </div>
+                    </button>
+                    <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                        <div class="overflow-hidden">
+                            <p class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
+                                We integrate directly with your PayFast account. When a client pays a deposit, it lands in your PayFast wallet instantly. We never hold your funds or act as a "middleman" for your hard-earned revenue.
+                            </p>
                         </div>
-                        <div class="w-full py-3 bg-slate-900 rounded-lg flex items-center justify-center gap-2 text-white">
-                            <span class="text-[10px] font-black uppercase tracking-widest">Confirm Booking</span>
+                    </div>
+                </div>
+
+                <div class="faq-item group border border-slate-200 rounded-[2rem] p-2 transition-all hover:border-indigo-200 hover:bg-slate-50/50">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <span class="font-black text-slate-900 pr-8">What happens if a client doesn't pay the deposit?</span>
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 transition-all group-[.active]:bg-indigo-600">
+                            <i class="fa-solid fa-plus text-slate-400 text-xs transition-transform duration-300 group-[.active]:rotate-45 group-[.active]:text-white"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                        <div class="overflow-hidden">
+                            <p class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
+                                If a deposit isn't received within your set timeframe (e.g., 30 minutes), the system automatically cancels the pending booking and re-opens that slot to other paying clients. No ghosting, no manual checking.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="group col-span-1 md:col-span-2 bg-slate-900 rounded-[2.5rem] p-8 border border-slate-800 shadow-xl overflow-hidden relative flex flex-col justify-between">
-                <div class="absolute top-0 right-0 p-32 bg-brand-500 rounded-full blur-[80px] opacity-20"></div>
-
-                <div class="relative z-10">
-                    <div class="w-10 h-10 bg-slate-800 text-brand-600 rounded-xl flex items-center justify-center text-lg mb-6 border border-slate-700">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h3 class="text-2xl font-black text-white mb-3 tracking-tight">Kill No-Shows</h3>
-                    <p class="text-slate-400 font-medium text-sm leading-relaxed">Protect yuor time by securing upfront deposits via PayFast. Validated instantly. You choose who pays and how much!</p>
-                </div>
-
-                <div class="mt-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 rounded-2xl flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="h-8 w-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs border border-emerald-500/30">
-                            <i class="fa-solid fa-check"></i>
+            <div class="space-y-4">
+                <div class="faq-item group border border-slate-200 rounded-[2rem] p-2 transition-all hover:border-indigo-200 hover:bg-slate-50/50">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <span class="font-black text-slate-900 pr-8">Can I manage multiple staff members?</span>
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 transition-all group-[.active]:bg-indigo-600">
+                            <i class="fa-solid fa-plus text-slate-400 text-xs transition-transform duration-300 group-[.active]:rotate-45 group-[.active]:text-white"></i>
                         </div>
-                        <div>
-                            <p class="text-white text-xs font-bold">Deposit Paid</p>
-                            <p class="text-slate-500 text-[10px]">R150.00 • PayFast</p>
+                    </button>
+                    <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                        <div class="overflow-hidden">
+                            <p class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
+                                Yes. You can add unlimited staff members. Each stylist can have their own schedule, services, and pricing. You, as the owner, have a "Master View" of the entire business's performance.
+                            </p>
                         </div>
                     </div>
-                    <span class="text-[10px] font-black text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded">SECURE</span>
                 </div>
-            </div>
 
-            <div class="group col-span-1 md:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-brand-900/5 transition-all duration-500 overflow-hidden">
-                <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg mb-6">
-                    <i class="fa-regular fa-bell"></i>
-                </div>
-                <h3 class="text-xl font-black text-slate-900 mb-2 tracking-tight">Auto Reminders</h3>
-                <p class="text-slate-500 text-sm font-medium mb-8">We chase the client so you don't have to. 2h & 24h Reminders as well as booking and payment confirmations.</p>
-
-                <div class="space-y-3 relative">
-                     <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-100"></div>
-                    <div class="relative bg-slate-50 p-3 rounded-2xl rounded-tl-none border border-slate-100 ml-4">
-                        <p class="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">GetMeBooked Bot</p>
-                        <p class="text-xs text-slate-700 font-medium">Hi! Reminder for your appointment tomorrow at 2PM.</p>
-                    </div>
-                    <div class="relative bg-brand-600 p-3 rounded-2xl rounded-tr-none ml-auto w-fit max-w-[80%] shadow-lg shadow-brand-100">
-                        <p class="text-xs text-white font-medium">Confirming! See you then.</p>
+                <div class="faq-item group border border-slate-200 rounded-[2rem] p-2 transition-all hover:border-indigo-200 hover:bg-slate-50/50">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <span class="font-black text-slate-900 pr-8">Are there any hidden transaction fees?</span>
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 transition-all group-[.active]:bg-indigo-600">
+                            <i class="fa-solid fa-plus text-slate-400 text-xs transition-transform duration-300 group-[.active]:rotate-45 group-[.active]:text-white"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                        <div class="overflow-hidden">
+                            <p class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
+                                GetMeBooked only charges your flat R349 monthly subscription. We never take a percentage of your bookings. You only pay the standard PayFast processing fees on deposits, just like any other card machine or online payment.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="group col-span-1 md:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-brand-900/5 transition-all duration-500 overflow-hidden">
-                <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-lg mb-6">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-                <h3 class="text-xl font-black text-slate-900 mb-2 tracking-tight">Team Access</h3>
-                <p class="text-slate-500 text-sm font-medium mb-8">Assigned services, individual logins, calendars, and performance tracking.</p>
-
-                <div class="flex items-center -space-x-4 pl-2">
-                    <img class="w-12 h-12 rounded-full border-4 border-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100" alt="">
-                    <img class="w-12 h-12 rounded-full border-4 border-white object-cover" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&h=100" alt="">
-                    <img class="w-12 h-12 rounded-full border-4 border-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100" alt="">
-                    <div class="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-black">+3</div>
-                </div>
-            </div>
-
-             <div class="group col-span-1 md:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-brand-900/5 transition-all duration-500 overflow-hidden">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-chart-line"></i>
+                <div class="faq-item group border border-slate-200 rounded-[2rem] p-2 transition-all hover:border-indigo-200 hover:bg-slate-50/50">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <span class="font-black text-slate-900 pr-8">Is my client data safe?</span>
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 transition-all group-[.active]:bg-indigo-600">
+                            <i class="fa-solid fa-plus text-slate-400 text-xs transition-transform duration-300 group-[.active]:rotate-45 group-[.active]:text-white"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                        <div class="overflow-hidden">
+                            <p class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
+                                Data security is our top priority. We use industry-standard encryption, and because we integrate with PayFast (PCI-DSS Level 1 Compliant), we never store your clients' sensitive credit card information on our servers.
+                            </p>
+                        </div>
                     </div>
-                    <span class="bg-emerald-50 text-emerald-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">+14% Growth</span>
-                </div>
-                <h3 class="text-xl font-black text-slate-900 mb-2 tracking-tight">Business Intelligence</h3>
-                <p class="text-slate-500 text-sm font-medium mb-6">Track revenue, no-show savings, top services, staff and peak hours.</p>
-
-                <div class="flex items-end gap-2 h-24 mt-auto">
-                    <div class="w-full bg-slate-100 rounded-t-lg h-[40%] group-hover:h-[50%] transition-all duration-500"></div>
-                    <div class="w-full bg-slate-200 rounded-t-lg h-[60%] group-hover:h-[65%] transition-all duration-500 delay-75"></div>
-                    <div class="w-full bg-brand-600 rounded-t-lg h-[85%] group-hover:h-[95%] transition-all duration-500 delay-100 relative shadow-lg shadow-brand-200">
-                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-bold text-slate-900 bg-white px-1.5 py-0.5 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">R42k</div>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-t-lg h-[55%] group-hover:h-[50%] transition-all duration-500"></div>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
 
-<style>
-    /* Ensures clean text rendering */
-    body {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
+<footer class="bg-slate-50 border-t border-slate-200 pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid md:grid-cols-5 gap-12 mb-12">
 
-    /* If you haven't defined brand colors in tailwind.config.js,
-       find and replace 'brand-600' with your specific hex code (e.g., #2563eb) */
-    .text-brand-600 { color: #4F46E5; }
-    .bg-brand-600 { background-color: #4F46E5; }
-    .bg-brand-500 { background-color: #4F46E5; }
-    .bg-brand-100 { background-color: #4F46E5; }
-    .bg-brand-50 { background-color: #eff6ff; }
-    .shadow-brand-200 { --tw-shadow-color: #bfdbfe; }
-</style>
-<section id="roi" class="py-16 md:py-24 bg-white relative overflow-hidden">
-    <div class="max-w-6xl mx-auto px-6 relative z-10">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-700 uppercase tracking-wider mb-4">
-                    Revenue Recovery
-                </span>
-                <h2 class="text-3xl md:text-4xl font-display font-black text-slate-900 mb-6 tracking-tight">
-                    Stop losing money on <span class="text-brand-600">no-shows.</span>
-                </h2>
-                <p class="text-slate-500 text-lg mb-8 leading-relaxed max-w-md">
-                    No-shows are expensive. Calculate how much you could recover by securing bookings with PayFast deposits.
+            <!-- BRAND -->
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-6 h-6 bg-brand-600 rounded-full flex items-center justify-center text-white text-[10px]">
+                        <i class="fa fa-calendar-check"></i>
+                    </div>
+                    <span class="font-bold text-slate-900">
+                        Get<span class="text-brand-600">Me</span>Booked
+                    </span>
+                </div>
+                <p class="text-sm text-slate-500 max-w-xs leading-relaxed">
+                    Helping South African beauty businesses thrive with modern booking technology.
                 </p>
-
-                <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-8">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">PayFast Fees</p>
-                        <p class="text-sm font-bold text-slate-700">3.2% + R2.00</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Payout Speed</p>
-                        <p class="text-sm font-bold text-slate-700">Instant to Wallet</p>
-                    </div>
-                </div>
             </div>
 
-            <div class="bg-slate-50 rounded-[2rem] p-2 md:p-3 border border-slate-200 shadow-sm">
-                <div class="bg-white rounded-[1.7rem] p-8 shadow-xl shadow-slate-200/50">
-                    <div class="space-y-8 mb-10">
-                        <div>
-                            <div class="flex justify-between mb-4 items-center">
-                                <label class="font-bold text-[11px] text-slate-400 uppercase tracking-widest">Monthly No-shows</label>
-                                <span class="text-xl font-black text-brand-600" id="apptVal">10</span>
-                            </div>
-                            <input type="range" id="apptRange" min="5" max="50" value="10" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-brand-600">
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-4 items-center">
-                                <label class="font-bold text-[11px] text-slate-400 uppercase tracking-widest">Deposit Amount</label>
-                                <span class="text-xl font-black text-brand-600" id="priceVal">R150</span>
-                            </div>
-                            <input type="range" id="priceRange" min="100" max="1000" step="50" value="150" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-brand-600">
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900 rounded-2xl p-6 text-center text-white overflow-hidden relative group">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-500/20 blur-2xl rounded-full -mr-12 -mt-12 transition-all group-hover:bg-brand-500/40"></div>
-                        <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 relative z-10">Recoverable Monthly Revenue</h3>
-                        <div id="roiTotal" class="text-4xl md:text-5xl font-display font-black tracking-tight mb-2 relative z-10">R1,448</div>
-                        <p class="text-[10px] text-slate-500 italic relative z-10">Estimated net recovery after fees</p>
-                    </div>
-                </div>
+            <!-- SOLUTIONS (SEO GOLD) -->
+            <div>
+                <h4 class="font-bold text-slate-900 mb-4 text-sm">Solutions</h4>
+                <ul class="space-y-2 text-sm text-slate-500">
+                    <li>
+                        <a href="/salon-booking-system-south-africa/"
+                           class="hover:text-brand-600 transition">
+                            Salon Booking System
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/barber-booking-system/"
+                           class="hover:text-brand-600 transition">
+                            Barber Booking System
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/reduce-no-shows/"
+                           class="hover:text-brand-600 transition">
+                            Reduce No-Shows
+                        </a>
+                    </li>
+                </ul>
             </div>
+
+            <!-- PRODUCT -->
+            <div>
+                <h4 class="font-bold text-slate-900 mb-4 text-sm">Product</h4>
+                <ul class="space-y-2 text-sm text-slate-500">
+                    <li><a href="#features" class="hover:text-brand-600 transition">Features</a></li>
+                    <li><a href="#pricing" class="hover:text-brand-600 transition">Pricing</a></li>
+                    <li><a href="{% url 'login' %}" class="hover:text-brand-600 transition">Login</a></li>
+                </ul>
+            </div>
+
+            <!-- LEGAL -->
+            <div>
+                <h4 class="font-bold text-slate-900 mb-4 text-sm">Legal</h4>
+                <ul class="space-y-2 text-sm text-slate-500">
+                    <li><a href="{% url 'terms' %}" class="hover:text-brand-600 transition">Terms</a></li>
+                    <li><a href="{% url 'privacy' %}" class="hover:text-brand-600 transition">Privacy</a></li>
+                    <li>
+                        <a href="mailto:support@getmebooked.co.za"
+                           class="hover:text-brand-600 transition">
+                            Support
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
         </div>
-    </div>
-</section>
 
-<section id="pricing" class="relative py-20 md:py-32 bg-slate-50 overflow-hidden border-t border-slate-200">
-
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-
-    <div class="relative max-w-7xl mx-auto px-6">
-
-        <div class="text-center mb-16 md:mb-24 max-w-3xl mx-auto">
-             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-widest shadow-sm mb-6">
-                <i class="fa-solid fa-tag text-brand-600"></i> Simple Pricing
-            </div>
-            <h2 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-6">
-                No Contracts. <br class="hidden md:block">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600">No Nonsense.</span>
-            </h2>
-            <p class="text-lg text-slate-500 font-medium max-w-xl mx-auto leading-relaxed">
-                One flat fee. No hidden commissions. No per-booking charges. Just pure business growth.
+        <div class="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-slate-400 font-medium">
+                © 2026 GetMeBooked Technologies.
             </p>
-        </div>
-
-        <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-
-            <div class="lg:col-span-5 relative">
-                <div class="absolute inset-0 bg-brand-600 blur-[80px] opacity-20 translate-y-4"></div>
-
-                <div class="relative bg-white rounded-[2.5rem] p-8 md:p-10 border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden group hover:border-brand-300 transition-all duration-300">
-
-                    <div class="flex justify-between items-start mb-8">
-                        <div>
-                            <p class="text-slate-500 font-bold text-sm uppercase tracking-widest mb-2">Monthly Subscription</p>
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-6xl md:text-7xl font-black text-slate-900 tracking-tighter">R199</span>
-                                <span class="text-slate-400 font-bold text-lg">/mo</span>
-                            </div>
-                        </div>
-                        <div class="px-3 py-1.5 bg-brand-50 text-brand-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-brand-100">
-                            Best Value
-                        </div>
-                    </div>
-
-                    <div class="h-px w-full bg-slate-100 mb-8"></div>
-
-                    <ul class="space-y-4 mb-10">
-                        <li class="flex items-start gap-4">
-                            <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-xs mt-0.5 border border-emerald-100">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                            <span class="text-slate-700 font-bold text-sm">Unlimited bookings & staff</span>
-                        </li>
-                        <li class="flex items-start gap-4">
-                            <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-xs mt-0.5 border border-emerald-100">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                            <span class="text-slate-700 font-bold text-sm">Booking Link + Website Widget</span>
-                        </li>
-                        <li class="flex items-start gap-4">
-                            <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-xs mt-0.5 border border-emerald-100">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                            <span class="text-slate-700 font-bold text-sm">Automated Email & SMS Reminders</span>
-                        </li>
-                        <li class="flex items-start gap-4">
-                            <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 text-xs mt-0.5 border border-emerald-100">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                            <span class="text-slate-700 font-bold text-sm">Instant Deposit Payouts (PayFast)</span>
-                        </li>
-                    </ul>
-
-                    <a href="{% url 'register' %}" class="relative block w-full group overflow-hidden rounded-2xl bg-slate-900 py-5 text-white shadow-xl transition-all hover:bg-slate-800 hover:scale-[1.02]">
-                        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
-                        <div class="relative flex items-center justify-center gap-3">
-                            <span class="text-xs font-black uppercase tracking-[0.2em]">Start 14-Day Free Trial</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </div>
-                    </a>
-                    <p class="text-center text-slate-400 text-[10px] font-bold uppercase tracking-wide mt-4">No credit card required</p>
-                </div>
-            </div>
-
-            <div class="lg:col-span-7 flex flex-col justify-center h-full">
-                <div class="mb-8">
-                    <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tight">Frequently Asked Questions</h3>
-                </div>
-
-                <div class="space-y-4">
-
-                    <div class="faq-item group bg-white border border-slate-200 rounded-2xl transition-all duration-300 hover:border-brand-200">
-                        <button class="faq-toggle w-full px-6 py-5 flex items-center justify-between gap-4 text-left">
-                            <span class="font-bold text-slate-900 text-sm md:text-base">Do I need my own website?</span>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 transition-transform duration-300 icon-wrapper group-hover:bg-brand-50 group-hover:text-brand-600">
-                                <i class="fa-solid fa-plus text-xs"></i>
-                            </div>
-                        </button>
-                        <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
-                            <div class="overflow-hidden">
-                                <div class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
-                                    No. We provide your own booking link. Drop it in your Instagram bio, WhatsApp, or Google listing and start taking bookings immediately.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item group bg-white border border-slate-200 rounded-2xl transition-all duration-300 hover:border-brand-200">
-                        <button class="faq-toggle w-full px-6 py-5 flex items-center justify-between gap-4 text-left">
-                            <span class="font-bold text-slate-900 text-sm md:text-base">Does GetMeBooked take a cut?</span>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 transition-transform duration-300 icon-wrapper group-hover:bg-brand-50 group-hover:text-brand-600">
-                                <i class="fa-solid fa-plus text-xs"></i>
-                            </div>
-                        </button>
-                        <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
-                            <div class="overflow-hidden">
-                                <div class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
-                                    No, we don't take a commission from your deposits. Funds go directly from the client to your PayFast wallet. Standard PayFast fees apply.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item group bg-white border border-slate-200 rounded-2xl transition-all duration-300 hover:border-brand-200">
-                        <button class="faq-toggle w-full px-6 py-5 flex items-center justify-between gap-4 text-left">
-                            <span class="font-bold text-slate-900 text-sm md:text-base">How do I get paid?</span>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 transition-transform duration-300 icon-wrapper group-hover:bg-brand-50 group-hover:text-brand-600">
-                                <i class="fa-solid fa-plus text-xs"></i>
-                            </div>
-                        </button>
-                        <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
-                            <div class="overflow-hidden">
-                                <div class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
-                                    When you connect your PayFast account, clients pay their deposit when booking and the money goes straight into your PayFast account.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item group bg-white border border-slate-200 rounded-2xl transition-all duration-300 hover:border-brand-200">
-                        <button class="faq-toggle w-full px-6 py-5 flex items-center justify-between gap-4 text-left">
-                            <span class="font-bold text-slate-900 text-sm md:text-base">What if I want to cancel?</span>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 transition-transform duration-300 icon-wrapper group-hover:bg-brand-50 group-hover:text-brand-600">
-                                <i class="fa-solid fa-plus text-xs"></i>
-                            </div>
-                        </button>
-                        <div class="faq-answer grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
-                            <div class="overflow-hidden">
-                                <div class="px-6 pb-6 text-slate-500 text-sm leading-relaxed font-medium">
-                                    No contracts. You can cancel anytime directly from your dashboard with one click. No penalties.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
+            <div class="flex items-center gap-2 text-slate-300 text-xs font-medium">
+                <i class="fa-solid fa-lock"></i> Secure Payments via PayFast
             </div>
         </div>
     </div>
-</section>
-
-<style>
-    /* Button Shimmer Animation */
-    @keyframes shimmer {
-        100% { transform: translateX(100%); }
-    }
-    .animate-shimmer {
-        animation: shimmer 1.5s infinite;
-    }
-
-    /* FAQ State Styling */
-    .faq-item.active .faq-answer {
-        grid-template-rows: 1fr;
-    }
-    .faq-item.active .icon-wrapper {
-        background-color: #eff6ff; /* brand-50 */
-        color: #2563eb; /* brand-600 */
-        transform: rotate(45deg);
-    }
-</style>
-
-<script>
-    document.querySelectorAll('.faq-toggle').forEach(button => {
-        button.addEventListener('click', () => {
-            const item = button.closest('.faq-item');
-            const isActive = item.classList.contains('active');
-
-            // Close all items
-            document.querySelectorAll('.faq-item').forEach(el => {
-                el.classList.remove('active');
-            });
-
-            // If it wasn't active before, open it now
-            if (!isActive) {
-                item.classList.add('active');
-            }
-        });
-    });
-</script>
+</footer>
 
 
-
-
-<div id="demoModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 transition-opacity">
+<div id="demoModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 transition-opacity">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate__animated animate__zoomIn">
 
-        <div class="bg-slate-50 border-b border-slate-100 px-8 py-5 flex justify-between items-center">
+        <div class="bg-white border-b border-slate-100 px-8 py-6 flex justify-between items-center sticky top-0 z-10">
             <div>
-                <h3 class="text-slate-900 font-bold text-xl">Book Demo Appointment</h3>
-                <p id="step-indicator" class="text-slate-500 text-sm mt-1">Step 1 of 4: Select Service</p>
+                <h3 class="text-slate-900 font-bold text-xl">Book a Demo</h3>
+                <p id="step-indicator" class="text-brand-600 text-xs font-bold uppercase tracking-wide mt-1">Step 1 of 4</p>
             </div>
-            <button onclick="closeDemoModal()" class="text-slate-400 hover:text-red-500 transition text-2xl font-bold">&times;</button>
+            <button onclick="closeDemoModal()" class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+                <i class="fa-solid fa-times"></i>
+            </button>
         </div>
 
-        <div class="w-full bg-slate-100 h-1.5">
-            <div id="progress-bar" class="bg-indigo-600 h-1.5 transition-all duration-300" style="width: 25%"></div>
+        <div class="w-full bg-slate-100 h-1">
+            <div id="progress-bar" class="bg-brand-600 h-1 transition-all duration-300" style="width: 25%"></div>
         </div>
 
         <div class="flex-1 overflow-y-auto p-8">
 
             <div id="step-1" class="step-content space-y-4">
-                <h4 class="text-lg font-bold text-slate-800 mb-4">Choose a Service</h4>
                 <div class="grid grid-cols-1 gap-4">
-                    <div onclick="selectService('Gents Fade & Beard Trim', 350, this)" class="service-card cursor-pointer border-2 border-indigo-600 bg-indigo-50 p-5 rounded-xl flex justify-between items-center transition-all">
-                        <div>
-                            <div class="font-bold text-slate-900">Gents Fade & Beard Trim</div>
-                            <div class="text-sm text-slate-500 mt-1">45 Mins • R350</div>
+                    <div onclick="selectService('Gents Fade', 350, this)" class="service-card cursor-pointer border-2 border-brand-500 bg-brand-50 p-5 rounded-2xl flex justify-between items-center transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-brand-600 font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-scissors"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">Gents Fade & Beard</div>
+                                <div class="text-xs text-slate-500 mt-1">45 Mins • R350</div>
+                            </div>
                         </div>
-                        <div class="h-6 w-6 rounded-full border-2 border-indigo-600 flex items-center justify-center bg-indigo-600 text-white check-mark">✓</div>
+                        <div class="h-6 w-6 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs check-mark"><i class="fa-solid fa-check"></i></div>
                     </div>
 
-                    <div onclick="selectService('Hot Towel Shave', 200, this)" class="service-card cursor-pointer border-2 border-slate-200 p-5 rounded-xl flex justify-between items-center hover:border-indigo-300 transition-all">
-                        <div>
-                            <div class="font-bold text-slate-900">Hot Towel Shave</div>
-                            <div class="text-sm text-slate-500 mt-1">30 Mins • R200</div>
+                    <div onclick="selectService('Hot Towel Shave', 200, this)" class="service-card cursor-pointer border-2 border-slate-100 p-5 rounded-2xl flex justify-between items-center hover:border-brand-200 transition-all">
+                         <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 font-bold text-lg">
+                                <i class="fa-solid fa-soap"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">Hot Towel Shave</div>
+                                <div class="text-xs text-slate-500 mt-1">30 Mins • R200</div>
+                            </div>
                         </div>
-                        <div class="h-6 w-6 rounded-full border-2 border-slate-300 flex items-center justify-center text-transparent check-mark">✓</div>
-                    </div>
-
-                    <div onclick="selectService('Full House Special', 550, this)" class="service-card cursor-pointer border-2 border-slate-200 p-5 rounded-xl flex justify-between items-center hover:border-indigo-300 transition-all">
-                        <div>
-                            <div class="font-bold text-slate-900">Full House Special</div>
-                            <div class="text-sm text-slate-500 mt-1">90 Mins • R550</div>
-                        </div>
-                        <div class="h-6 w-6 rounded-full border-2 border-slate-300 flex items-center justify-center text-transparent check-mark">✓</div>
+                        <div class="h-6 w-6 rounded-full border border-slate-300 flex items-center justify-center text-transparent check-mark"><i class="fa-solid fa-check"></i></div>
                     </div>
                 </div>
             </div>
 
             <div id="step-2" class="step-content hidden space-y-8">
                 <div>
-                    <h4 class="text-lg font-bold text-slate-800 mb-4">Select Professional</h4>
-                    <div class="flex gap-6">
-                        <div onclick="selectStaff('Sarah', this)" class="staff-card cursor-pointer text-center group">
-                            <div class="w-16 h-16 rounded-full bg-indigo-100 border-4 border-indigo-600 flex items-center justify-center text-indigo-700 font-bold text-xl mx-auto mb-2 transition-all">S</div>
-                            <span class="font-medium text-slate-900">Sarah</span>
-                        </div>
-                        <div onclick="selectStaff('Mike', this)" class="staff-card cursor-pointer text-center group opacity-60 hover:opacity-100">
-                            <div class="w-16 h-16 rounded-full bg-slate-100 border-4 border-transparent flex items-center justify-center text-slate-500 font-bold text-xl mx-auto mb-2 transition-all">M</div>
-                            <span class="font-medium text-slate-500">Mike</span>
-                        </div>
-                    </div>
+                    <h4 class="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Select Professional</h4>
+                    <div class="flex gap-4">
+    <div onclick="selectStaff('Sarah', this)"
+         class="staff-card cursor-pointer p-4 rounded-2xl border-2 border-brand-500 bg-brand-50 text-center w-28">
+        <img
+            src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=200&q=80"
+            class="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white shadow-sm object-cover">
+        <span class="block text-sm font-bold text-slate-900">Sarah</span>
+    </div>
+
+    <div onclick="selectStaff('Mike', this)"
+         class="staff-card cursor-pointer p-4 rounded-2xl border-2 border-slate-100 text-center w-28 opacity-60 hover:opacity-100 transition-all">
+        <img
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
+            class="w-12 h-12 rounded-full mx-auto mb-2 border-2 border-white shadow-sm grayscale object-cover">
+        <span class="block text-sm font-bold text-slate-900">Mike</span>
+    </div>
+</div>
+
                 </div>
 
                 <div>
-                    <h4 class="text-lg font-bold text-slate-800 mb-4">Available Slots (Tomorrow)</h4>
+                    <h4 class="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Tomorrow's Availability</h4>
                     <div class="grid grid-cols-3 gap-3">
-                        <button onclick="selectTime('09:00 AM', this)" class="time-btn py-2 px-3 rounded-lg border border-slate-200 text-sm font-medium hover:border-indigo-500 transition-colors">09:00 AM</button>
-                        <button onclick="selectTime('10:30 AM', this)" class="time-btn py-2 px-3 rounded-lg bg-indigo-600 text-white border-indigo-600 text-sm font-medium shadow-md">10:30 AM</button>
-                        <button onclick="selectTime('12:00 PM', this)" class="time-btn py-2 px-3 rounded-lg border border-slate-200 text-sm font-medium hover:border-indigo-500">12:00 PM</button>
+                        <button onclick="selectTime('09:00 AM', this)" class="time-btn py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:border-brand-500 hover:text-brand-600 transition-all">09:00</button>
+                        <button onclick="selectTime('10:30 AM', this)" class="time-btn py-3 rounded-xl bg-brand-600 text-white shadow-lg shadow-brand-200 text-sm font-bold">10:30</button>
+                        <button onclick="selectTime('12:00 PM', this)" class="time-btn py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:border-brand-500 hover:text-brand-600 transition-all">12:00</button>
                     </div>
                 </div>
             </div>
 
             <div id="step-3" class="step-content hidden space-y-6">
-                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5">
-                    <h5 class="text-indigo-900 font-bold text-xs uppercase tracking-wide mb-2">Booking Summary</h5>
-                    <p class="text-indigo-700 text-lg font-medium" id="summary-text"></p>
+                <div class="bg-brand-50 rounded-2xl p-6 border border-brand-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-brand-600 uppercase tracking-wider mb-1">Booking Summary</p>
+                        <p class="text-slate-900 font-bold text-lg" id="summary-text">Service @ Time</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-brand-600 shadow-sm">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
                 </div>
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Your Name</label>
-                        <input type="text" id="client_name" placeholder="John Doe" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Your Name</label>
+                        <input type="text" id="client_name" placeholder="Enter your name" class="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
-                        <input type="email" id="client_email" placeholder="john@example.com" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                        <p class="text-xs text-slate-500 mt-1">We will send your receipt here.</p>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Email Address</label>
+                        <input type="email" id="client_email" placeholder="name@example.com" class="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium">
+                        <p class="text-[10px] text-slate-400 mt-2 font-medium">We'll send your demo booking confirmation here.</p>
                     </div>
                 </div>
             </div>
 
             <div id="step-4" class="step-content hidden">
-                <div class="border rounded-xl overflow-hidden shadow-sm">
-                    <div class="bg-sky-500 p-4 flex justify-between items-center text-white">
-                        <div class="font-black text-xl italic tracking-tighter uppercase">payfast</div>
-
-                        <div class="flex items-center gap-1 text-[10px] uppercase font-bold opacity-80">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg>
-                            Demo Checkout
-                        </div>
+                <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                    <div class="bg-slate-900 p-6 flex justify-between items-center text-white">
+                        <div class="font-bold text-lg italic tracking-tight">payfast</div>
+                        <div class="text-[10px] font-bold uppercase bg-white/10 px-2 py-1 rounded">Secure Mode</div>
                     </div>
-
-                    <div class="p-6 bg-slate-50 space-y-6">
-                        <div class="flex justify-between items-center border-b border-slate-200 pb-4">
-                            <div>
-                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Merchant</p>
-                                <p class="text-slate-800 font-bold">The Grooming Lounge</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Deposit Amount</p>
-                                <p class="text-2xl font-black text-slate-900" id="payfast-amount">R0.00</p>
-                            </div>
+                    <div class="p-8 bg-slate-50">
+                        <div class="text-center mb-8">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Total Deposit</p>
+                            <p class="text-4xl font-black text-slate-900" id="payfast-amount">R350.00</p>
                         </div>
-
-                        <div class="space-y-3">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-tight">Select Payment Method</p>
-
-                            <div class="border-2 border-sky-500 bg-white p-4 rounded-lg flex items-center gap-4 cursor-pointer relative">
-                                <div class="w-10 h-7 bg-slate-100 rounded border flex items-center justify-center text-[8px] font-black text-slate-400">VISA</div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-bold text-slate-800">Credit / Debit Card</p>
-                                    <p class="text-[11px] text-slate-500">Visa, Mastercard, Amex</p>
-                                </div>
-                                <div class="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
-                                    <div class="w-2 h-2 rounded-full bg-white"></div>
-                                </div>
-                            </div>
-
-                            <div class="border border-slate-200 bg-white p-4 rounded-lg flex items-center gap-4 opacity-50 grayscale cursor-not-allowed">
-                                <div class="w-10 h-7 bg-slate-100 rounded border flex items-center justify-center text-[8px] font-black text-slate-400">EFT</div>
-                                <div class="flex-1 text-sm font-bold text-slate-800">Instant EFT</div>
-                            </div>
-                        </div>
+                        <button class="w-full py-4 bg-[#da2128] text-white font-bold rounded-xl shadow-lg hover:brightness-110 transition-all flex justify-center items-center gap-2 pointer-events-none opacity-80">
+                            Pay Now <i class="fa-solid fa-lock text-xs"></i>
+                        </button>
+                        <p class="text-center text-[10px] text-slate-400 mt-4">This is a simulation. No actual payment occurs.</p>
                     </div>
                 </div>
             </div>
+
         </div>
 
-        <div class="p-6 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
-            <button id="btn-back" onclick="changeStep(-1)" class="text-slate-500 font-semibold px-4 py-2 hover:text-slate-800 hidden">Back</button>
-
-            <button id="btn-next" onclick="changeStep(1)" class="ml-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2">
+        <div class="p-6 border-t border-slate-100 bg-white flex justify-between items-center">
+            <button id="btn-back" onclick="changeStep(-1)" class="text-slate-500 font-bold text-sm hover:text-slate-900 hidden px-4">Back</button>
+            <button id="btn-next" onclick="changeStep(1)" class="ml-auto bg-brand-600 hover:bg-brand-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-brand-500/30 transition-all flex items-center gap-2">
                 <span id="btn-text">Continue</span>
-                <svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
         </div>
     </div>
 </div>
-<div id="cookie-pill" class="fixed bottom-6 inset-x-6 md:right-8 md:left-auto md:w-max flex items-center bg-slate-900/50 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-[100] border border-white/10 transition-all duration-700 translate-y-24 opacity-0 invisible">
+<div class="fixed bottom-8 right-8 z-[100] flex items-center gap-4 group">
 
-    <span class="text-sm font-medium mr-6 ml-1">
-        This site uses cookies. <a href="/privacy" class="text-blue-400 hover:text-blue-300 ml-1 transition-colors">Details</a>
-    </span>
+    <div class="bg-white px-5 py-2.5 rounded-full border border-slate-200 shadow-xl opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
+        <p class="text-[11px] font-black text-slate-900 uppercase tracking-widest whitespace-nowrap">Chat to Support</p>
+    </div>
 
-    <button id="cookie-btn" class="bg-white text-slate-950 text-xs font-bold px-5 py-2 rounded-xl hover:bg-blue-50 transition-all active:scale-95 whitespace-nowrap">
-        Got it
-    </button>
+    <a href="https://wa.me/27624216712"
+       target="_blank"
+       class="w-16 h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-xl shadow-emerald-200/40 hover:scale-105 transition-all duration-300">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+    </a>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const pill = document.getElementById('cookie-pill');
-
-    if (!localStorage.getItem('cookies_ok')) {
-        // Subtle delay so it doesn't slap them in the face immediately
-        setTimeout(() => {
-            pill.classList.remove('translate-y-24', 'opacity-0', 'invisible');
-        }, 800);
-    }
-
-    document.getElementById('cookie-btn').onclick = () => {
-        localStorage.setItem('cookies_ok', 'true');
-        pill.classList.add('translate-y-24', 'opacity-0');
-    };
-});
-</script>
-
-
-<script>
-    // 1. STATE MANAGEMENT
-    let currentStep = 1;
-    let formData = {
-        service: "Gents Fade & Beard Trim",
-        price: 350,
-        staff: "Sarah",
-        time: "10:30 AM",
-        name: "",
-        email: ""
-    };
-
-    // 2. MODAL CONTROLS
-    function openDemoModal() {
-        document.getElementById('demoModal').classList.replace('hidden', 'flex');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeDemoModal() {
-        document.getElementById('demoModal').classList.replace('flex', 'hidden');
-        document.body.style.overflow = 'auto';
-    }
-
-    // 3. SELECTION LOGIC
-    function selectService(serviceName, price, el) {
-        formData.service = serviceName;
-        formData.price = price;
-
-        document.querySelectorAll('.service-card').forEach(card => {
-            card.classList.remove('border-indigo-600', 'bg-indigo-50');
-            card.classList.add('border-slate-200');
-            card.querySelector('.check-mark').classList.replace('bg-indigo-600', 'text-transparent');
-            card.querySelector('.check-mark').classList.remove('text-white', 'border-indigo-600');
-            card.querySelector('.check-mark').classList.add('border-slate-300');
-        });
-
-        el.classList.remove('border-slate-200');
-        el.classList.add('border-indigo-600', 'bg-indigo-50');
-        el.querySelector('.check-mark').classList.replace('text-transparent', 'bg-indigo-600');
-        el.querySelector('.check-mark').classList.add('text-white', 'border-indigo-600');
-        el.querySelector('.check-mark').classList.remove('border-slate-300');
-    }
-
-    function selectStaff(staffName, el) {
-        formData.staff = staffName;
-        document.querySelectorAll('.staff-card div').forEach(div => {
-            div.classList.remove('bg-indigo-100', 'border-indigo-600', 'text-indigo-700');
-            div.classList.add('bg-slate-100', 'border-transparent', 'text-slate-500');
-        });
-        const activeDiv = el.querySelector('div');
-        activeDiv.classList.add('bg-indigo-100', 'border-indigo-600', 'text-indigo-700');
-    }
-
-    function selectTime(timeSlot, el) {
-        formData.time = timeSlot;
-        document.querySelectorAll('.time-btn').forEach(btn => {
-            btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-md');
-            btn.classList.add('border-slate-200', 'text-slate-800');
-        });
-        el.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-md');
-    }
-
-    // 4. NAVIGATION LOGIC
-    function changeStep(direction) {
-        if (currentStep === 3 && direction === 1) {
-            const emailInput = document.getElementById('client_email');
-            if (!emailInput.value || !emailInput.value.includes('@')) {
-                alert("Please enter a valid email address.");
-                emailInput.focus();
-                return;
-            }
-            formData.name = document.getElementById('client_name').value || "Valued Client";
-            formData.email = emailInput.value;
-        }
-
-        if (currentStep === 4 && direction === 1) {
-            submitBooking();
-            return;
-        }
-
-        const nextStep = currentStep + direction;
-        document.getElementById(`step-${currentStep}`).classList.add('hidden');
-        document.getElementById(`step-${nextStep}`).classList.remove('hidden');
-        currentStep = nextStep;
-        updateUI();
-    }
-
-    function updateUI() {
-        const progress = (currentStep / 4) * 100;
-        document.getElementById('progress-bar').style.width = `${progress}%`;
-
-        const titles = ["Select Service", "Professional & Time", "Final Details", "Secure Payment"];
-        document.getElementById('step-indicator').innerText = `Step ${currentStep} of 4: ${titles[currentStep-1]}`;
-
-        document.getElementById('btn-back').classList.toggle('hidden', currentStep === 1);
-
-        const nextBtn = document.getElementById('btn-next');
-        const btnText = document.getElementById('btn-text');
-
-        if (currentStep === 3) {
-            btnText.innerText = "Proceed to Payment";
-            document.getElementById('summary-text').innerText = `${formData.service} with ${formData.staff} @ ${formData.time}`;
-        } else if (currentStep === 4) {
-            nextBtn.classList.replace('bg-indigo-600', 'bg-indigo-600');
-            btnText.innerText = `Complete Demo`;
-            document.getElementById('payfast-amount').innerText = `R${formData.price}`;
-        } else {
-            nextBtn.classList.replace('bg-[#da2128]', 'bg-indigo-600');
-            btnText.innerText = "Continue";
-        }
-    }
-
-    // 5. API SUBMISSION (FIXED)
-    async function submitBooking() {
-        const nextBtn = document.getElementById('btn-next');
-        const btnText = document.getElementById('btn-text');
-
-        nextBtn.disabled = true;
-        btnText.innerText = "Processing...";
-
-        try {
-            const response = await fetch('/api/demo-booking/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]') ?
-                                   document.querySelector('[name=csrfmiddlewaretoken]').value : ''
-                },
-                body: JSON.stringify({
-                    email: formData.email,
-                    name: formData.name,
-                    service: formData.service,
-                    price: formData.price,
-                    staff: formData.staff,
-                    time: formData.time,
-                    send_email: true
-                })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert("🎉 Appointment Booked! Check your email for confirmation.");
-                closeDemoModal();
-                location.reload();
-            } else {
-                alert("Error: " + (result.message || "Failed to book."));
-                nextBtn.disabled = false;
-                btnText.innerText = `Pay R${formData.price}`;
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Network error. Please check your connection.");
-            nextBtn.disabled = false;
-            btnText.innerText = `Pay R${formData.price}`;
-        }
-    }
-</script>
-<footer class="bg-white border-t border-slate-100 pt-20 pb-10">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="grid md:grid-cols-4 gap-10 mb-16">
-            <div class="col-span-1 md:col-span-2">
-                <a href="/" class="flex items-center gap-2 mb-6">
-                     <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white">
-                        <i class="fa fa-calendar-check text-xs"></i>
-                    </div>
-                    <span class="font-display font-extrabold text-xl tracking-tight text-slate-900">Get<span class="text-brand-600">Me</span>Booked</span>
-                </a>
-                <p class="text-slate-500 text-sm leading-relaxed max-w-sm">
-                    South Africa's dedicated appointment operating system. Built in Pretoria, used nationwide.
-                </p>
-            </div>
-            <div>
-                <h4 class="font-bold text-slate-900 mb-6">Product</h4>
-                <ul class="space-y-4 text-sm text-slate-500">
-                    <li><a href="#features" class="hover:text-brand-600">Features</a></li>
-                    <li><a href="#pricing" class="hover:text-brand-600">Pricing</a></li>
-                    <li><a href="{% url 'login' %}" class="hover:text-brand-600">Login</a></li>
-                    <li><a href="{% url 'register' %}" class="hover:text-brand-600">Sign Up</a></li>
-                    <li><a href="{% static 'downloads/getmebooked.apk' %}" download="GetMeBooked.apk" class="hover:text-brand-600">Download Android App</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold text-slate-900 mb-6">Legal</h4>
-                <ul class="space-y-4 text-sm text-slate-500">
-                    <li><a href="{% url 'terms' %}" class="hover:text-brand-600">Terms of Service</a></li>
-                    <li><a href="{% url 'privacy' %}" class="hover:text-brand-600">Privacy Policy</a></li>
-                    <li><a href="mailto:getmebookedinfo@gmail.com" class="hover:text-brand-600">Support</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="border-t border-slate-100 pt-10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-xs text-slate-400 font-medium">&copy; 2026 GetMeBooked.</p>
-            <div class="flex items-center gap-4 opacity-50 grayscale">
-               <i class="fa-solid fa-lock text-xs text-slate-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Secure Payments via PayFast</span>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<script>
-    // --- 1. NAVBAR SCROLL ---
+    /* --- LOGIC: Navbar & Scroll --- */
     window.addEventListener('scroll', () => {
         const nav = document.getElementById('navbar');
-        const container = document.getElementById('navbarContainer');
         if (window.scrollY > 20) {
-            nav.classList.add('py-3', 'shadow-md');
-            nav.classList.remove('py-4', 'shadow-lg');
-            container.classList.remove('pt-6');
-            container.classList.add('pt-2');
+            nav.classList.add('py-2', 'shadow-md');
+            nav.classList.remove('py-4', 'shadow-none');
         } else {
-            nav.classList.remove('py-3', 'shadow-md');
-            nav.classList.add('py-4', 'shadow-lg');
-            container.classList.add('pt-6');
-            container.classList.remove('pt-2');
+            nav.classList.remove('py-2', 'shadow-md');
+            nav.classList.add('py-4', 'shadow-none');
         }
     });
 
-    // --- 2. MOBILE MENU ---
-    const menu = document.getElementById('mobileMenu');
-    const drawer = document.getElementById('mobileDrawer');
-
     function toggleMenu() {
+        const menu = document.getElementById('mobileMenu');
+        const drawer = document.getElementById('mobileDrawer');
         const isOpen = menu.classList.contains('pointer-events-auto');
+
         if (isOpen) {
             menu.classList.remove('pointer-events-auto', 'opacity-100');
             menu.classList.add('pointer-events-none', 'opacity-0');
             drawer.classList.add('translate-x-full');
-            document.body.style.overflow = '';
         } else {
             menu.classList.add('pointer-events-auto', 'opacity-100');
             menu.classList.remove('pointer-events-none', 'opacity-0');
             drawer.classList.remove('translate-x-full');
-            document.body.style.overflow = 'hidden';
         }
     }
     document.getElementById('mobileMenuBtn').addEventListener('click', toggleMenu);
 
-    // --- 3. ROI CALCULATOR ---
+    /* --- LOGIC: FAQ Accordion --- */
+    document.querySelectorAll('.faq-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const item = button.closest('.faq-item');
+            const isActive = item.classList.contains('active');
+
+            // 1. Close all other open items
+            document.querySelectorAll('.faq-item').forEach(el => {
+                if (el !== item) {
+                    el.classList.remove('active');
+                }
+            });
+
+            // 2. Toggle the current item
+            item.classList.toggle('active');
+        });
+    });
+
+    /* --- LOGIC: Scroll Reveal --- */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
+    /* --- LOGIC: ROI Calculator --- */
     const apptRange = document.getElementById('apptRange');
     const priceRange = document.getElementById('priceRange');
     const apptVal = document.getElementById('apptVal');
@@ -1285,97 +1839,146 @@ document.addEventListener('DOMContentLoaded', () => {
     const roiTotal = document.getElementById('roiTotal');
 
     function updateROI() {
-        const appts = parseInt(apptRange.value, 10) || 0;
-        const price = parseInt(priceRange.value, 10) || 0;
+        const appts = parseInt(apptRange.value);
+        const price = parseInt(priceRange.value);
 
         apptVal.innerText = appts;
         priceVal.innerText = `R${price}`;
 
-        // Payfast Standard: 3.2% + R2.00 + VAT(15%)
-        const percentageFee = 0.032;
-        const fixedFee = 2.00;
-        const vat = 1.15;
-
-        const singleFee = ((price * percentageFee) + fixedFee) * vat;
+        // Calc: (Appts * Price) - PayFast Fees
         const revenue = appts * price;
-        const totalFees = appts * singleFee;
-        const net = revenue - totalFees;
+        const fees = appts * (((price * 0.032) + 2.00) * 1.15); // Including VAT on fees
+        const net = Math.floor(revenue - fees);
 
-        roiTotal.innerText = `R${Math.max(0, net).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
+        roiTotal.innerText = `R${net.toLocaleString()}`;
     }
 
-    apptRange.oninput = updateROI;
-    priceRange.oninput = updateROI;
+    apptRange.addEventListener('input', updateROI);
+    priceRange.addEventListener('input', updateROI);
     updateROI();
 
-    // --- 4. FAQ ACCORDION ---
-    document.querySelectorAll('.faq-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const content = btn.nextElementSibling;
-            const icon = btn.querySelector('.fa-chevron-down');
-            const isOpen = content.style.maxHeight;
+    /* --- LOGIC: Demo Modal (Preserved) --- */
+    let currentStep = 1;
+    let formData = { service: "Gents Fade", price: 350, staff: "Sarah", time: "10:30 AM", name: "", email: "" };
 
-            // Close all
-            document.querySelectorAll('.faq-content').forEach(el => el.style.maxHeight = null);
-            document.querySelectorAll('.fa-chevron-down').forEach(el => el.classList.remove('rotate-180'));
+    function openDemoModal() {
+        document.getElementById('demoModal').classList.remove('hidden');
+        document.getElementById('demoModal').classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
 
-            if (!isOpen) {
-                content.style.maxHeight = content.scrollHeight + "px";
-                icon.classList.add('rotate-180');
-            }
+    function closeDemoModal() {
+        document.getElementById('demoModal').classList.add('hidden');
+        document.getElementById('demoModal').classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    }
+
+    function selectService(name, price, el) {
+        formData.service = name;
+        formData.price = price;
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.classList.remove('border-brand-500', 'bg-brand-50');
+            card.classList.add('border-slate-100');
+            card.querySelector('.check-mark').classList.remove('bg-brand-600', 'text-white');
+            card.querySelector('.check-mark').classList.add('border', 'border-slate-300', 'text-transparent');
         });
-    });
+        el.classList.add('border-brand-500', 'bg-brand-50');
+        el.classList.remove('border-slate-100');
+        el.querySelector('.check-mark').classList.add('bg-brand-600', 'text-white');
+        el.querySelector('.check-mark').classList.remove('border', 'border-slate-300', 'text-transparent');
+    }
 
-    // --- 5. SMOOTH SCROLL ---
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                window.scrollTo({
-                    top: target.offsetTop - 100,
-                    behavior: 'smooth'
-                });
-            }
+    function selectStaff(name, el) {
+        formData.staff = name;
+        document.querySelectorAll('.staff-card').forEach(card => {
+            card.classList.remove('border-brand-500', 'bg-brand-50');
+            card.classList.add('border-slate-100', 'opacity-60');
+            card.querySelector('img').classList.add('grayscale');
         });
-    });
+        el.classList.add('border-brand-500', 'bg-brand-50');
+        el.classList.remove('border-slate-100', 'opacity-60');
+        el.querySelector('img').classList.remove('grayscale');
+    }
 
-    document.addEventListener("DOMContentLoaded", () => {
-  const observerOptions = {
-    threshold: 0.1 // Trigger when 10% of the element is visible
-  };
+    function selectTime(time, el) {
+        formData.time = time;
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.classList.remove('bg-brand-600', 'text-white', 'shadow-lg');
+            btn.classList.add('border', 'border-slate-200', 'text-slate-600');
+        });
+        el.classList.add('bg-brand-600', 'text-white', 'shadow-lg');
+        el.classList.remove('border', 'border-slate-200', 'text-slate-600');
+    }
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        // Optional: Stop observing once revealed
-        observer.unobserve(entry.target);
-      }
-    });
-  }, observerOptions);
-
-  // Target all elements with the reveal class
-  const revealElements = document.querySelectorAll(".reveal-on-scroll");
-  revealElements.forEach((el) => observer.observe(el));
-});
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const carousel = document.getElementById('desktop-carousel');
-        const slides = carousel.children;
-        const totalSlides = slides.length;
-        let currentIndex = 0;
-
-        function rotateCarousel() {
-            currentIndex = (currentIndex + 1) % totalSlides;
-            const offset = currentIndex * 100;
-            carousel.style.transform = `translateX(-${offset}%)`;
+    function changeStep(dir) {
+        if (currentStep === 3 && dir === 1) {
+            const email = document.getElementById('client_email').value;
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email.');
+                return;
+            }
+            formData.name = document.getElementById('client_name').value;
+            formData.email = email;
         }
 
-        // Rotate every 4 seconds
-        setInterval(rotateCarousel, 4000);
-    });
+        if (currentStep === 4 && dir === 1) {
+            submitBooking();
+            return;
+        }
+
+        const nextStep = currentStep + dir;
+        document.getElementById(`step-${currentStep}`).classList.add('hidden');
+        document.getElementById(`step-${nextStep}`).classList.remove('hidden');
+        currentStep = nextStep;
+        updateModalUI();
+    }
+
+    function updateModalUI() {
+        document.getElementById('progress-bar').style.width = `${(currentStep/4)*100}%`;
+        document.getElementById('step-indicator').innerText = `Step ${currentStep} of 4`;
+        document.getElementById('btn-back').classList.toggle('hidden', currentStep === 1);
+
+        const btnText = document.getElementById('btn-text');
+        const nextBtn = document.getElementById('btn-next');
+
+        if (currentStep === 3) {
+            document.getElementById('summary-text').innerText = `${formData.service} with ${formData.staff} @ ${formData.time}`;
+            btnText.innerText = "Proceed to Payment";
+        } else if (currentStep === 4) {
+            document.getElementById('payfast-amount').innerText = `R${formData.price}.00`;
+            btnText.innerText = "Complete Demo";
+        } else {
+            btnText.innerText = "Continue";
+        }
+    }
+
+    async function submitBooking() {
+        const btnText = document.getElementById('btn-text');
+        const nextBtn = document.getElementById('btn-next');
+        btnText.innerText = "Processing...";
+        nextBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/demo-booking/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value
+                },
+                body: JSON.stringify({...formData, send_email: true})
+            });
+
+            if (response.ok) {
+                alert("Demo Complete! Redirecting you to sign up...");
+                window.location.href = '/register/';
+            } else {
+                throw new Error('Failed');
+            }
+        } catch (e) {
+            alert("Network error, but since this is a demo, let's proceed!");
+            window.location.href = '/register/';
+        }
+    }
 </script>
 </body>
 </html>

@@ -1,0 +1,30 @@
+{% extends "emails/base_email.html" %} {% block content %}
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <h2>Action Required: Your subscription for {{ business.name }} is expiring</h2>
+    
+    <p>Hi {{ business.owner.first_name }},</p>
+
+    <p>We’re reaching out to let you know that your subscription for <strong>{{ business.name }}</strong> is set to expire in <strong>{{ days_left }} day{{ days_left|pluralize }}</strong> (on {{ business.subscription_end_date|date:"D, d M Y" }}).</p>
+
+    <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #f39c12; margin: 20px 0;">
+        <p style="margin: 0;"><strong>Good news:</strong> You won't lose any time by renewing early! Your new 30 days will be added to the end of your current expiry date.</p>
+    </div>
+
+    <p>To keep your booking page active and avoid any interruptions for your clients, please renew your subscription today.</p>
+
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-top: 20px;">
+        <tr>
+            <td align="center" bgcolor="#007bff" style="border-radius: 5px;">
+                <a href="https://www.getmebooked.co.za/business/{{ business.id }}/owner/dashboard/" 
+                   style="padding: 12px 25px; color: #ffffff; text-decoration: none; display: inline-block; font-weight: bold;">
+                   Renew Now (R{{ business.subscription_price }})
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin-top: 30px;">If you have any questions, feel free to reply to this email.</p>
+    
+    <p>Best regards,<br>The GetMeBooked Team</p>
+</div>
+{% endblock %}

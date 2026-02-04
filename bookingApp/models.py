@@ -8,7 +8,7 @@ from django.db import models
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from decimal import Decimal
-
+from django.utils import timezone
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
@@ -19,6 +19,7 @@ class Profile(models.Model):
     email_notifications = models.BooleanField(default=True)
     sms_notifications = models.BooleanField(default=False)
     onesignal_player_id = models.CharField(max_length=200, blank=True, null=True)
+    last_active = models.DateTimeField(default=timezone.now, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -53,11 +54,11 @@ from imagekit.processors import ResizeToFill
 from django.db.models import Avg
 
 class Business(models.Model):
-    INDUSTRY_CHOICES = [
-        ('salon', 'Salon'),
-        ('clinic', 'Clinic'),
-        ('barber', 'Barber'),
-    ]
+
+    deposit_enabled = models.BooleanField(
+        default=False,
+        help_text="Master switch to turn deposits on/off without deleting credentials."
+    )
 
     buffer_time = models.PositiveIntegerField(
         default=0,
@@ -105,11 +106,35 @@ class Business(models.Model):
     )
 
     # --- UPDATED Payment & Deposit Settings ---
-    payfast_merchant_id = models.CharField(max_length=50, blank=True, null=True, help_text="Your PayFast Merchant ID")
-    payfast_merchant_key = models.CharField(max_length=50, blank=True, null=True, help_text="Your PayFast Merchant Key")
+    # models.py inside Business class
+    payfast_merchant_id = models.CharField(max_length=50, blank=True, null=True)
+    payfast_merchant_key = models.CharField(max_length=50, blank=True, null=True)
+
+    # Add this new field
+    payfast_passphrase = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Match this to your PayFast 'Passphrase' setting. Leave blank if not set."
+    )
 
     # Add this to Business model in models.py
     referral_bonus_paid = models.BooleanField(default=False)
+    # models.py inside Business class
+
+    PLAN_CHOICES = [
+        ('founder', 'Founder Plan (R100)'),
+        ('regular', 'Regular Plan (R349)'),
+    ]
+
+    plan_type = models.CharField(
+        max_length=20,
+        choices=PLAN_CHOICES,
+        default='regular',
+        help_text="Determines the subscription pricing."
+    )
+
+
 
     DEPOSIT_TYPE_CHOICES = [
         ('fixed', 'Fixed Amount (R)'),
@@ -144,18 +169,44 @@ class Business(models.Model):
 
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
-    industry = models.CharField(max_length=20, choices=INDUSTRY_CHOICES, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
     contact_number = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+
+    payfast_token = models.CharField(max_length=255, null=True, blank=True)
+    token_status = models.CharField(max_length=20, default='inactive')
 
     # --- Social Fields ---
     instagram_url = models.URLField(max_length=500, blank=True, null=True)
     facebook_url = models.URLField(max_length=500, blank=True, null=True)
     twitter_url = models.URLField(max_length=500, blank=True, null=True)
+    website_url = models.URLField(max_length=500, blank=True, null=True, help_text="Your main business website")
 
     created_at = models.DateTimeField(auto_now_add=True)
     join_code = models.CharField(max_length=12, unique=True, null=True, blank=True)
+
+    # --- Custom Email Messages ---
+    custom_deposit_message = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Replaces the standard text in the Deposit Request email."
+    )
+    custom_confirmation_message = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Replaces the standard text in the Booking Confirmation email."
+    )
+    custom_cancellation_message = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Replaces the standard text in the Cancellation email."
+    )
+    custom_thank_you_message = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Replaces the standard text in the Thank You / Review Request email."
+    )
+    last_active = models.DateTimeField(default=timezone.now, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         # 1. Handle Slug Generation
@@ -225,10 +276,16 @@ class Business(models.Model):
 
     @property
     def deposit_required(self):
+        # First: Is the switch on?
+        if not self.deposit_enabled:
+            return False
+
+        # Second: Do we have credentials?
         has_creds = all([self.payfast_merchant_id, self.payfast_merchant_key])
         if not has_creds:
             return False
 
+        # Third: Is the amount > 0?
         if self.deposit_type == 'percentage':
             return self.deposit_percentage > 0
         else:
@@ -256,6 +313,11 @@ class Business(models.Model):
         delta = self.subscription_end_date - timezone.now()
         return max(0, delta.days)
 
+    @property
+    def subscription_price(self):
+        # Founder plan is R199, everything else is R349
+        return 100.00 if self.plan_type == 'founder' else 349.00
+
     def get_absolute_url(self):
         return f"/business/{self.id}/"
 
@@ -280,9 +342,12 @@ class Staff(models.Model):
         related_name='staff_profile'
     )
     name = models.CharField(max_length=255)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='STAFF') # New field
+    role = models.CharField(max_length=50, default="Staff")
     email = models.EmailField(blank=True, null=True)
     services = models.ManyToManyField('Service', related_name='staff_members', blank=True)
+
+    # --- ADD THIS FIELD ---
+    is_active = models.BooleanField(default=True, help_text="If false, staff member cannot be booked.")
 
     def __str__(self):
         return f"{self.name} ({self.role}) @ {self.business.name}"
@@ -382,7 +447,7 @@ class Appointment(models.Model):
     ]
 
     booking_form = models.ForeignKey('BookingForm', on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)
-    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)
+    customer = models.ForeignKey('ClientProfile', on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)
 
     deposit_paid = models.BooleanField(default=False)
     amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -480,7 +545,7 @@ class Appointment(models.Model):
     def __str__(self):
         display_name = "Guest"
         if self.customer:
-            display_name = self.customer.username
+            display_name = self.customer.name
         elif self.guest_name:
             display_name = self.guest_name
 
@@ -732,13 +797,32 @@ class ClientProfile(models.Model):
         params = urllib.parse.urlencode({'text': message})
         return f"https://wa.me/{clean_number}?{params}"
 
+    import urllib.parse
+
     @property
     def rebook_email_link(self):
-        if not self.email: return None
-        subject = "We miss you!"
-        body = f"Hi {self.name},\n\nIt's been a while since your last visit. We'd love to welcome you back soon.\n\nBook here: https://getmebooked.co.za"
-        params = urllib.parse.urlencode({'subject': subject, 'body': body})
-        return f"mailto:{self.email}?{params}"
+        if not self.email:
+            return None
+
+        # 1. Booking logic (Matches your WhatsApp logic)
+        booking_form = getattr(self.business, 'booking_form', None)
+        if booking_form:
+            booking_path = reverse('book_appointment', kwargs={'booking_form_id': booking_form.id})
+            booking_url = f"https://www.getmebooked.co.za{booking_path}"
+        else:
+            booking_url = "https://www.getmebooked.co.za"
+
+        # 2. Build the message (Identical to WhatsApp)
+        message = (
+            f"Hi {self.name}, it's been a while since your last visit to {self.business.name}! "
+            f"We'd love to see you again. You can book your next session here:\n\n {booking_url}"
+        )
+
+        # 3. Use quote with safe=' ' to keep literal spaces
+        clean_subject = urllib.parse.quote("We miss you!", safe=' ')
+        clean_body = urllib.parse.quote(message, safe=' :/')
+
+        return f"mailto:{self.email}?subject={clean_subject}&body={clean_body}"
 
 # Signal to automatically build the client list
 @receiver(post_save, sender='bookingApp.Appointment') # Use string name if Appointment is defined later
@@ -759,13 +843,20 @@ def sync_client_profile(sender, instance, created, **kwargs):
                 }
             )
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+class VisitorLog(models.Model):
+    # Link to a user if they are logged in, otherwise null
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    # The email captured (populated later via form submission)
+    email = models.EmailField(null=True, blank=True)
 
-@receiver(post_save, sender=Business)
-def create_business_booking_form(sender, instance, created, **kwargs):
-    if created:
-        BookingForm.objects.get_or_create(
-            business=instance,
-            defaults={'name': f"Main Booking Form - {instance.name}"}
-        )
+    session_key = models.CharField(max_length=40, db_index=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    path = models.CharField(max_length=255) # e.g., "/landing/"
+    referer = models.URLField(null=True, blank=True) # Where they came from
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.email or 'Anonymous'} - {self.timestamp}"
+

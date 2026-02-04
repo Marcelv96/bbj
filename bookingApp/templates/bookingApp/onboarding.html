@@ -177,26 +177,40 @@
                 <div class="step-progress-fill" id="progress-bar"></div>
             </div>
         </div>
- {% if messages %}
-            <div class="max-w-6xl mx-auto p-4 pb-0">
-                {% for message in messages %}
-                    <div class="flex items-center justify-between p-4 mb-4 border rounded-xl shadow-sm bg-white animate-in fade-in slide-in-from-top-2 {% if message.tags == 'success' %}border-l-4 border-l-emerald-500{% else %}border-l-4 border-l-red-500{% endif %}">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check text-emerald-500{% else %}fa-circle-exclamation text-red-500{% endif %}"></i>
-                            <span class="text-sm font-bold text-slate-700">{{ message|safe }}</span>
-                        </div>
-                        <button type="button" class="btn-close opacity-50 hover:opacity-100" onclick="this.parentElement.remove()"></button>
-                    </div>
-                {% endfor %}
+        {% if form.errors or service_formset.errors %}
+    <div class="bg-red-500 text-white p-4 rounded-xl mb-4">
+        <strong>Form Errors:</strong> {{ form.errors }}
+        <br>
+        <strong>Service Errors:</strong> {{ service_formset.errors }}
+    </div>
+{% endif %}
+{% if messages %}
+<div class="max-w-6xl mx-auto p-4 pb-0">
+    {% for message in messages %}
+        <div class="flex items-center justify-between p-4 mb-4 border rounded-xl shadow-sm bg-white transition-all duration-300
+            {% if message.tags == 'success' %}border-l-4 border-l-emerald-500{% else %}border-l-4 border-l-red-500{% endif %}">
+
+            <div class="flex items-center gap-3">
+                <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check text-emerald-500{% else %}fa-circle-exclamation text-red-500{% endif %}"></i>
+                <span class="text-sm font-bold text-slate-700">{{ message|safe }}</span>
             </div>
-            {% endif %}
+
+            <button type="button"
+                    class="text-slate-400 hover:text-slate-600 transition-colors"
+                    onclick="this.closest('.flex').remove()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
         <div class="main-content">
             <header>
                 <h1 class="h-mega">{% if is_editing %}Update Business{% else %}Let's set up your shop{% endif %}</h1>
                 <span class="sub-mega">Complete these steps to get your booking page live.</span>
             </header>
 
-            <form method="post" enctype="multipart/form-data" id="onboarding-form">
+            <form method="post" enctype="multipart/form-data" id="onboarding-form" novalidate>
                 {% csrf_token %}
 
                 <div class="step-view" id="step-1">
@@ -208,10 +222,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="form-group">
-                            <label class="field-label">Industry</label>
-                            {{ form.industry }}
-                        </div>
+
                         <div class="form-group">
                             <label class="field-label">Contact Phone</label>
                             {{ form.contact_number }}
@@ -269,6 +280,10 @@
                                 {{ form.sun_close }}
                             </div>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="field-label" required="true">Buffer</label>
+                        {{ form.buffer_time }}
                     </div>
 
                     <button type="button" class="btn-modern next-step">
@@ -338,6 +353,11 @@
                             <label class="field-label text-[10px]">Twitter/X</label>
                             {{ form.twitter_url }}
                         </div>
+                         <div class="form-group">
+                            <label class="field-label text-[10px]">Website</label>
+                            {{ form.website_url }}
+                        </div>
+
                     </div>
 
                     <button type="submit" class="btn-modern !bg-emerald-600 !shadow-emerald-200">

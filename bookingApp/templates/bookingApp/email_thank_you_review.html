@@ -16,7 +16,7 @@
                             <table width="100%">
                                 <tr>
                                     <td style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #000000; text-transform: uppercase;">
-                                        {{ business_name }}
+                                        {{ business.name|default:business_name }}
                                     </td>
                                     <td align="right">
                                         <div style="width: 12px; height: 12px; background-color: #000000; border-radius: 50%; display: inline-block;"></div>
@@ -34,10 +34,15 @@
                             <h1 style="font-size: 84px; font-weight: 900; line-height: 0.85; margin: 0; color: #000000; letter-spacing: -4px;">
                                 Thank<br/>You.
                             </h1>
-                            <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
-                                Hi {{ customer_name }}, thanks for visiting <span style="color: #000000; font-weight: 600;">{{ business_name }}</span>. We hope you enjoyed your experience!
-                            </p>
-                        </td>
+                            
+                            {% load email_extras %} <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
+    {% if business.custom_thank_you_message %}
+        {{ business.custom_thank_you_message|render_email_placeholders:appointment|linebreaksbr }}
+    {% else %}
+        Hi {{ customer_name }}, thanks for visiting <span style="color: #000000; font-weight: 600;">{{ business.name|default:business_name }}</span>. We hope you enjoyed your experience!
+    {% endif %}
+</p>
+                            </td>
                     </tr>
 
                     <tr>

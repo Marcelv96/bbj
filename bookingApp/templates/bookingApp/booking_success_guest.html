@@ -40,35 +40,7 @@
                 <p class="text-slate-400 text-sm mt-1">Reference: #BK-{{ appointment.id|stringformat:"04d" }}</p>
             </div>
 
-            {% if appointment.booking_form.business.deposit_required %}
-            <div class="p-6 deposit-notice mx-6 mt-6 rounded-xl">
-                <div class="flex gap-4">
-                    <div class="text-amber-600">
-                        <i class="fa-solid fa-circle-exclamation text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-amber-900 font-bold text-sm uppercase tracking-wider">Deposit Payment Required</h3>
-                        <p class="text-amber-800 text-sm mt-1 leading-relaxed">
-                            To finalize your appointment, a deposit of <strong>R{{ appointment.booking_form.business.deposit_amount }}</strong> is required.
-                        </p>
 
-                        <div class="mt-4 p-3 bg-white/60 rounded-lg border border-amber-200">
-                            <p class="text-xs text-amber-900 font-semibold">
-                                <i class="fa-solid fa-envelope-open-text mr-2"></i>
-                                Action: Please check your email for the PayFast payment link.
-                            </p>
-                        </div>
-
-                        {% if appointment.booking_form.business.deposit_policy %}
-                        <div class="mt-3">
-                            <p class="text-[10px] uppercase font-bold text-amber-700/60 tracking-widest">Policy Details</p>
-                            <p class="text-xs text-amber-800 italic mt-1">{{ appointment.booking_form.business.deposit_policy }}</p>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endif %}
 
             <div class="p-8">
                 <div class="grid grid-cols-2 gap-y-6 border-b border-slate-100 pb-8">

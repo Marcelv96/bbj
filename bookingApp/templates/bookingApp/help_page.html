@@ -2,238 +2,236 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>System Manual | GetMeBooked</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --brand-indigo: #4338ca;
-            --brand-red: #ef4444;
-            --slate-200: #e2e8f0;
+            --primary: #1e293b; /* Slate 800 */
+            --accent: #4f46e5;  /* Indigo 600 */
+            --border: #e2e8f0;
+            --bg-subtle: #f8fafc;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #1e293b;
             overflow: hidden;
+            height: 100vh;
         }
 
-        /* PERSISTENT HEADER */
-        header {
-            height: 80px;
-            background: white;
-            border-bottom: 2px solid var(--slate-200);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 40px;
-            position: fixed;
+        /* --- UI COMPONENTS --- */
+        .sidebar-link {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .sidebar-link.active {
+            background-color: var(--bg-subtle);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .sidebar-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
             top: 0;
-            width: 100%;
-            z-index: 1000;
+            bottom: 0;
+            width: 3px;
+            background-color: var(--accent);
         }
 
-        .layout-container {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            margin-top: 80px;
-            height: calc(100vh - 80px);
+        /* Documentation Style Content */
+        .prose-content b {
+            color: #0f172a;
+            font-weight: 600;
         }
 
-        /* SIDEBAR */
-        .sidebar {
-            background: white;
-            border-right: 2px solid var(--slate-200);
-            overflow-y: auto;
-            padding: 20px 0;
+        .prose-content a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 4px;
         }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 16px 30px;
-            gap: 15px;
-            cursor: pointer;
-            border-left: 4px solid transparent;
-            transition: all 0.2s;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        .nav-item.active {
-            background: #f1f5f9;
-            border-left-color: var(--brand-indigo);
-            color: var(--brand-indigo);
-        }
-
-        .status-box {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 800;
-        }
-
-        .nav-item.done .status-box {
-            background: #10b981;
-            border-color: #10b981;
-            color: white;
-        }
-
-        /* MAIN CONTENT */
-        .workspace {
-            padding: 60px;
-            overflow-y: auto;
-        }
-
-        .card {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border: 1px solid var(--slate-200);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            overflow: hidden;
-        }
-
-        /* BUTTONS */
-        .btn-indigo {
-            background: var(--brand-indigo);
-            color: white;
-            padding: 14px 30px;
-            border-radius: 8px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 13px;
-        }
-
-        .btn-red {
-            background: var(--brand-red);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 800;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
-        .btn-support {
-            border: 2px solid var(--brand-indigo);
-            color: var(--brand-indigo);
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 800;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
-        .btn-support:hover {
-            background: var(--brand-indigo);
-            color: white;
+        @media (max-width: 1024px) {
+            .sidebar-mobile {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .sidebar-mobile.open {
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
-<body>
+<body class="flex flex-col">
 
-    <header>
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <i class="fa-solid fa-book-open text-white"></i>
-            </div>
-            <h1 class="text-xl font-black uppercase tracking-tighter">GetMeBooked</h1>
-        </div>
-        
+    <header class="h-16 border-b border-slate-200 flex items-center justify-between px-6 bg-white z-50">
         <div class="flex items-center gap-4">
-            <a href="mailto:getmebookedinfo@gmail.com" class="btn-support">
-                <i class="fa-solid fa-headset mr-2"></i> Contact Support
+            <button onclick="toggleSidebar()" class="lg:hidden text-slate-500 hover:text-slate-900">
+                <i class="fa-solid fa-bars-staggered text-xl"></i>
+            </button>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center">
+                    <i class="fa-solid fa-book-bookmark text-white text-sm"></i>
+                </div>
+                <span class="font-bold tracking-tight text-slate-900 uppercase text-sm">System Manual</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a href="mailto:getmebookedinfo@gmail.com" class="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-2 transition">
+                Help Center
             </a>
-            <button onclick="window.location.href='{% if user.is_authenticated %}{% if user.business %}{% url 'owner_dashboard' user.business.id %}{% elif user.staff_profile %}{% url 'owner_dashboard' user.staff_profile.business.id %}{% else %}/{% endif %}{% else %}/{% endif %}'" class="btn-red">
-                <i class="fa-solid fa-xmark mr-2"></i> Exit Manual
+            <button onclick="exitManual()" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded shadow-sm hover:bg-slate-800 transition">
+                EXIT GUIDE
             </button>
         </div>
     </header>
 
-    <div class="layout-container">
-        <aside class="sidebar" id="sidebarNav"></aside>
+    <div class="flex flex-1 overflow-hidden">
+        <aside id="sidebar" class="sidebar-mobile lg:transform-none fixed lg:relative w-72 h-full bg-white border-r border-slate-200 z-40 overflow-y-auto pt-4">
+            <div class="px-6 mb-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                Onboarding Modules
+            </div>
+            <nav id="sidebarNav" class="flex flex-col">
+                </nav>
+        </aside>
 
-        <main class="workspace">
-            <div class="card">
-                <div class="h-1 bg-slate-100 w-full">
-                    <div id="progressBar" class="h-full bg-indigo-600 transition-all duration-500" style="width: 11%"></div>
+        <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-30 hidden lg:hidden"></div>
+
+        <main class="flex-1 overflow-y-auto bg-slate-50/50">
+            <div class="max-w-4xl mx-auto px-6 py-12 lg:py-20">
+                
+                <div class="mb-12">
+                    <div class="flex justify-between items-end mb-3">
+                        <div>
+                            <span id="moduleTag" class="text-indigo-600 font-bold text-xs uppercase tracking-widest">Module 01</span>
+                            <h3 id="displayTitle" class="text-3xl lg:text-4xl font-bold text-slate-900 mt-1 tracking-tight"></h3>
+                        </div>
+                        <span id="stepCount" class="text-xs font-medium text-slate-400 mb-1">Step 1/9</span>
+                    </div>
+                    <div class="h-1 w-full bg-slate-200 rounded-full overflow-hidden">
+                        <div id="progressBar" class="h-full bg-indigo-600 transition-all duration-700 w-0"></div>
+                    </div>
                 </div>
 
-                <div class="p-16">
-                    <div class="flex justify-between items-center mb-10">
-                        <span id="moduleTag" class="text-xs font-black text-indigo-600 uppercase tracking-widest">Module 01</span>
-                        <span id="stepCount" class="text-xs font-bold text-slate-400 uppercase">Step 1 of 9</span>
-                    </div>
+                <div class="bg-white border border-slate-200 rounded-xl p-8 lg:p-12 shadow-sm min-h-[300px] flex flex-col">
+                    <div id="displayDesc" class="prose-content text-slate-600 text-lg leading-relaxed mb-10">
+                        </div>
 
-                    <h2 id="displayTitle" class="text-5xl font-black tracking-tighter mb-8"></h2>
-                    <div id="displayDesc" class="text-slate-500 text-xl leading-relaxed mb-16 max-w-2xl font-medium"></div>
-
-                    <div class="flex items-center gap-6">
-                        <button onclick="changeStep(1)" id="nextBtn" class="btn-indigo">Next Module</button>
-                        <button onclick="changeStep(-1)" class="text-sm font-bold text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors">Previous</button>
+                    <div class="mt-auto pt-8 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
+                        <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
+                            <span>Continue to Next Module</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
                     </div>
                 </div>
+
+                <footer class="mt-12 text-center text-slate-400 text-[11px] uppercase tracking-widest">
+                    &copy; 2026 GetMeBooked Professional Scheduling
+                </footer>
             </div>
         </main>
     </div>
 
-    <script>
-        const steps = [
-            { title: "Thank You!", desc: "Thank you for choosing <b>GetMeBooked</b>! We are here to make your life easier. This system is designed to handle your calendar, payments, and staff so you can focus on your customers." },
-            { title: "Booking Tools", desc: "The moment you register, the system gives you four powerful tools: A <b>Booking Link</b> for social media, a <b>Booking Form</b>, a <b>Website Modal</b>, and a dedicated <b>Client Booking Site</b>." },
-            { title: "Setting Rules", desc: "In your dashboard, you decide when you are open. Set your <b>Operating Hours</b> and <b>Block Days</b> (like holidays). You also add your <b>Services</b> with specific prices and durations." },
-            { title: "Getting Paid", desc: "You decide your own deposit policy! Simply enter your <b>PayFast Merchant details</b> to take payments. If you leave it blank, customers can book for free." },
-            { title: "Auto Acceptance", desc: "If you use PayFast, once a customer pays their deposit, the system <b>automatically accepts</b> the booking. No work for you! The money goes to you, and the customer gets instant confirmation." },
-            { title: "Manual Control", desc: "If you don't require deposits, bookings are marked as 'Pending'. You can <b>manually confirm</b> them via the dashboard or the notification email we send you." },
-            { title: "Staff Members", desc: "Give your team your business's <b>Join Code</b>. Once they link up, they can see their own appointments, and customers can choose to book with specific staff members." },
-            { title: "Smart Reminders", desc: "We send <b>Email Reminders</b> to both you and your customer before the appointment. This eliminates no-shows and ensures a professional client experience." },
-            { title: "Free Months", desc: "We love referrals! For every business that signs up using your link, you get <b>one month totally free</b>. Refer 10 businesses, get 10 months free. There is no limit!" }
-        ];
+<script>
+    const homeUrl = "{% url 'home' %}"; // Django tag remains
+    const steps = [
+        { title: "Introduction", desc: "Welcome to <b>GetMeBooked</b>. This manual provides a structured overview of our ecosystem. Our platform is designed to act as your digital storefront, handling scheduling, financial transactions, and resource management with minimal manual intervention." },
+        { title: "Booking Infrastructure", desc: "Upon registration, you are provisioned with four core integration tools: A direct <b>Booking Link</b> for social platforms, an embeddable <b>Booking Form</b>, a <b>Website Modal</b> for existing sites, and a standalone <b>Client Booking Site</b> hosted by us." },
+        { title: "Operational Parameters", desc: "Define your business logic within the dashboard. This includes <b>Operating Hours</b>, <b>Blackout Dates</b> for public holidays, and a comprehensive <b>Service Catalog</b> including pricing tiers and service duration." },
+        {
+          title: "Payment Integration",
+          desc: "Secure deposit handling is managed via PayFast. Navigate to <b>Settings → Developer Settings</b> in your PayFast portal to retrieve your <b>Merchant ID</b> and <b>Key</b>. <br><br><b>Technical Note:</b> Ensure <b>'Require Signature'</b> is enabled to prevent transaction issues. If these fields remain unconfigured, the system defaults to a 'Free Booking' model without upfront payment."
+        },
+        { title: "Automated Workflows", desc: "With PayFast active, the system employs <b>Auto-Acceptance</b>. Once a transaction is verified, the booking is confirmed, calendar slots are locked, and funds are routed to your account without requiring manual approval." },
+        { title: "Administrative Control", desc: "For businesses not requiring deposits, the system utilizes a <b>Pending Status</b>. Administrators must manually authorize these requests via the dashboard or through the secure link provided in your notification emails." },
+        { title: "Staff Resource Management", desc: "Scale your operations by inviting team members using your unique <b>Join Code</b>. This allows for individual staff calendars and provides clients the ability to select specific providers during the booking flow." },
+        { title: "Retention & Reminders", desc: "To mitigate revenue loss through no-shows, GetMeBooked dispatches <b>Automated Email Reminders</b> to both the service provider and the client prior to the scheduled appointment time." },
+        { title: "Referral Program", desc: "Our growth is built on community. For every business that successfully registers via your referral link, your account will be credited with <b>one month of premium access</b> at no cost. There is no cap on earned credits." }
+    ];
 
-        let currentStep = 0;
+    let currentStep = 0;
 
-        function renderSidebar() {
-            const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = '';
-            steps.forEach((s, i) => {
-                const div = document.createElement('div');
-                const isDone = i < currentStep;
-                div.className = `nav-item ${i === currentStep ? 'active' : ''} ${isDone ? 'done' : ''}`;
-                div.onclick = () => { currentStep = i; update(); };
-                div.innerHTML = `
-                    <div class="status-box">${isDone ? '<i class="fa-solid fa-check"></i>' : (i + 1)}</div>
-                    <span class="text-xs font-black uppercase tracking-wide">${s.title}</span>
-                `;
-                nav.appendChild(div);
-            });
-        }
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('hidden');
+    }
 
-        function update() {
-            const s = steps[currentStep];
-            document.getElementById('displayTitle').innerHTML = s.title;
-            document.getElementById('displayDesc').innerHTML = s.desc;
-            document.getElementById('moduleTag').innerText = `Module ${String(currentStep + 1).padStart(2, '0')}`;
-            document.getElementById('stepCount').innerText = `Step ${currentStep + 1} of 9`;
-            document.getElementById('progressBar').style.width = ((currentStep + 1) / 9 * 100) + '%';
-            document.getElementById('nextBtn').innerText = currentStep === 8 ? 'Finish & Start' : 'Next Module';
-            renderSidebar();
-        }
+    function exitManual() {
+        window.location.href = '{% if user.is_authenticated %}{% if user.business %}{% url "owner_dashboard" user.business.id %}{% elif user.staff_profile %}{% url "owner_dashboard" user.staff_profile.business.id %}{% else %}/{% endif %}{% else %}/{% endif %}';
+    }
 
-        function changeStep(n) {
-            currentStep = Math.max(0, Math.min(8, currentStep + n));
+    function renderSidebar() {
+        const nav = document.getElementById('sidebarNav');
+        nav.innerHTML = '';
+
+        steps.forEach((s, i) => {
+            const div = document.createElement('div');
+            const isActive = i === currentStep;
+            const isDone = i < currentStep;
+
+            div.className = `sidebar-link px-6 py-3 cursor-pointer text-sm flex items-center justify-between ${isActive ? 'active' : 'text-slate-500 hover:bg-slate-50'}`;
+            
+            div.onclick = () => {
+                currentStep = i;
+                update();
+                if (window.innerWidth < 1024) toggleSidebar();
+            };
+
+            div.innerHTML = `
+                <span class="truncate pr-4">${i + 1}. ${s.title}</span>
+                ${isDone ? '<i class="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i>' : ''}
+            `;
+            nav.appendChild(div);
+        });
+    }
+
+    function update() {
+        const s = steps[currentStep];
+        document.getElementById('displayTitle').innerHTML = s.title;
+        document.getElementById('displayDesc').innerHTML = s.desc;
+        document.getElementById('moduleTag').innerText = `Module ${String(currentStep + 1).padStart(2, '0')}`;
+        document.getElementById('stepCount').innerText = `Step ${currentStep + 1}/9`;
+        
+        // Update Progress
+        const progressPercent = ((currentStep + 1) / steps.length) * 100;
+        document.getElementById('progressBar').style.width = progressPercent + '%';
+        
+        // Update Button
+        const btn = document.getElementById('nextBtn');
+        btn.innerHTML = currentStep === steps.length - 1 
+            ? `<span>Complete Setup</span> <i class="fa-solid fa-check text-xs"></i>` 
+            : `<span>Continue to Next Module</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
+
+        renderSidebar();
+        document.querySelector('main').scrollTop = 0;
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        if (currentStep === steps.length - 1) {
+            window.location.href = homeUrl;
+        } else {
+            currentStep++;
             update();
         }
+    });
 
-        update();
-    </script>
+    // Init
+    update();
+</script>
+
 </body>
 </html>

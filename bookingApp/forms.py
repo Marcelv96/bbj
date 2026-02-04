@@ -109,10 +109,14 @@ class BusinessForm(forms.ModelForm):
         fields = [
             'name',
             'cover_image',
-            'industry',
             'address',
             'contact_number',
             'description',
+            'custom_deposit_message',
+            'custom_confirmation_message',
+            'custom_cancellation_message',
+            'custom_thank_you_message',
+            'website_url',
         ]
 
         widgets = {
@@ -121,9 +125,7 @@ class BusinessForm(forms.ModelForm):
                 'placeholder': 'Business name'
             }),
             'cover_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'industry': forms.Select(attrs={
-                'class': 'form-select'
-            }),
+
             'address': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Physical address'
@@ -132,11 +134,19 @@ class BusinessForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Contact number'
             }),
+            'website_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'https://www.yourbusiness.com'
+            }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,
                 'placeholder': 'Tell customers about your business'
             }),
+            'custom_deposit_message': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Custom message for deposit requests...'}),
+            'custom_confirmation_message': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Custom message for confirmations...'}),
+            'custom_cancellation_message': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Custom message for cancellations...'}),
+            'custom_thank_you_message': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Custom message for thank you notes...'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -225,12 +235,16 @@ class BusinessOnboardingForm(forms.ModelForm):
     instagram_url = forms.URLField(required=False, widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://instagram.com/yourpage'}))
     facebook_url = forms.URLField(required=False, widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://facebook.com/yourpage'}))
     twitter_url = forms.URLField(required=False, widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://twitter.com/yourpage'}))
+    website_url = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.yourbusiness.com'})
+    )
 
     class Meta:
         model = Business
         fields = [
-            'name', 'industry', 'buffer_time', 'address', 'contact_number', 'description',
-            'cover_image', 'instagram_url', 'facebook_url', 'twitter_url'
+            'name', 'buffer_time', 'address', 'contact_number', 'description',
+            'cover_image', 'instagram_url', 'website_url', 'facebook_url', 'twitter_url'
         ]
         widgets = {
             field: forms.TextInput(attrs={'class': 'form-control'}) for field in ['name', 'address', 'contact_number']
@@ -239,7 +253,6 @@ class BusinessOnboardingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['description'].widget = forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
-        self.fields['industry'].widget.attrs.update({'class': 'form-select'})
 # --- FORMSETS (Required for your View imports) ---
 
 StaffFormSet = inlineformset_factory(

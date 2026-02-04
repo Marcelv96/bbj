@@ -125,7 +125,7 @@
     #detail-modal.open #detail-modal-panel { transform: translateY(0); }
     @media (min-width: 640px) {
         #detail-modal-panel {
-            width: 100%; max-width: 550px; height: auto; max-height: 85vh;
+            width: 100%; max-width: 650px; height: auto; max-height: 85vh;
             border-radius: 5px; transform: scale(0.95) translateY(10px); opacity: 0;
         }
         #detail-modal.open #detail-modal-panel { transform: scale(1) translateY(0); opacity: 1; }
@@ -157,7 +157,7 @@
                     </div>
                 </div>
 
-                <a href="{% url 'manual_booking' business.id %}" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">
+                <a href="{% url 'manual_booking' business.id %}" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-sm text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">
                     <i class="fa-solid fa-plus"></i>
                     <span class="hidden md:inline">Quick Booking</span>
                     <span class="md:hidden">New</span>
@@ -167,15 +167,15 @@
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
                     <div class="flex bg-slate-100 p-1 rounded-md border border-slate-200/50 shrink-0">
-                        <button onclick="handleTabSwitch('my')" id="tab-my" class="px-4 py-1.5 rounded-sm text-[11px] font-bold transition-all">Personal</button>
+                        <button onclick="handleTabSwitch('my')" id="tab-my" class="px-4 py-1.5 rounded-sm text-[11px] font-bold transition-all">Me</button>
                         <button onclick="handleTabSwitch('all')" id="tab-all" class="px-4 py-1.5 rounded-sm text-[11px] font-bold transition-all">Team</button>
                     </div>
 
-                    <div class="hidden md:flex bg-slate-100 p-1 rounded-lg border border-slate-200/50 shrink-0">
-                        <button onclick="handleScaleSwitch('day')" id="scale-day" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Day</button>
-                        <button onclick="handleScaleSwitch('week')" id="scale-week" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Week</button>
-                        <button onclick="handleScaleSwitch('month')" id="scale-month" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Month</button>
-                    </div>
+                    <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200/50 shrink-0">
+        <button onclick="handleScaleSwitch('day')" id="scale-day" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Day</button>
+        <button onclick="handleScaleSwitch('week')" id="scale-week" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Week</button>
+        <button onclick="handleScaleSwitch('month')" id="scale-month" class="px-3 py-1.5 rounded-sm text-[11px] font-bold transition-all">Month</button>
+    </div>
 
                     <div class="flex items-center bg-white border border-slate-200 rounded-md p-0.5 shadow-sm shrink-0">
     <button onclick="adjDate(-1)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900">
@@ -470,201 +470,121 @@ window.addEventListener('load', () => {
 </div>
 
 
+<div id="masterHelpModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-0 md:p-4 font-sans text-slate-900">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="toggleMasterHelp()"></div>
 
-<div id="masterHelpModal" class="fixed inset-0 z-[60] hidden items-center justify-center p-0 md:p-4 font-sans">
-    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="toggleMasterHelp()"></div>
+    <div class="relative bg-white w-full max-w-5xl h-full md:h-auto md:max-h-[85vh] flex flex-col overflow-hidden md:rounded-lg shadow-2xl border border-slate-200">
 
-    <div class="relative bg-white w-full max-w-3xl h-full md:max-h-[75vh] animate-fade-up flex flex-col overflow-hidden md:rounded-xl shadow-2xl">
-
-        <div class="px-6 md:px-8 py-3 md:py-6 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
             <div>
-                <span class="text-indigo-600 text-[10px] font-bold uppercase tracking-wider mb-1 block">Staff & Owner Guide</span>
-                <h2 class="text-xl md:text-2xl font-bold text-slate-900">Master Schedule Guide</h2>
+                <span class="text-indigo-600 text-[11px] font-bold uppercase tracking-[0.1em] block mb-0.5">Staff & Owner Guide</span>
+                <h2 class="text-xl font-bold text-slate-900">Master Schedule Guide</h2>
             </div>
-            <button onclick="toggleMasterHelp()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
+            <button onclick="toggleMasterHelp()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
         </div>
 
-        <div class="overflow-y-auto flex-1 bg-slate-50/50 p-6 md:p-10 space-y-8">
+        <div class="overflow-y-auto flex-1 p-6 md:p-8 bg-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
 
-            <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-3">
-                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-lg">View Modes & Navigation</h3>
-                        <p class="text-xs text-slate-500">Understanding the 3 distinct timeline views</p>
-                    </div>
+                <div class="space-y-10">
+                    <section>
+                        <div class="flex items-center gap-2 mb-4 text-slate-800">
+                            <i class="fa-solid fa-layer-group text-indigo-500"></i>
+                            <h3 class="font-bold text-base">View Modes & Navigation</h3>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 mb-1">Day View (List)</h4>
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    Chronological operational log. <span class="text-indigo-600 font-semibold">Note:</span> This is the only view that supports pagination for high-volume booking days.
+                                </p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 mb-1">Week & Month Views</h4>
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    Visual Mon-Sun pipelines and calendar grids designed for staff load-balancing and long-term capacity audits.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <div class="flex items-center gap-2 mb-4 text-slate-800">
+                            <i class="fa-solid fa-circle-check text-indigo-500"></i>
+                            <h3 class="font-bold text-base">Appointment Status Key</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="flex items-center gap-2.5 p-2 border border-slate-100 rounded">
+                                <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                                <span class="text-xs font-bold text-slate-700">Pending</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-2 border border-slate-100 rounded">
+                                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                <span class="text-xs font-bold text-slate-700">Confirmed</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-2 border border-slate-100 rounded">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span class="text-xs font-bold text-slate-700">Completed</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-2 border border-slate-100 rounded">
+                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                <span class="text-xs font-bold text-slate-700">Cancelled</span>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
-                <div class="grid md:grid-cols-3 gap-4">
-                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-100">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold uppercase text-slate-400">Default</span>
-                            <i class="fa-solid fa-list text-indigo-500"></i>
+                <div class="space-y-10">
+                    <section>
+                        <div class="flex items-center gap-2 mb-4 text-slate-800">
+                            <i class="fa-solid fa-file-invoice-dollar text-indigo-500"></i>
+                            <h3 class="font-bold text-base">Deposits & Logic</h3>
                         </div>
-                        <h4 class="font-bold text-slate-800 text-sm mb-2">Day View (List)</h4>
-                        <p class="text-[11px] text-slate-600 leading-relaxed">
-                            Best for daily operations. It shows a detailed chronological list of bookings for a single day.
-                            <br><br>
-                            <span class="text-indigo-600 font-bold">Feature:</span> Only the Day view supports pagination (page 1, 2, etc.) for high-volume days.
-                        </p>
-                    </div>
-
-                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-100">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold uppercase text-slate-400">Overview</span>
-                            <i class="fa-solid fa-calendar-week text-emerald-500"></i>
+                        <div class="space-y-4">
+                            <div class="flex gap-3">
+                                <i class="fa-solid fa-bolt text-amber-500 mt-1 text-xs"></i>
+                                <p class="text-sm text-slate-600">
+                                    <strong class="text-slate-900">Auto-Confirmation:</strong> Payments via PayFast trigger instant confirmation. If payment fails, a backup link is automatically emailed to the client.
+                                </p>
+                            </div>
+                            <div class="flex gap-3">
+                                <i class="fa-solid fa-user-shield text-emerald-500 mt-1 text-xs"></i>
+                                <p class="text-sm text-slate-600">
+                                    <strong class="text-slate-900">VIP Exemptions:</strong> Clients marked as "Exempt" bypass payment gates; their bookings are auto-confirmed by the system immediately.
+                                </p>
+                            </div>
                         </div>
-                        <h4 class="font-bold text-slate-800 text-sm mb-2">Week View</h4>
-                        <p class="text-[11px] text-slate-600 leading-relaxed">
-                            Visualizes 7 days (Mon-Sun). Ideal for seeing gaps in your schedule or spotting busy days at a glance.
-                        </p>
-                    </div>
+                    </section>
 
-                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-100">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold uppercase text-slate-400">Planning</span>
-                            <i class="fa-solid fa-calendar-days text-amber-500"></i>
+                    <section>
+                        <div class="flex items-center gap-2 mb-4 text-slate-800">
+                            <i class="fa-solid fa-magnifying-glass text-indigo-500"></i>
+                            <h3 class="font-bold text-base">Search & Team Tools</h3>
                         </div>
-                        <h4 class="font-bold text-slate-800 text-sm mb-2">Month View</h4>
-                        <p class="text-[11px] text-slate-600 leading-relaxed">
-                            A traditional calendar grid. Use this to spot long-term availability or check bookings spread across the entire month.
-                        </p>
-                    </div>
-                </div>
-            </section>
-            <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex items-center gap-3 mb-4 border-b border-slate-100 pb-3">
-                    <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-lg">Deposits & Confirmations</h3>
-                        <p class="text-xs text-slate-500">How bookings transition from pending to confirmed</p>
-                    </div>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="text-sm font-bold text-slate-800 mb-2">If Deposits are Required:</h4>
-                        <ul class="space-y-3">
-                            <li class="flex gap-3 text-[11px] text-slate-600">
-                                <i class="fa-solid fa-bolt text-amber-500 mt-0.5"></i>
-                                <span><strong>Auto-Confirmation:</strong> Appointments are confirmed automatically once the PayFast payment is successful.</span>
-                            </li>
-                            <li class="flex gap-3 text-[11px] text-slate-600">
-                                <i class="fa-solid fa-envelope-open-text text-amber-500 mt-0.5"></i>
-                                <span><strong>Payment Links:</strong> Clients are redirected to PayFast immediately. A backup link is also emailed if the redirect fails.</span>
-                            </li>
-                            <li class="flex gap-3 text-[11px] text-slate-600">
-                                <i class="fa-solid fa-clock-rotate-left text-amber-500 mt-0.5"></i>
-                                <span><strong>Rescheduling:</strong> Clients can reschedule themselves within the time window set in your <strong>Dashboard Settings</strong>.</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                        <h4 class="text-sm font-bold text-slate-800 mb-2">No Deposit / Exemptions:</h4>
-                        <ul class="space-y-3">
-                            <li class="flex gap-3 text-[11px] text-slate-600">
-                                <i class="fa-solid fa-user-check text-emerald-500 mt-0.5"></i>
-                                <span><strong>Exempt Clients:</strong> If a client is marked as exempt from deposits, their booking is <strong>always</strong> auto-confirmed.</span>
-                            </li>
-                            <li class="flex gap-3 text-[11px] text-slate-600">
-                                <i class="fa-solid fa-hand text-indigo-500 mt-0.5"></i>
-                                <span><strong>Manual Approval:</strong> If you don't require deposits, bookings stay "Pending" until you manually confirm/decline them to prevent spam.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <section class="grid md:grid-cols-2 gap-6">
-
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 bg-sky-100 text-sky-600 rounded flex items-center justify-center text-sm">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-                        <h3 class="font-bold text-slate-900">Smart Search</h3>
-                    </div>
-                    <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-                        The search bar filters appointments in real-time. It checks across multiple data points simultaneously:
-                    </p>
-                    <ul class="space-y-2">
-                        <li class="flex items-center gap-2 text-xs text-slate-500">
-                            <i class="fa-solid fa-check text-emerald-500"></i> Client Name
-                        </li>
-                        <li class="flex items-center gap-2 text-xs text-slate-500">
-                            <i class="fa-solid fa-check text-emerald-500"></i> Client Email
-                        </li>
-                        <li class="flex items-center gap-2 text-xs text-slate-500">
-                            <i class="fa-solid fa-check text-emerald-500"></i> Guest details (for unregistered bookings)
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded flex items-center justify-center text-sm">
-                            <i class="fa-solid fa-user-group"></i>
-                        </div>
-                        <h3 class="font-bold text-slate-900">Team Filters</h3>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <h4 class="text-xs font-bold uppercase text-slate-400 mb-1">For Owners/Admins</h4>
-                            <p class="text-[11px] text-slate-600">
-                                You see <strong>All</strong> bookings by default. Use the "Staff" dropdown to filter the calendar to see only one specific employee's schedule.
+                        <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
+                            <p>
+                                Universal search bar filters by <strong class="text-slate-900">Names, Emails, and Guest Metadata</strong> in real-time.
                             </p>
+                            <div class="p-4 bg-slate-50 rounded border-l-4 border-indigo-500">
+                                <p class="text-xs font-bold text-slate-900 uppercase mb-1">Permissions Notice</p>
+                                <p class="text-[13px]">Admins see all schedules by default. Staff can toggle between "My Schedule" and "Team View" using the top switcher.</p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="text-xs font-bold uppercase text-slate-400 mb-1">For Staff</h4>
-                            <p class="text-[11px] text-slate-600">
-                                Toggle between <strong>"My Schedule"</strong> (only your jobs) and <strong>"Team View"</strong> (everyone's jobs) using the view switcher at the top.
-                            </p>
-                        </div>
-                    </div>
+                    </section>
                 </div>
 
-            </section>
-
-            <section class="bg-slate-900 p-6 rounded-xl text-white shadow-lg">
-                <div class="flex items-center gap-3 mb-4">
-                    <i class="fa-solid fa-traffic-light text-yellow-400 text-lg"></i>
-                    <h3 class="font-bold text-lg">Appointment Status Guide</h3>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded border border-white/10">
-                        <span class="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]"></span>
-                        <span class="text-xs font-medium text-slate-300">Pending</span>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded border border-white/10">
-                        <span class="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span>
-                        <span class="text-xs font-medium text-slate-300">Confirmed</span>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded border border-white/10">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
-                        <span class="text-xs font-medium text-slate-300">Completed</span>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded border border-white/10">
-                        <span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
-                        <span class="text-xs font-medium text-slate-300">Cancelled</span>
-                    </div>
-                </div>
-            </section>
-
+            </div>
         </div>
 
-        <div class="p-4 border-t border-slate-100 bg-white flex justify-between items-center shrink-0">
-
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
+            <button onclick="toggleMasterHelp()" class="px-5 py-2 bg-slate-900 text-white text-sm font-bold rounded hover:bg-slate-800 transition-all shadow-sm">
+                Dismiss Guide
+            </button>
         </div>
     </div>
 </div>
-
 <script>
     function toggleMasterHelp() {
         const modal = document.getElementById('masterHelpModal');
@@ -705,17 +625,25 @@ window.addEventListener('load', () => {
             allTab.classList.add(...inactiveClass);
         }
 
-        // Scale Styles
+        // Scale Styles (UPDATED)
         ['day', 'week', 'month'].forEach(s => {
             const btn = document.getElementById(`scale-${s}`);
             if(btn) {
-                btn.className = 'px-3 py-1.5 rounded-md text-[11px] font-bold transition-all';
-                if(scale === s) btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-                else btn.classList.add('text-slate-500', 'hover:text-slate-700');
+                // 1. Base classes
+                let cls = 'px-3 py-1.5 rounded-md text-[11px] font-bold transition-all';
+
+                // 2. Active/Inactive Logic
+                if(scale === s) cls += ' bg-white text-slate-900 shadow-sm';
+                else cls += ' text-slate-500 hover:text-slate-700';
+
+                // 3. Mobile Logic: Hide Month button on small screens (< md)
+                if(s === 'month') cls += ' hidden md:block';
+
+                btn.className = cls;
             }
         });
 
-        // Avatar Coloring logic
+        // Avatar Coloring logic... (rest of the function remains the same)
         document.querySelectorAll('[data-name]').forEach(el => {
             const name = el.getAttribute('data-name') || '?';
             const colors = [

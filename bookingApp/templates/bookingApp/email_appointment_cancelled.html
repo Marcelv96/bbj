@@ -34,10 +34,15 @@
                             <h1 style="font-size: 84px; font-weight: 900; line-height: 0.85; margin: 0; color: #000000; letter-spacing: -4px;">
                                 Booking<br/>Cancelled.
                             </h1>
-                            <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
-                                Your appointment with <span style="color: #000000; font-weight: 600;">{{ business.name }}</span> has been cancelled.
-                            </p>
-                        </td>
+                            
+                       {% load email_extras %} <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
+    {% if business.custom_cancellation_message %}
+        {{ business.custom_cancellation_message|render_email_placeholders:appointment|linebreaksbr }}
+    {% else %}
+        Your appointment with <span style="color: #000000; font-weight: 600;">{{ business.name }}</span> has been cancelled.
+    {% endif %}
+</p>
+                            </td>
                     </tr>
 
                     <tr>
@@ -71,8 +76,8 @@
                                     <tr>
                                         <td>
                                             <a href="{{ site_url }}{% url 'book_appointment' booking_form_id=business.booking_form.id %}" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 20px 40px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-    Find a New Time
-</a>
+                                                Find a New Time
+                                            </a>
                                         </td>
                                     </tr>
                                 </table>

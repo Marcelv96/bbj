@@ -1,0 +1,272 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en-ZA" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+
+    <title>{{ seo_title|default:"Salon & Barber Online Booking System South Africa | GetMeBooked" }}</title>
+
+    <meta name="description" content="{{ seo_description|default:'GetMeBooked is South Africa’s leading online booking system for salons and barbers. Accept online bookings, collect PayFast deposits, and send automated WhatsApp reminders.' }}" />
+    <meta name="author" content="GetMeBooked Technologies" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="bingbot" content="index, follow" />
+    <meta name="theme-color" content="#4F46E5" />
+
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GetMeBooked" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:title" content="{{ seo_title|default:'Online Booking System for Salons & Barbers in South Africa' }}" />
+    <meta property="og:description" content="{{ seo_description }}" />
+    <meta property="og:image" content="{% static 'og-image-v2026.jpg' %}" />
+    <meta property="og:locale" content="en_ZA" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ seo_title }}" />
+    <meta name="twitter:description" content="{{ seo_description }}" />
+    <meta name="twitter:image" content="{% static 'og-image-v2026.jpg' %}" />
+
+    <!-- AI & Classification Meta -->
+    <meta name="application-name" content="GetMeBooked" />
+    <meta name="category" content="Salon Booking Software" />
+    <meta name="coverage" content="South Africa" />
+    <meta name="rating" content="General" />
+    <meta name="distribution" content="Global" />
+    <meta name="subject" content="Online booking system for salons and barbers" />
+    <meta name="keywords" content="salon booking system south africa, barber booking system, payfast deposits, reduce no shows, beauty booking software" />
+
+    <!-- Fonts & CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            500: '#6366f1',
+                            600: '#4F46E5',
+                            700: '#4338ca',
+                            900: '#312e81'
+                        }
+                    },
+                    boxShadow: {
+                        soft: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        glow: '0 0 20px rgba(79, 70, 229, 0.3)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .glass-header {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #4F46E5 0%, #3730a3 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+
+    <!-- Structured Data: SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "GetMeBooked",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "description": "Online booking system for salons and barbers in South Africa with PayFast deposits and WhatsApp reminders.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "ZAR"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "South Africa"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "GetMeBooked Technologies",
+        "url": "https://www.getmebooked.co.za"
+      }
+    }
+    </script>
+
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "GetMeBooked",
+      "url": "https://www.getmebooked.co.za",
+      "logo": "https://www.getmebooked.co.za/static/og-image-v2026.jpg",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Support",
+        "email": "support@getmebooked.co.za",
+        "areaServed": "ZA"
+      },
+      "sameAs": [
+        "https://www.instagram.com/",
+        "https://www.linkedin.com/"
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.getmebooked.co.za/"
+        }
+      ]
+    }
+    </script>
+
+</head>
+
+<body class="selection:bg-brand-600 selection:text-white">
+
+    <!-- NAVIGATION -->
+    <div class="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
+        <nav class="max-w-5xl w-full glass-header rounded-2xl px-6 py-3 flex items-center justify-between shadow-soft">
+            <div class="flex items-center gap-10">
+                <a href="/" class="flex items-center gap-2.5 group">
+                    <div class="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center text-white shadow-glow group-hover:rotate-6 transition-transform">
+                        <i class="fa fa-layer-group text-sm"></i>
+                    </div>
+                    <span class="font-display font-extrabold text-xl tracking-tighter text-slate-900">GetMeBooked</span>
+                </a>
+
+                <div class="hidden lg:flex items-center gap-7 text-[13px] font-bold text-slate-500 uppercase tracking-wider">
+                    <a href="/salon-booking-system-south-africa/" class="nav-link hover:text-brand-600">Salons</a>
+                    <a href="/barber-booking-system/" class="nav-link hover:text-brand-600">Barbers</a>
+                    <a href="/reduce-no-shows/" class="nav-link hover:text-brand-600">Protection</a>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                {% if user.is_authenticated %}
+                <a href="{% url 'login_dispatch' %}" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-black transition-all">
+                    Dashboard
+                </a>
+                {% else %}
+                <a href="{% url 'login' %}" class="hidden sm:block text-xs font-black text-slate-900 hover:text-brand-600 transition-colors uppercase">Sign In</a>
+                <a href="{% url 'register' %}" class="btn-premium text-white px-6 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-brand-500/10 uppercase tracking-widest">Start Free</a>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <main class="pt-32 min-h-[70vh]">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-100 py-20 mt-32">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-5 gap-12">
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white text-xs shadow-glow"><i class="fa fa-check"></i></div>
+                    <span class="font-display font-black text-xl text-slate-900">GetMeBooked</span>
+                </div>
+                <p class="text-slate-500 max-w-sm mb-8 font-medium">
+                    South Africa's dedicated appointment infrastructure. Built for performance, security, and revenue growth.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-brand-600 hover:border-brand-600 transition-all"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-brand-600 hover:border-brand-600 transition-all"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-black text-xs text-slate-900 uppercase tracking-[0.2em] mb-6">Solutions</h4>
+                <ul class="space-y-4 text-sm font-semibold text-slate-500">
+                    <li><a href="/salon-booking-system-south-africa/" class="hover:text-brand-600 transition-colors">Salon Booking System</a></li>
+                    <li><a href="/barber-booking-system/" class="hover:text-brand-600 transition-colors">Barber Booking System</a></li>
+                    <li><a href="/reduce-no-shows/" class="hover:text-brand-600 transition-colors">Reduce No-Shows</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-black text-xs text-slate-900 uppercase tracking-[0.2em] mb-6">Product</h4>
+                <ul class="space-y-4 text-sm font-semibold text-slate-500">
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">PayFast Integration</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">WhatsApp Engine</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Dashboard</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-black text-xs text-slate-900 uppercase tracking-[0.2em] mb-6">Legal</h4>
+                <ul class="space-y-4 text-sm font-semibold text-slate-500">
+                    <li><a href="{% url 'terms' %}" class="hover:text-brand-600 transition-colors">Terms</a></li>
+                    <li><a href="{% url 'privacy' %}" class="hover:text-brand-600 transition-colors">Privacy</a></li>
+                    <li><a href="mailto:support@getmebooked.co.za" class="hover:text-brand-600 transition-colors">Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">© 2026 GetMeBooked Technologies. Built in South Africa.</p>
+        </div>
+    </footer>
+</body>
+</html>

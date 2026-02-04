@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Reminder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; width: 100% !important; background-color: #ffffff; font-family: 'Inter', -apple-system, sans-serif; }
+        .hero-text { font-size: 80px; font-weight: 900; letter-spacing: -4px; line-height: 0.9; color: #000000; text-transform: uppercase; margin: 0; }
+        .accent-color { color: #10b981; } /* Emerald */
+        .logo-text { font-size: 24px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; color: #000000; }
+        .indigo-me { color: #6366f1; }
+        @media screen and (max-width: 600px) {
+            .hero-text { font-size: 55px !important; }
+            .mobile-padding { padding: 40px 20px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff;">
+    <center>
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff;">
+            <tr>
+                <td align="center" class="mobile-padding" style="padding: 60px 20px;">
+                    <table role="presentation" width="100%" style="max-width: 600px;" border="0" cellspacing="0" cellpadding="0">
+                        
+                        <tr>
+                            <td style="padding-bottom: 40px;">
+                                <div class="logo-text">GET<span class="indigo-me">ME</span>BOOKED</div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <h1 class="hero-text">KEEP<br/>GETTING<br/><span class="accent-color">BOOKED.</span></h1>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding-top: 40px; font-size: 18px; color: #475569; line-height: 1.6;">
+                                Hi {{ owner_name }},<br/><br/>
+                                This is a friendly reminder that your subscription for <strong>{{ business_name }}</strong> expires in <span style="color: #000000; font-weight: 700;">2 days</span>. 
+                                Keep your booking page live and your calendar full by renewing your plan today.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding-top: 40px;">
+                                <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td align="center" bgcolor="#000000" style="border-radius: 4px;">
+                                            <a href="{{ renew_url }}" target="_blank" style="font-size: 14px; font-weight: 900; color: #ffffff; text-decoration: none; padding: 18px 32px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+                                                RENEW SUBSCRIPTION
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding-top: 80px; border-top: 1px solid #f1f5f9; font-size: 12px; color: #94a3b8; line-height: 1.5;">
+                                <strong>GetMeBooked</strong><br/>
+                                &copy; 2026 GetMeBooked. All rights reserved.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

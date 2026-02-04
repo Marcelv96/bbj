@@ -290,93 +290,101 @@ details[open] summary i {
         </a>
     </div>
 
-<nav class="flex-grow overflow-y-auto py-2 custom-scroll">
-    {% if user.is_authenticated %}
+    <nav class="flex-grow overflow-y-auto py-2 custom-scroll">
+        {% if user.is_authenticated %}
 
-        {# MANAGEMENT SECTION #}
-        {% if user.business or user.staff_profile.role == 'ADMIN' %}
-            <div class="sidebar-section-title">Management</div>
-            {% with b_id=user.business.id|default:user.staff_profile.business.id b_name=user.business.name|default:user.staff_profile.business.name %}
-                <a href="{% url 'owner_dashboard' b_id %}" class="nav-link {% if 'owner_dashboard' in request.path %}active{% endif %}">
-                    <i class="fa-solid fa-store"></i>
-                    <span class="sidebar-text truncate">{{ b_name }}</span>
+            {# 1. OWNER SECTION (Business Owners & Admin Staff) #}
+            {% if user.business or user.staff_profile.role == "Admin/Co-Owner" %}
+                <div class="sidebar-section-title">Management</div>
+                {% with active_biz=user.business|default:user.staff_profile.business %}
+                    <a href="{% url 'owner_dashboard' active_biz.id %}" class="nav-link {% if 'owner/dashboard/' in request.path %}active{% endif %}">
+                        <i class="fa-solid fa-store"></i>
+                        <span class="sidebar-text truncate">{{ active_biz.name }}</span>
+                    </a>
+                    {# INSIGHTS BUTTON FOR OWNERS #}
+
+                {% endwith %}
+            {% endif %}
+
+            {# 2. OPERATIONS SECTION (Owner & Active Staff) #}
+            {% if user.business or user.staff_profile.is_active %}
+                <div class="sidebar-section-title mt-4">Operations</div>
+
+                {% with b_id=user.business.id|default:user.staff_profile.business.id %}
+                    <a href="{% url 'master_appointments' b_id %}" class="nav-link {% if 'appointments/master/' in request.path %}active{% endif %}">
+                        <i class="fa fa-calendar-days"></i>
+                        <span class="sidebar-text">Calendar</span>
+                    </a>
+                    <a href="{% url 'client-list' %}" class="nav-link {% if 'clients' in request.path %}active{% endif %}">
+                        <i class="fa-solid fa-users"></i>
+                        <span class="sidebar-text">All Clients</span>
+                    </a>
+                {% endwith %}
+
+                <a href="{% url 'staff_dashboard' %}" class="nav-link {% if 'staff/dashboard/' in request.path %}active{% endif %}">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    <span class="sidebar-text">My Services</span>
                 </a>
-                <a href="{% url 'master_appointments' b_id %}" class="nav-link {% if 'master_appointments' in request.path %}active{% endif %}">
-                    <i class="fa fa-calendar-days"></i>
-                    <span class="sidebar-text">Calendar</span>
-                    <span id="nav-badge-business-desktop" class="badge-count ml-auto bg-brand-primary text-white text-[9px] font-black px-1.5 rounded-full hidden">0</span>
+                <a href="{% url 'analytics_dashboard' %}" class="nav-link {% if 'analytics' in request.path %}active{% endif %}">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span class="sidebar-text">Insights</span>
+                    </a>
+            {% endif %}
+
+            {# 3. ONBOARDING #}
+            {% if not user.business and not user.staff_profile %}
+                <div class="sidebar-section-title mt-4">Get Started</div>
+                <a href="{% url 'business_onboarding' %}" class="nav-link">
+                    <i class="fa fa-scissors"></i>
+                    <span class="sidebar-text">Register Business</span>
                 </a>
-                <a href="{% url 'client-list' %}" class="nav-link {% if 'master_appointments' in request.path %}active{% endif %}">
-                    <i class="fa-solid fa-users"></i>
-                    <span class="sidebar-text">All Clients</span>
-                    <span id="nav-badge-business-desktop" class="badge-count ml-auto bg-brand-primary text-white text-[9px] font-black px-1.5 rounded-full hidden">0</span>
+                <a href="{% url 'join_staff' %}" class="nav-link">
+                    <i class="fa fa-user-plus"></i>
+                    <span class="sidebar-text">Join As Staff</span>
                 </a>
-            {% endwith %}
-        {% else %}
-            <a href="{% url 'business_onboarding' %}" class="nav-link {% if 'business_onboarding' in request.path %}active{% endif %}">
-                <i class="fa fa-scissors"></i>
-                <span class="sidebar-text">Register Business</span>
-            </a>
-            <a href="{% url 'join_staff' %}" class="nav-link {% if 'join_staff' in request.path %}active{% endif %}">
-                <i class="fa fa-user-plus"></i>
-                <span class="sidebar-text">Join As Staff</span>
-            </a>
+            {% endif %}
+
         {% endif %}
 
-        {# WORKSPACE SECTION #}
-        {% if user.staff_profile %}
-            <div class="sidebar-section-title mt-4">Workspace</div>
-            <a href="{% url 'staff_dashboard' %}" class="nav-link {% if 'staff_dashboard' in request.path %}active{% endif %}">
-                <i class="fa-regular fa-calendar-check"></i>
-                <span class="sidebar-text">My Services</span>
-            </a>
-            <a href="{% url 'analytics_dashboard' %}" class="nav-link {% if 'analytics_dashboard' in request.path %}active{% endif %}">
-                <i class="fa-solid fa-chart-line"></i>
-                <span class="sidebar-text">Insights</span>
-            </a>
-        {% endif %}
+        {# SYSTEM ACCORDION #}
+        <div class="sidebar-section mt-4">
+            <details class="sidebar-accordion group" {% if 'user_guide' in request.path %}open{% endif %}>
+                <summary class="sidebar-section-title flex items-center justify-between cursor-pointer list-none">
+                    <span>System</span>
+                    <i class="fa fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+                </summary>
 
-    {% endif %}
+                <div class="accordion-content mt-1">
+                    <a href="{% url 'user_guide' %}" class="nav-link {% if 'user_guide' in request.path %}active{% endif %}">
+                        <i class="fa fa-question-circle"></i>
+                        <span class="sidebar-text">Help Guide</span>
+                    </a>
+                    <a href="mailto:getmebookedinfo@gmail.com" class="nav-link">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span class="sidebar-text">Support</span>
+                    </a>
+                </div>
+            </details>
+        </div>
+    </nav>
 
-    {# SYSTEM ACCORDION #}
-    <div class="sidebar-section mt-4">
-        <details class="sidebar-accordion group" {% if 'user_guide' in request.path %}open{% endif %}>
-            <summary class="sidebar-section-title flex items-center justify-between cursor-pointer list-none list-image-none">
-                <span>System</span>
-                <i class="fa fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
-            </summary>
-
-            <div class="accordion-content mt-1">
-                <a href="{% url 'user_guide' %}" class="nav-link {% if 'user_guide' in request.path %}active{% endif %}">
-                    <i class="fa fa-question-circle" aria-hidden="true"></i>
-                    <span class="sidebar-text">Help Guide</span>
-                </a>
-
-                <a href="mailto:getmebookedinfo@gmail.com" class="nav-link">
-                    <i class="fa fa-envelope" aria-hidden="true"></i>
-                    <span class="sidebar-text">Support</span>
-                </a>
-            </div>
-        </details>
-    </div>
-</nav>
-
+    {# FOOTER / PROFILE #}
     <div class="p-4 border-t border-slate-800 bg-black/20">
         {% if user.is_authenticated %}
             <div class="flex items-center gap-3 overflow-hidden rounded-xl p-2 hover:bg-white/5 transition-colors cursor-pointer group" onclick="window.location.href='{% url 'profile' %}'">
                 <div class="shrink-0 relative">
                     {% if user.profile.avatar %}
-                        <img src="{{ user.profile.avatar.url }}" class="w-9 h-9 rounded-full bg-slate-800 object-cover ring-2 ring-slate-800 group-hover:ring-brand-primary transition-all">
+                        <img src="{{ user.profile.avatar.url }}" class="w-9 h-9 rounded-full object-cover ring-2 ring-slate-800 group-hover:ring-brand-primary">
                     {% else %}
-                        <div class="w-9 h-9 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold border border-slate-700 ring-2 ring-slate-800 group-hover:ring-brand-primary transition-all">
+                        <div class="w-9 h-9 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold border border-slate-700 ring-2 ring-slate-800 group-hover:ring-brand-primary">
                             {{ user.username|slice:":1"|upper }}
                         </div>
                     {% endif %}
                     <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-brand-dark rounded-full"></div>
                 </div>
-                <div class="user-details user-details-container overflow-hidden">
+                <div class="user-details overflow-hidden">
                     <div class="text-sm font-bold text-white truncate">{{ user.username }}</div>
-                    <div class="text-[10px] font-bold text-slate-500 truncate uppercase tracking-wider">Settings</div>
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Settings</div>
                 </div>
             </div>
         {% endif %}
@@ -386,24 +394,19 @@ details[open] summary i {
     <form action="{% url 'logout' %}" method="post" class="bg-black/20">
         {% csrf_token %}
         <button type="submit" class="nav-link w-full text-left !mb-0 !rounded-none !py-4 hover:!bg-red-500/10 hover:!text-red-400">
-            <i class="fa fa-power-off text-red-500" aria-hidden="true"></i>
+            <i class="fa fa-power-off text-red-500"></i>
             <span class="sidebar-text">Logout</span>
         </button>
     </form>
     {% endif %}
 </aside>
 
+{# MOBILE BOTTOM NAV #}
 <nav class="lg:hidden mobile-nav">
     <a href="{% if request.user.business %}{% url 'master_appointments' request.user.business.id %}{% elif request.user.staff_profile %}{% url 'master_appointments' request.user.staff_profile.business.id %}{% else %}{% url 'home' %}{% endif %}"
        class="mobile-tab relative {% if 'master_appointments' in request.path %}active{% endif %}">
-
         <i class="fa fa-calendar-days text-xl"></i>
         <span class="text-[10px] font-bold">Calendar</span>
-
-        <span id="nav-badge-staff-mobile"
-              class="absolute top-1 right-[28%] bg-brand-primary text-white text-[9px] min-w-[16px] h-[16px] flex items-center justify-center rounded-full border border-white font-bold hidden">
-              0
-        </span>
     </a>
 
     {% if user.is_authenticated %}
@@ -423,94 +426,83 @@ details[open] summary i {
     </button>
 </nav>
 
+{# MOBILE WORKSPACE MENU #}
 <div class="offcanvas offcanvas-bottom shadow-2xl" tabindex="-1" id="workspaceMenu">
     <div class="offcanvas-header pb-0 justify-center">
         <div class="w-12 h-1.5 bg-slate-200 rounded-full mt-1.5"></div>
     </div>
-    <div class="offcanvas-body p-0 pt-2"> <div class="px-6 pb-2 border-b border-slate-50"> <h5 class="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace</h5>
+    <div class="offcanvas-body p-0 pt-2">
+        <div class="px-6 pb-2 border-b border-slate-50">
+            <h5 class="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace</h5>
         </div>
 
         <div class="flex flex-col">
-            {% if user.business or user.staff_profile %}
-                <a href="{% url 'owner_dashboard' user.staff_profile.business.id %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white shadow-md shadow-slate-200">
-                            <i class="fa-solid fa-store text-sm"></i>
+            {% if user.business or user.staff_profile.role == "Admin/Co-Owner" %}
+                {% with active_biz=user.business|default:user.staff_profile.business %}
+                    <a href="{% url 'owner_dashboard' active_biz.id %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white shadow-md">
+                                <i class="fa-solid fa-store text-sm"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-sm text-slate-900">{{ active_biz.name }}</div>
+                                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Owner Dashboard</div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="font-bold text-sm text-slate-900">{{ user.staff_profile.business.name }}</div>
-                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Owner Dashboard</div>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
-                </a>
+                        <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                    </a>
+                {% endwith %}
 
-                <a href="{% url 'analytics_dashboard' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+                {# MOBILE INSIGHTS BUTTON #}
+                <a href="{% url 'analytics_dashboard' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary">
-                            <i class="fa-solid fa-chart-pie text-sm"></i>
+                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary shadow-sm">
+                            <i class="fa-solid fa-chart-line text-sm"></i>
                         </div>
                         <div>
                             <div class="font-bold text-sm text-slate-900">Insights</div>
-                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Reports & Analytics</div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Analytics</div>
                         </div>
                     </div>
-                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
+                    <i class="fa-solid fa-arrow-right text-slate-300"></i>
                 </a>
+            {% endif %}
 
-                <a href="{% url 'staff_dashboard' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+            {% if user.business or user.staff_profile.is_active %}
+                <a href="{% url 'staff_dashboard' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary">
                             <i class="fa-regular fa-calendar-check text-sm"></i>
                         </div>
-                        <div>
-                            <div class="font-bold text-sm text-slate-900">My Services</div>
-                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Staff Dashboard</div>
-                        </div>
+                        <div><div class="font-bold text-sm text-slate-900">My Services</div></div>
                     </div>
-                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
+                    <i class="fa-solid fa-arrow-right text-slate-300"></i>
                 </a>
 
-                <a href="{% url 'client-list' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group transition-colors">
+                <a href="{% url 'client-list' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-brand-primary">
                             <i class="fa-solid fa-users text-sm"></i>
                         </div>
-                        <div>
-                            <div class="font-bold text-sm text-slate-900">All Clients</div>
-                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Client Dashboard</div>
-                        </div>
+                        <div><div class="font-bold text-sm text-slate-900">All Clients</div></div>
                     </div>
-                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-brand-primary transition-colors"></i>
+                    <i class="fa-solid fa-arrow-right text-slate-300"></i>
                 </a>
-            {% else %}
+            {% endif %}
+
+            {% if not user.business and not user.staff_profile %}
                 <a href="{% url 'business_onboarding' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 border border-slate-100">
-                            <i class="fa fa-scissors text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-sm text-slate-900">Register Business</div>
-                        </div>
+                        <div class="w-10 h-10 bg-slate-50 flex items-center justify-center rounded-xl"><i class="fa fa-scissors"></i></div>
+                        <div class="font-bold text-sm">Register Business</div>
                     </div>
-                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-slate-900 transition-colors"></i>
-                </a>
-                <a href="{% url 'join_staff' %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 border-b border-slate-50 group">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 border border-slate-100">
-                            <i class="fa fa-user-plus text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-sm text-slate-900">Join As Staff</div>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-slate-900 transition-colors"></i>
                 </a>
             {% endif %}
         </div>
     </div>
 </div>
 
+{# MOBILE PROFILE MENU #}
 <div class="offcanvas offcanvas-bottom shadow-2xl" tabindex="-1" id="profileMenu">
     <div class="offcanvas-header pb-0 justify-center">
         <div class="w-12 h-1.5 bg-slate-200 rounded-full mt-2"></div>
@@ -518,52 +510,35 @@ details[open] summary i {
     <div class="offcanvas-body p-0 pt-6">
         {% if user.is_authenticated %}
             <div class="px-6 pb-6 flex items-center gap-5 border-b border-slate-50">
-                <div class="w-12 h-12 flex items-center justify-center bg-slate-900 text-white rounded-xl font-bold text-lg shadow-lg shadow-slate-200">
+                <div class="w-12 h-12 flex items-center justify-center bg-slate-900 text-white rounded-xl font-bold text-lg">
                     {{ user.username|slice:":1"|upper }}
                 </div>
                 <div class="flex-1">
                     <div class="font-black text-slate-900 text-lg leading-tight">{{ user.username }}</div>
-                    <a href="{% url 'profile' %}" class="text-[10px] font-bold uppercase tracking-wider text-brand-primary hover:text-indigo-800 no-underline">Account Settings</a>
+                    <a href="{% url 'profile' %}" class="text-[10px] font-bold uppercase tracking-wider text-brand-primary no-underline">Account Settings</a>
                 </div>
             </div>
-
             <div class="flex flex-col">
-                <a href="{% url 'user_guide' %}" class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 group border-b border-slate-50">
-                    <i class="fa-solid fa-book-open text-slate-400 group-hover:text-slate-900"></i>
-                    <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">User Guide</span>
+                <a href="{% url 'user_guide' %}" class="flex items-center gap-4 px-6 py-4 border-b border-slate-50">
+                    <i class="fa-solid fa-book-open text-slate-400"></i>
+                    <span class="text-sm font-bold text-slate-600">User Guide</span>
                 </a>
-
-                <a href="mailto:support@getmebooked.co.za" class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 group border-b border-slate-50">
-                    <i class="fa-solid fa-headset text-slate-400 group-hover:text-slate-900"></i>
-                    <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">Contact Support</span>
+                <a href="mailto:support@getmebooked.co.za" class="flex items-center gap-4 px-6 py-4 border-b border-slate-50">
+                    <i class="fa-solid fa-headset text-slate-400"></i>
+                    <span class="text-sm font-bold text-slate-600">Contact Support</span>
                 </a>
-
-                <div id="download-android-btn">
-                    <a href="{% static 'downloads/getmebooked.apk' %}" download="GetMeBooked.apk" class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 group border-b border-slate-50">
-                        <i class="fa-brands fa-android text-slate-400 group-hover:text-emerald-600"></i>
-                        <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">Download Android APK</span>
-                    </a>
-                </div>
             </div>
-
             <div class="p-6 bg-slate-50/50">
                 <form action="{% url 'logout' %}" method="post" class="m-0">
                     {% csrf_token %}
-                    <button class="w-full py-3 bg-white border border-slate-200 text-red-600 font-black text-xs uppercase tracking-widest hover:bg-red-50 hover:border-red-100 transition-all rounded-xl shadow-sm">
+                    <button class="w-full py-3 bg-white border border-slate-200 text-red-600 font-black text-xs uppercase tracking-widest rounded-xl shadow-sm">
                         Sign Out
                     </button>
                 </form>
             </div>
-        {% else %}
-            <div class="p-8 text-center">
-                <a href="{% url 'login' %}" class="inline-block w-full py-4 bg-brand-primary text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-lg shadow-indigo-200">
-                    Log In / Sign Up
-                </a>
-            </div>
         {% endif %}
     </div>
 </div>
-
 
 <script>
   function showMobileWebOnly() {

@@ -4,12 +4,28 @@ from . import views
 from .views import book_appointment, demo_booking_api, save_player_id
 from django.urls import path, include
 from django.urls import path
-from .views import AnalyticsDashboardView, ClientListView
+from .views import AnalyticsDashboardView, ClientListView, ExportAnalyticsCSVView, HomeView, SalonBookingView, BarberBookingView, ReduceNoShowsView
 from .forms import FlexiblePasswordResetForm
 
 urlpatterns = [
 
     path('', views.home, name='home'), # A view without the slug requirement
+
+    path(
+        "salon-booking-system-south-africa/",
+        views.SalonBookingView.as_view(),
+        name="salon-booking",
+    ),
+    path(
+        "barber-booking-system/",
+        views.BarberBookingView.as_view(),
+        name="barber-booking",
+    ),
+    path(
+        "reduce-no-shows/",
+        views.ReduceNoShowsView.as_view(),
+        name="reduce-no-shows",
+    ),
 
 
     #path('explore/', views.home, name='home'),
@@ -20,6 +36,9 @@ urlpatterns = [
     path('business/<int:business_id>/owner/dashboard/', views.owner_dashboard, name='owner_dashboard'),
     path('business/<int:business_id>/owner/bookingform/create/', views.booking_form_create, name='booking_form_create'),
     path('business/<int:business_id>/owner/bookingform/<int:booking_form_id>/edit/', views.booking_form_edit, name='booking_form_edit'),
+    path('analytics/export/', ExportAnalyticsCSVView.as_view(), name='export_analytics_csv'),
+
+    path('clients/<int:client_id>/', views.client_detail, name='client_detail'),
     # urls.py
     path('book/<slug:business_slug>/', views.book_appointment, name='book_appointment'),
     path('booking/success/<int:appointment_id>/', views.booking_success, name='booking_success'),
@@ -32,6 +51,10 @@ urlpatterns = [
     path('dashboard/clients/', ClientListView.as_view(), name='client-list'),
     path('toggle-exemption/<int:client_id>/', views.toggle_client_exemption, name='toggle_client_exemption'),
     path('business/<int:business_id>/service/<int:service_id>/delete/', views.service_delete, name='service_delete'),
+    path('account-deactivated/', views.staff_deactivated, name='staff_deactivated'),
+
+    path('clients/<int:client_id>/', views.client_detail, name='client_detail'),
+    path('clients/<int:client_id>/update/', views.client_update_details, name='client_update_details'),
 
 
 
@@ -44,6 +67,9 @@ urlpatterns = [
 
     # Add this line to your urlpatterns
     path('book/<str:token>/', views.book_appointment_public, name='booking_form_public'),
+
+
+
     path('business/<int:business_id>/owner/service/add/', views.service_create, name='service_create'),
     path('business/<int:business_id>/owner/service/<int:service_id>/edit/', views.service_edit, name='service_edit'),
     path('business/<int:business_id>/owner/staff/add/', views.staff_create, name='staff_create'),

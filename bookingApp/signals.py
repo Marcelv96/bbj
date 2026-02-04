@@ -179,9 +179,10 @@ def signal_staff_services_updated(sender, instance, action, **kwargs):
 @receiver(post_save, sender=Business)
 def create_business_booking_form(sender, instance, created, **kwargs):
     if created:
-        BookingForm.objects.create(
+        # Use get_or_create instead of create
+        BookingForm.objects.get_or_create(
             business=instance,
-            name=f"Booking Form - {instance.name}"
+            defaults={'name': f"Booking Form - {instance.name}"}
         )
 
 logger = logging.getLogger(__name__)
@@ -350,7 +351,7 @@ def get_owner_gcal_link(instance):
     business = instance.booking_form.business
 
     if instance.customer:
-        customer_id = instance.customer.username
+        customer_id = instance.customer.name
     else:
         customer_id = f"{instance.guest_name} (Guest)"
 

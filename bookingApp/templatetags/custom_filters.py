@@ -10,8 +10,71 @@ from django import template
 register = template.Library()
 from django import template
 import hashlib
+# bookingApp/templatetags/custom_filters.py
+from django import template
+register = template.Library()
+from django import template
 
 register = template.Library()
+
+@register.filter
+def sum_attribute(queryset, attr_name):
+    """
+    Sums the numeric attribute (attr_name) for all items in the queryset/list.
+    Example: {{ appointments|sum_attribute:"service.price" }}
+    Supports nested attributes via dot notation.
+    """
+    total = 0
+    for item in queryset:
+        value = item
+        for attr in attr_name.split('.'):
+            value = getattr(value, attr, 0)
+            if value is None:
+                value = 0
+        try:
+            total += float(value)
+        except (ValueError, TypeError):
+            pass
+    return total
+
+@register.filter
+def time_to_offset(t):
+    """Converts a time object to a pixel offset from 08:00"""
+    try:
+        # Assuming your grid starts at 08:00 AM
+        return ((t.hour - 8) * 60) + t.minute
+    except:
+        return 0
+
+@register.filter
+def multiply(value, arg):
+    return int(value) * int(arg)
+register = template.Library()
+# bookingApp/templatetags/custom_filters.py
+from django import template
+register = template.Library()
+
+@register.filter
+def to_minutes_offset(dt):
+    """Calculates minutes from 06:00 AM for grid positioning"""
+    return (dt.hour - 6) * 60 + dt.minute
+
+@register.filter
+def multiply_pixels(value):
+    """Converts minutes to pixels (2px per minute)"""
+    try:
+        return int(value) * 2
+    except:
+        return 0
+
+@register.filter
+def add_pixels(value, arg):
+    """Adds duration to offset for buffer positioning"""
+    return (int(value) + int(arg)) * 2
+
+@register.filter(name='split')
+def split(value, arg):
+    return value.split(arg)
 
 # A small palette of accessible background colors
 _PALETTE = [

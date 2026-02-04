@@ -31,9 +31,15 @@
                             <h1 style="font-size: 84px; font-weight: 900; line-height: 0.85; margin: 0; color: #000000; letter-spacing: -4px;">
                                 Secure your<br/>Spot.
                             </h1>
-                            <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
-                                Hi {{ appointment.guest_name }}, your booking for <span style="color: #000000; font-weight: 600;">{{ business.name }}</span> is pending a deposit.<span style="color: red;"> If paid and confirmation email received, please ignore this email.</span>
-                            </p><br>
+                            
+                            {% load email_extras %} <p style="font-size: 20px; color: #64748b; margin: 32px 0 0 0; line-height: 1.6; max-width: 500px;">
+    {% if business.custom_deposit_message %}
+        {{ business.custom_deposit_message|render_email_placeholders:appointment|linebreaksbr }}
+    {% else %}
+        Hi {{ appointment.guest_name }}, your booking for <span style="color: #000000; font-weight: 600;">{{ business.name }}</span> is pending a deposit.<span style="color: red;"> If paid and confirmation email received, please ignore this email.</span>
+    {% endif %}
+</p>
+                            <br>
                             <div style="background-color: #000000; padding: 20px; border-radius: 4px; text-align: left;">
                                 <div style="color: #ffffff; font-size: 32px; font-weight: 700; margin-bottom: 12px; letter-spacing: -1px;">Complete your booking</div>
                                 <p style="color: #94a3b8; margin-bottom: 12px; line-height: 1.6;">To finalize your appointment and secure your time slot, please pay the deposit via PayFast.</p>
@@ -51,64 +57,59 @@
                                                 Reschedule
                                             </a>
                                         </td>
-
                                     </tr>
-
                                 </table>
                             </div>
                         </td>
                     </tr>
 
-
-
-
                     <tr>
                         <td style="padding: 50px 0; border-top: 2px solid #000000; border-bottom: 1px solid #e5e7eb;">
-                            <table width="100%" cellpadding="0" cellspacing="0">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="padding: 20px 0; border-top: 2px solid #000000; border-bottom: 1px solid #e5e7eb;">
                                 <tr>
-                                    <td width="33%" valign="top">
-                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Amount Due</div>
-                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">R{{ business.deposit_amount }}</div>
-                                    </td>
-                                    <td width="33%" valign="top">
-                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Service</div>
-                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">{{ appointment.service.name }}</div>
-                                    </td>
-                                    <td width="34%" valign="top">
-                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">When</div>
-                                        <div style="font-size: 20px; font-weight: 600; color: #000000;">
-                                            {{ appointment.appointment_date|date:"l, F j" }}<br/>@ {{ appointment.appointment_start_time|time:"H:i" }}
+                                    <td width="50%" valign="top" style="padding-right: 20px;">
+                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Appointment For</div>
+                                        <div style="font-size: 18px; font-weight: 700; color: #000000; margin-bottom: 4px;">{{ appointment.service.name }}</div>
+                                        <div style="font-size: 14px; color: #64748b;">
+                                            {{ appointment.appointment_date|date:"l, F j" }} @ {{ appointment.appointment_start_time|time:"H:i" }}
                                         </div>
+                                    </td>
+
+                                    <td width="50%" valign="top" style="border-left: 1px solid #e5e7eb; padding-left: 20px;">
+                                        <table width="100%">
+                                            <tr>
+                                                <td style="font-size: 13px; color: #64748b; padding-bottom: 8px;">Total Service Fee:</td>
+                                                <td align="right" style="font-size: 13px; color: #000000; font-weight: 600; padding-bottom: 8px;">R{{ appointment.service.price }}</td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
                     <tr>
-                                            <td style="padding-bottom: 40px;">
-                                                <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 4px;">
-                                                    <tr>
-                                                        <td style="padding: 20px; background-color: #f8fafc;">
-                                                            <table width="100%" cellpadding="0" cellspacing="0">
-                                                                <tr>
-                                                                    <td>
-                                                                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Prefer Chat?</div>
-                                                                        <div style="font-size: 14px; color: #000000; font-weight: 600;">Message us on WhatsApp</div>
-                                                                    </td>
-                                                                    <td align="right">
-                                                                        <a href="https://wa.me/{{ business.phone_number }}" style="display: inline-block; background-color: #25D366; color: #ffffff; padding: 10px 20px; text-decoration: none; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px;">
-                                                                            Open WhatsApp
-                                                                        </a>
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-
-
+                        <td style="padding-bottom: 40px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 4px;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #f8fafc;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td>
+                                                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Prefer Chat?</div>
+                                                    <div style="font-size: 14px; color: #000000; font-weight: 600;">Message us on WhatsApp</div>
+                                                </td>
+                                                <td align="right">
+                                                    <a href="https://wa.me/{{ business.phone_number }}" style="display: inline-block; background-color: #25D366; color: #ffffff; padding: 10px 20px; text-decoration: none; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px;">
+                                                        Open WhatsApp
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
                     <tr>
                         <td style="padding-top: 20px;">

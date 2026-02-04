@@ -106,7 +106,7 @@
 </head>
 <body>
 
-    <header class="relative w-full h-[400px] md:h-[400px] bg-slate-900 overflow-hidden group">
+    <header class="relative w-full h-[800px] md:h-[700px] bg-slate-900 overflow-hidden group">
         {% if business.cover_image %}
             <img src="{{ business.cover_image.url }}" alt="{{ business.name }}" class="w-full h-full object-cover opacity-90 scale-105 group-hover:scale-100 transition-transform duration-[2s]">
         {% else %}
@@ -118,14 +118,7 @@
         <nav class="absolute top-0 left-0 w-full z-50 p-6">
             <div class="max-w-[1400px] mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    {% if request.user.staff_profile %}
-                        {% if is_admin_staff or is_owner %}
-                            <a href="{% if is_owner %}{% url 'owner_dashboard' user_business_id %}{% else %}{% url 'staff_dashboard' %}{% endif %}"
-                               class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider hover:bg-white hover:text-indigo-600 transition-all">
-                                <i class="fa-solid fa-gauge-high mr-2"></i> Dashboard
-                            </a>
-                        {% endif %}
-                    {% endif %}
+
                 </div>
                 <a href="/" class="h-10 w-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white hover:bg-white hover:text-indigo-600 transition-all shadow-lg">
                     <i class="fa-solid fa-house text-sm"></i>
@@ -145,7 +138,7 @@
                         {{ business.name }}
                     </h1>
 
-                    <div class="flex flex-wrap items-center gap-6 text-slate-300 font-medium text-sm">
+                    <div class="flex flex-wrap mb-5 items-center gap-6 text-slate-300 font-medium text-sm">
                         <div class="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5">
                             <i class="fa-solid fa-location-dot text-indigo-400"></i>
                             <span>{{ business.address }}</span>
@@ -158,7 +151,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col items-start md:items-end gap-4 animate-enter" style="animation-delay: 0.1s">
+                <div class="flex flex-col mb-5 items-start md:items-end gap-4 animate-enter" style="animation-delay: 0.1s">
                     <div class="flex items-center gap-3">
                         <button onclick="copyPageUrl(this)" class="group flex items-center gap-2 bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-xl text-white transition-all">
                             <i class="fa-solid fa-link text-xs group-hover:text-indigo-400 transition-colors"></i>
@@ -170,6 +163,12 @@
                             {% if business.instagram_url %}
                             <a href="{{ business.instagram_url }}" target="_blank" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-gradient-to-tr hover:from-purple-500 hover:to-orange-500 transition-all"><i class="fa-brands fa-instagram"></i></a>
                             {% endif %}
+                            {% if business.facebook_url %}
+                            <a href="{{ business.facebook_url }}" target="_blank" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-blue-500"><i class="fa-brands fa-facebook"></i></a>
+                            {% endif %}
+                            {% if business.twitter_url %}
+                            <a href="{{ business.twitter_url }}" target="_blank" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-sky-500"><i class="fa-brands fa-twitter"></i></a>
+                            {% endif %}
                         {% endif %}
                     </div>
 
@@ -180,13 +179,19 @@
                 </div>
             </div>
         </div>
+        <a href="#services" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 text-white/50 hover:text-white transition-all duration-300 animate-bounce">
+    <div class="flex flex-col items-center gap-1">
+        <span class="text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Explore</span>
+        <i class="fa-solid fa-chevron-down text-xl"></i>
+    </div>
+</a>
     </header>
 
     <div class="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200">
         <div class="max-w-[1400px] mx-auto px-6">
             <div class="flex gap-8 h-16 overflow-x-auto hide-scrollbar items-center">
-                <a href="#services" class="nav-link">Services</a>
                 {% if business.description %}<a href="#about" class="nav-link">About</a>{% endif %}
+                <a href="#services" class="nav-link">Services</a>
                 <a href="#reviews" class="nav-link">Reviews</a>
                 <a href="#location" class="nav-link">Location</a>
             </div>
@@ -197,6 +202,22 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
             <div class="lg:col-span-8 space-y-16">
+
+                {% if business.description %}
+                <section id="about" class="scroll-mt-32">
+                    <div class="bg-slate-900 rounded-2xl p-8 md:p-12 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-600 rounded-full blur-[100px] opacity-20 translate-x-1/2 -translate-y-1/2"></div>
+
+                        <div class="relative z-10">
+                            <div class="mini-label text-indigo-300 mb-3">Our Story</div>
+                            <h2 class="text-3xl h-display text-white mb-6">About Us</h2>
+                            <div class="prose prose-invert prose-lg text-slate-400 leading-relaxed max-w-none font-medium">
+                                {{ business.description|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
 
                 <section id="services" class="scroll-mt-32">
                     <div class="glass-panel p-6 md:p-8 relative overflow-hidden">
@@ -280,21 +301,7 @@
                     </div>
                 </section>
 
-                {% if business.description %}
-                <section id="about" class="scroll-mt-32">
-                    <div class="bg-slate-900 rounded-2xl p-8 md:p-12 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-600 rounded-full blur-[100px] opacity-20 translate-x-1/2 -translate-y-1/2"></div>
 
-                        <div class="relative z-10">
-                            <div class="mini-label text-indigo-300 mb-3">Our Story</div>
-                            <h2 class="text-3xl h-display text-white mb-6">About Us</h2>
-                            <div class="prose prose-invert prose-lg text-slate-400 leading-relaxed max-w-none font-medium">
-                                {{ business.description|linebreaks }}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                {% endif %}
 
                 <section id="reviews" class="scroll-mt-32">
                     <div class="flex justify-between items-center mb-8">
@@ -428,7 +435,9 @@
     <div id="booking-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onclick="closeBookingModal()"></div>
 
+
         <div class="relative z-10 bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-enter">
+
 
             <div class="p-6 border-b border-slate-100 flex-shrink-0 bg-white z-20">
                 <div class="flex justify-between items-start mb-6">
@@ -461,6 +470,7 @@
                     <div id="step-wrapper" class="step-wrapper">
 
                         <div class="step-panel">
+
                             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
                                 <label class="mini-label block mb-3">Select Treatment</label>
                                 <div class="relative">
@@ -510,27 +520,7 @@
                         </div>
 
                         <div class="step-panel">
-           {% if business.deposit_required %}
-<div class="bg-indigo-50/50 border border-indigo-100 p-5 rounded-xl mb-6">
-    <div class="flex items-center gap-2 mb-2">
-        <i class="fa-solid fa-shield-halved text-indigo-600"></i>
-        <h4 class="text-xs font-black uppercase tracking-widest text-indigo-900">Deposit Required</h4>
-    </div>
-    <div class="flex justify-between items-end mb-2">
-        <span class="text-sm font-medium text-indigo-700">Due Now:</span>
-        <span id="dynamic-deposit" class="text-xl font-black text-indigo-600">
-            {% if business.deposit_type == 'percentage' %}
-                {{ business.deposit_percentage }}%
-            {% else %}
-                R{{ business.deposit_amount|floatformat:2 }}
-            {% endif %}
-        </span>
-    </div>
-    <p class="text-[10px] text-indigo-500 leading-relaxed opacity-80">
-        Payment secured via PayFast.
-    </p>
-</div>
-{% endif %}
+
 
                             <div class="space-y-4">
                                 <div>
@@ -549,12 +539,90 @@
                                            value="{{ user.profile.phone_number }}" required placeholder="082 123 4567">
                                 </div>
                             </div>
+                               {% if business.deposit_required %}
+<div class="bg-white border-2 border-indigo-50 rounded-2xl overflow-hidden mb-6 shadow-sm mt-3">
+    <div class="bg-indigo-50/50 px-5 py-3 border-b border-indigo-100 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-indigo-700">Reservation Guarantee</span>
+        </div>
+        <i class="fa-solid fa-shield-halved text-indigo-400 text-xs"></i>
+    </div>
+
+    <div class="p-5">
+        <div class="flex justify-between items-center mb-5">
+            <div>
+                <p class="text-xs text-slate-500 font-medium">Deposit Amount</p>
+                <h4 class="text-3xl font-black text-slate-900" id="dynamic-deposit">
+                    {% if business.deposit_type == 'percentage' %}
+                        {{ business.deposit_percentage }}%
+                    {% else %}
+                        R{{ business.deposit_amount|floatformat:0 }}
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="text-right">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-tighter">
+                    Secured by PayFast
+                </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Refund Policy</span>
+                </div>
+                <p class="text-xs font-semibold text-slate-700 leading-snug">
+                    {{ business.deposit_policy }}
+                </p>
+            </div>
+
+            <div class="space-y-1 border-l border-slate-100 pl-4">
+                <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Window</span>
+                </div>
+                <p class="text-xs font-semibold text-slate-700 leading-snug">
+                    {{ business.reschedule_window_hours }} Hour Reschedule
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="group relative">
+    <label for="deposit-policy" class="flex items-center gap-4 p-4 rounded-xl border-2 border-slate-100 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 transition-all duration-200 cursor-pointer">
+        <div class="relative flex items-center justify-center">
+            <input id="deposit-policy" type="checkbox" required
+                   class="peer h-6 w-6 cursor-pointer appearance-none rounded-lg border-2 border-slate-200 bg-slate-50 checked:bg-indigo-600 checked:border-indigo-600 transition-all">
+            <i class="fa-solid fa-check absolute text-white text-xs opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+        </div>
+
+        <div class="flex-1">
+            <p class="text-[11px] leading-relaxed text-slate-600">
+                I acknowledge the <span class="font-bold text-slate-900">deposit requirement</span> and agree to the
+                <span class="text-indigo-600 underline decoration-indigo-200 underline-offset-4 font-medium">Terms of Service</span>.
+            </p>
+        </div>
+    </label>
+</div>
+
+<div class="mt-4 flex items-center justify-center gap-2 opacity-40">
+    <i class="fa-solid fa-lock text-[10px]"></i>
+    <span class="text-[9px] font-bold uppercase tracking-[0.2em]">Secure Checkout</span>
+</div>
+{% endif %}
                         </div>
 
                     </div>
                 </div>
 
+
+
                 <div class="p-6 border-t border-slate-200 bg-white flex gap-4 z-20">
+
                     <button type="button" id="prevBtn" onclick="moveStep(-1)"
                             class="hidden px-6 py-3 rounded-xl border border-slate-200 text-slate-500 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-colors">
                         Back
@@ -865,6 +933,31 @@
             }, 2000);
         }).catch(err => console.error('Failed to copy: ', err));
     }
+
+    const bookingForm = document.getElementById('bookingForm');
+const depositCheckbox = document.getElementById('deposit-policy');
+
+bookingForm.addEventListener('submit', function(e) {
+    // Only validate if the checkbox actually exists in the DOM
+    if (depositCheckbox && !depositCheckbox.checked) {
+        e.preventDefault();
+
+        // Visual feedback
+        depositCheckbox.parentElement.parentElement.classList.add('border-rose-300', 'bg-rose-50');
+        alert("Please accept the deposit policy to continue.");
+
+        return false;
+    }
+});
+
+// Optional: Remove error styling when user clicks it
+if (depositCheckbox) {
+    depositCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            this.parentElement.parentElement.classList.remove('border-rose-300', 'bg-rose-50');
+        }
+    });
+}
 </script>
 </body>
 </html>

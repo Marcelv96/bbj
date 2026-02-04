@@ -323,13 +323,14 @@ def send_owner_paid_notification(appointment):
 import hashlib
 from urllib.parse import urlencode
 from django.conf import settings
+# Change this line:
+def generate_payfast_url(business, amount=None):  # Add =None here
+    amount = business.subscription_price          # This pulls R199 or R349 automatically
 
-def generate_payfast_url(business, amount):
-    # Use a list of tuples to maintain order for signature
     params = [
-        ('merchant_id', '33083387'), # Your platform ID
-        ('merchant_key', 'su9wfcs6tngdj'),
-        ('return_url', 'https://www.getmebooked.co.za/help/',),
+        ('merchant_id', settings.PAYFAST_MERCHANT_ID),
+        ('merchant_key', settings.PAYFAST_MERCHANT_KEY),
+        ('return_url', 'https://www.getmebooked.co.za/help/'),
         ('cancel_url', 'https://www.getmebooked.co.za/business/onboarding/'),
         ('notify_url', 'https://www.getmebooked.co.za/payfast/itn/'),
         ('m_payment_id', f"SUB-{business.id}-{int(timezone.now().timestamp())}"),
@@ -338,21 +339,21 @@ def generate_payfast_url(business, amount):
         ('custom_int1', str(business.id)),
     ]
 
-    # Generate Signature
-    pf_common = ""
+    pf_string = ""
     for key, value in params:
         if value:
-            pf_common += f"{key}={urllib.parse.quote_plus(str(value).strip())}&"
+            pf_string += f"{key}={urllib.parse.quote_plus(str(value).strip())}&"
 
-    pf_string = pf_common + f"passphrase={urllib.parse.quote_plus('VanWyknBake420')}"
+    pf_string = pf_string.rstrip("&")
+
+    passphrase = (settings.PAYFAST_PASSPHRASE or "").strip()
+    if passphrase:
+        pf_string += f"&passphrase={urllib.parse.quote_plus(passphrase)}"
+
     signature = hashlib.md5(pf_string.encode()).hexdigest()
 
-    # Build final URL
-    payload = dict(params)
-    payload['signature'] = signature
-
-    base_url = "https://www.payfast.co.za/eng/process"
-    return f"{base_url}?{urllib.parse.urlencode(payload)}" # Removed the '}'
+    final_params = params + [('signature', signature)]
+    return "https://www.payfast.co.za/eng/process?" + urllib.parse.urlencode(final_params)
 
 import hashlib
 import urllib.parse
@@ -381,56 +382,51 @@ def calculate_deposit_amount(business, service_price):
 import hashlib
 import urllib.parse
 from django.utils import timezone
+import hashlib
+import urllib.parse
+from django.utils import timezone
+
 
 def generate_appointment_payfast_url(request, appointment):
-    """
-    Generates the secure PayFast URL for a LIVE appointment deposit.
-    Includes timestamp to allow retries/cancellations without 'Duplicate Transaction' errors.
-    """
     business = appointment.booking_form.business
 
-    # 1. Credentials
-    m_id = str(business.payfast_merchant_id or "").strip()
-    m_key = str(business.payfast_merchant_key or "").strip()
-    passphrase = "VanWyknBake420"
+    merchant_id = str(business.payfast_merchant_id).strip()
+    merchant_key = str(business.payfast_merchant_key).strip()
+    passphrase = (business.payfast_passphrase or "").strip()
 
-    amount_val = appointment.amount_to_pay
-
-    # 2. Parameters
-    payfast_params = [
-        ('merchant_id', m_id),
-        ('merchant_key', m_key),
-        ('return_url', request.build_absolute_uri(f'/booking/success/{appointment.id}/')),
-        ('cancel_url', request.build_absolute_uri('/')),
-        ('notify_url', 'https://www.getmebooked.co.za/payfast/itn/'),
-        ('name_first', str(appointment.guest_name).split()[0] if appointment.guest_name else "Guest"),
-        ('email_address', str(appointment.guest_email or "")),
-        # CRITICAL FIX: Added timestamp to make every attempt unique
-        ('m_payment_id', f"APP-{appointment.id}-{int(timezone.now().timestamp())}"),
-        ('amount', f"{amount_val:.2f}"),
-        ('item_name', f"Deposit: {appointment.service.name}"),
-        ('custom_int1', str(appointment.id)),
+    params = [
+        ("merchant_id", merchant_id),
+        ("merchant_key", merchant_key),
+        ("return_url", request.build_absolute_uri(
+            f"/booking/success/{appointment.id}/"
+        )),
+        ("cancel_url", request.build_absolute_uri("/")),
+        ("notify_url", "https://www.getmebooked.co.za/payfast/itn/"),
+        ("name_first", appointment.guest_name.split()[0] if appointment.guest_name else "Guest"),
+        ("email_address", appointment.guest_email or ""),
+        ("m_payment_id", f"APP-{appointment.id}-{int(timezone.now().timestamp())}"),
+        ("amount", f"{appointment.amount_to_pay:.2f}"),
+        ("item_name", f"Deposit: {appointment.service.name}"),
+        ("custom_int1", str(appointment.id)),
     ]
 
-    # 3. Signature Generation (With Empty Value Cleaning)
-    # We filter out empty values BEFORE generating the signature string
-    clean_params = [(k, v) for k, v in payfast_params if v.strip()]
+    # Remove empty values
+    params = [(k, v) for k, v in params if str(v).strip()]
 
-    pf_common = ""
-    for key, value in clean_params:
-        pf_common += f"{key}={urllib.parse.quote_plus(str(value).strip())}&"
+    pf_string = ""
+    for key, value in params:
+        pf_string += f"{key}={urllib.parse.quote_plus(str(value))}&"
 
-    pf_string = pf_common.rstrip('&')
+    pf_string = pf_string.rstrip("&")
+
     if passphrase:
-        pf_string += f"&passphrase={urllib.parse.quote_plus(passphrase.strip())}"
+        pf_string += f"&passphrase={urllib.parse.quote_plus(passphrase)}"
 
     signature = hashlib.md5(pf_string.encode()).hexdigest()
 
-    # 4. Build Final Params
-    final_params = clean_params.copy()
-    final_params.append(('signature', signature))
+    params.append(("signature", signature))
 
-    return "https://www.payfast.co.za/eng/process?" + urllib.parse.urlencode(final_params)
+    return "https://www.payfast.co.za/eng/process?" + urllib.parse.urlencode(params)
 
 
 from django.core.mail import send_mail
@@ -522,3 +518,62 @@ def send_push_notification(player_ids, message):
     )
 
     logger.info(f"OneSignal response: {response.text}")
+
+
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils import timezone
+from django.utils.timezone import localtime
+from datetime import timedelta
+from django.conf import settings
+from .models import Business
+import logging
+
+logger = logging.getLogger(__name__)
+
+def send_subscription_expiry_reminders():
+    """
+    Checks for businesses expiring in exactly 1 or 2 days and sends reminders.
+    Designed to be run once daily via PythonAnywhere Scheduled Tasks.
+    """
+    # Use localtime to ensure we match the business owner's day
+    today = localtime(timezone.now()).date()
+
+    reminders = [
+        {'days': 2, 'target_date': today + timedelta(days=2)},
+        {'days': 1, 'target_date': today + timedelta(days=1)},
+    ]
+
+    for reminder in reminders:
+        # Filter for the date part of the DateTimeField
+        expiring_businesses = Business.objects.filter(
+            subscription_end_date__date=reminder['target_date']
+        )
+
+        logger.info(f"Checking for {reminder['days']} day reminders. Found: {expiring_businesses.count()}")
+
+        for business in expiring_businesses:
+            subject = f"⚠️ Reminder: Your {business.name} subscription expires in {reminder['days']} day(s)"
+
+            context = {
+                'business': business,
+                'days_left': reminder['days'],
+            }
+
+            html_content = render_to_string('emails/subscription_expiry.html', context)
+            # Fallback text for email clients that don't support HTML
+            text_content = f"Hi {business.owner.first_name}, your subscription for {business.name} expires in {reminder['days']} days. Renew here: https://www.getmebooked.co.za/business/{business.id}/owner/dashboard/"
+
+            try:
+                msg = EmailMultiAlternatives(
+                    subject,
+                    text_content,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [business.owner.email]
+                )
+                msg.attach_alternative(html_content, "text/html")
+                msg.send(fail_silently=False) # Keep False while testing to see errors in task logs
+                logger.info(f"✅ Expiry reminder sent to {business.owner.email} for {business.name}")
+            except Exception as e:
+                logger.error(f"❌ Failed to send expiry reminder to {business.owner.email}: {str(e)}")

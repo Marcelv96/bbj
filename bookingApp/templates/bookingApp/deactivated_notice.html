@@ -1,0 +1,30 @@
+{% extends 'bookingApp/base.html' %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <div class="max-w-md w-full bg-white border border-slate-200 p-8 text-center shadow-lg rounded-xl">
+        <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fa-solid fa-user-slash text-3xl"></i>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-slate-900 mb-2">Account Deactivated</h1>
+        <p class="text-slate-600 mb-6">
+            Hi <strong>{{ staff.name }}</strong>, your account for <strong>{{ business.name }}</strong> is currently inactive. 
+            You can still manage your personal settings, but dashboard access is restricted.
+        </p>
+
+        <div class="space-y-3">
+            <a href="{% url 'profile' %}" class="block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors">
+                <i class="fa-solid fa-user-gear mr-2"></i> Go to My Profile
+            </a>
+            
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="w-full py-3 px-4 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold rounded-lg transition-colors">
+                    Log Out
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

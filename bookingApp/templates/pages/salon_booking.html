@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="relative pt-20 pb-28 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <h1 class="text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] mb-6 tracking-tight">
+                    Take Control of <br/>
+                    <span class="text-brand-600">Your Bookings.</span>
+                </h1>
+                <p class="text-xl text-slate-600 mb-10 max-w-lg leading-relaxed">
+                    The booking infrastructure built for South African scale. Manage unlimited staff and services with optional PayFast deposits to end no-shows.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{% url 'register' %}" class="bg-brand-600 text-white px-10 py-4 rounded-lg font-bold text-center hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/10">
+                        Get Started Free
+                    </a>
+                </div>
+            </div>
+
+            <div class="lg:ml-auto w-full max-w-md">
+                <div class="bg-slate-900 rounded-3xl p-8 shadow-2xl relative">
+                    <div class="absolute -top-4 -right-4 bg-brand-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">Owner Dashboard</div>
+                    <div class="space-y-6">
+                        <div class="pb-6 border-b border-slate-800">
+                            <p class="text-slate-400 text-xs font-bold uppercase mb-4">Deposit Settings</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-white font-medium">Require PayFast Deposit</span>
+                                <div class="w-10 h-5 bg-brand-500 rounded-full relative">
+                                    <div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-emerald-500/20 text-emerald-500 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-whatsapp"></i>
+                                    </div>
+                                    <span class="text-sm text-slate-300">One-Click WhatsApp</span>
+                                </div>
+                                <span class="text-[10px] font-bold text-brand-400 uppercase">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-24 bg-slate-50 border-y border-slate-200">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="bg-white p-8 rounded-2xl border border-slate-200">
+                <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-wallet text-xl"></i>
+                </div>
+                <h4 class="font-bold text-slate-900 mb-3">Optional Deposits</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">You create the rules. Choose which services require a PayFast deposit and which don't. Money goes straight to your PayFast account.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl border border-slate-200">
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-6">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                </div>
+                <h4 class="font-bold text-slate-900 mb-3">One-Click WhatsApp</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">Stop typing the same messages. Use prefilled one-click buttons to send reminders or updates to clients instantly.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl border border-slate-200">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-envelope-open-text text-xl"></i>
+                </div>
+                <h4 class="font-bold text-slate-900 mb-3">Email Automation</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">Automated reminders are sent via email to ensure your clients never forget an appointment, drastically reducing no-shows.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl border border-slate-200">
+                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-users text-xl"></i>
+                </div>
+                <h4 class="font-bold text-slate-900 mb-3">Unlimited Everything</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">Grow without limits. Add as many staff members and services as your business needs at no extra cost.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid lg:grid-cols-2 gap-20 items-center">
+            <div>
+                <h3 class="text-3xl font-bold text-slate-900 mb-6">Built for the Business Owner</h3>
+                <p class="text-slate-600 mb-8 leading-relaxed">We provide the tools; you provide the rules. GetMeBooked is designed to stay out of your way while handling the heavy lifting of scheduling.</p>
+                
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-4">
+                        <i class="fa fa-check-circle text-brand-600 mt-1"></i>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">Full Control over Rules</p>
+                            <p class="text-xs text-slate-500">Decide your own cancellation windows and deposit requirements.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <i class="fa fa-check-circle text-brand-600 mt-1"></i>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">Eliminate Administrative Friction</p>
+                            <p class="text-xs text-slate-500">Prefilled WhatsApp buttons mean you spend less time on your phone and more time on your craft.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="bg-slate-100 rounded-2xl p-4">
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white">
+                            <i class="fa fa-whatsapp"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-black text-slate-400 uppercase">WhatsApp Preview</p>
+                            <p class="text-sm font-bold text-slate-900 italic">"Hi Sarah, your booking for..."</p>
+                        </div>
+                    </div>
+                    <div class="h-2 w-full bg-slate-100 rounded mb-2"></div>
+                    <div class="h-2 w-2/3 bg-slate-100 rounded"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-24 bg-brand-600">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+        <h2 class="text-4xl font-bold text-white mb-6">Stop no-shows. Start scaling.</h2>
+        <p class="text-brand-100 mb-10 text-lg">Unlimited staff, unlimited services, and total control over your PayFast deposits.</p>
+        <a href="{% url 'register' %}" class="bg-white text-brand-600 px-12 py-4 rounded-lg font-bold hover:bg-slate-50 transition-all inline-block">
+            Create Your Account Now
+        </a>
+    </div>
+</section>
+{% endblock %}

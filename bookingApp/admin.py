@@ -8,6 +8,24 @@ from .models import SavedBusiness, Review
 # admin.py
 from django.contrib import admin
 from .models import DemoLead
+from django.contrib import admin
+from .models import VisitorLog
+
+
+@admin.register(VisitorLog)
+class VisitorLogAdmin(admin.ModelAdmin):
+    # What columns to show in the list
+    list_display = ('timestamp', 'email_status', 'path', 'ip_address', 'referer')
+    # Add filters on the right sidebar
+    list_filter = ('timestamp', 'path')
+    # Allow searching by email or IP
+    search_fields = ('email', 'ip_address', 'session_key')
+
+    def email_status(self, obj):
+        if obj.email:
+            return obj.email
+        return "🕵️ Anonymous"
+    email_status.short_description = 'User Identity'
 
 admin.site.register(ClientProfile)
 
@@ -75,13 +93,13 @@ class ProfileAdmin(admin.ModelAdmin):
     # list_display = ['user', 'is_business_owner', 'phone_number']
 
     # FIXED: Use existing fields from your Profile model
-    list_display = ['user', 'phone_number', 'email_notifications']
+    list_display = ['user','last_active', 'phone_number', 'email_notifications']
     search_fields = ['user__username', 'phone_number']
 
 
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'slug', 'created_at', 'payfast_merchant_id', 'payfast_merchant_key')
+    list_display = ('name', 'owner','last_active', 'slug', 'created_at', 'payfast_merchant_id', 'payfast_merchant_key')
     list_filter = ('created_at',)
     search_fields = ('name', 'owner__username')
     prepopulated_fields = {'slug': ('name',)}
@@ -114,7 +132,7 @@ from .models import Appointment
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
     # Changed 'confirmed' to 'status'
-    list_display = ('id', 'customer', 'booking_form', 'service', 'staff', 'appointment_date', 'appointment_start_time', 'status')
+    list_display = ('guest_name', 'id', 'customer', 'booking_form', 'service', 'staff', 'appointment_date', 'appointment_start_time', 'status')
     # Filter by the new status choices
     list_filter = ('status', 'appointment_date', 'booking_form')
     search_fields = ('customer__username', 'booking_form__business__name', 'service__name')
